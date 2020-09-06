@@ -1,6 +1,11 @@
 import React from 'react';
+import Button from 'react-bootstrap/Button';
 
 export function Login() {
-    return <h2>Login</h2>;
+    return <div>
+        <form>
+            <Button>Login</Button>
+        </form>
+    </div>;
 }
   
