@@ -12,8 +12,7 @@ import { Login } from './pages/Login';
 import { Profile } from './pages/Profile';
 import { About } from './pages/About';
 
-import Navbar from 'react-bootstrap/Navbar';
-import Nav from 'react-bootstrap/Nav';
+import {Navbar, Nav, Image} from 'react-bootstrap';
 
 class App extends React.Component {
   render() {
@@ -28,6 +27,10 @@ class App extends React.Component {
                 <Nav.Link href="/login">Login</Nav.Link>
                 <Nav.Link href="/about">About</Nav.Link>
               </Nav>
+              <Navbar.Text>
+                <Image src="" rounded />
+                Signed in as: <a href="#login">Mark Otto</a>
+              </Navbar.Text>
             </Navbar.Collapse>
         </Navbar>
       <Switch>
