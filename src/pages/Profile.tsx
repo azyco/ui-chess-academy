@@ -1,7 +1,12 @@
 import React from 'react';
+import { Container } from 'react-bootstrap';
 
 export class Profile extends React.Component {
     render() {
-        return <h2>About</h2>;
+        return (
+        <Container>
+            Profile-Page
+        </Container>
+        );
     }
 }

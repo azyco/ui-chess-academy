@@ -1,11 +1,11 @@
 import React from 'react';
-import Button from 'react-bootstrap/Button';
+import { Container } from 'react-bootstrap';
 
 export function Login() {
-    return <div>
-        <form>
-            <Button>Login</Button>
-        </form>
-    </div>;
+    return (
+    <Container>
+        Login-Page
+    </Container>
+    );
 }
   
