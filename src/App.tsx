@@ -40,6 +40,10 @@ class App extends React.Component {
                 </Dropdown>
                 <Button variant="dark" href="/about">About</Button>
               </Nav>
+              <Navbar.Text>
+                <Image src="" rounded />
+                Signed in as: <a href="#login">Mark Otto</a>
+              </Navbar.Text>
             </Navbar.Collapse>
         </Navbar>
       <Switch>
