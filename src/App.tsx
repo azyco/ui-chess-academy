@@ -29,6 +29,10 @@ class App extends React.Component {
                 <Nav.Link href="/login">Login</Nav.Link>
                 <Nav.Link href="/about">About</Nav.Link>
               </Nav>
+              <Navbar.Text>
+                <Image src="" rounded />
+                Signed in as: <a href="#login">Mark Otto</a>
+              </Navbar.Text>
             </Navbar.Collapse>
         </Navbar>
       <Switch>
