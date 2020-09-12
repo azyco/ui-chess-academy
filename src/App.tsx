@@ -11,6 +11,7 @@ import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { Profile } from './pages/Profile';
 import { About } from './pages/About';
+import { Register } from './pages/Register';
 
 import {Navbar, Nav, Image} from 'react-bootstrap';
 
@@ -42,6 +43,9 @@ class App extends React.Component {
         </Route>
         <Route path="/login">
           <Login />
+        </Route>
+        <Route path="/register">
+          <Register />
         </Route>
         <Route path="/">
           <Home />
