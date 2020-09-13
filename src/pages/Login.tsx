@@ -23,7 +23,7 @@ export class Login extends React.Component<any,any> {
     render()
     {
         return (
-            <Container>
+            <Container fluid="sm">
                 {this.renderRedirect()}
                 <Row>
                     <Col>

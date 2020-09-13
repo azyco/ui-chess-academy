@@ -12,15 +12,16 @@ import { Login } from './pages/Login';
 import { Profile } from './pages/Profile';
 import { About } from './pages/About';
 import { Register } from './pages/Register';
+import config from './config';
 
-import {Navbar, Nav, Image} from 'react-bootstrap';
+import {Navbar, Nav,} from 'react-bootstrap';
 
 class App extends React.Component {
   render() {
     return (
     <Router>
-        <Navbar bg="dark" variant="dark" expand="lg">
-            <Navbar.Brand href="/">Chess Academy</Navbar.Brand>
+        <Navbar fixed="top" bg="dark" variant="dark" expand="lg">
+            <Navbar.Brand href="/">{config.websiteName}</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="mr-auto">
@@ -28,10 +29,6 @@ class App extends React.Component {
                 <Nav.Link href="/login">Login</Nav.Link>
                 <Nav.Link href="/about">About</Nav.Link>
               </Nav>
-              <Navbar.Text>
-                <Image src="" rounded />
-                Signed in as: <a href="#login">Mark Otto</a>
-              </Navbar.Text>
             </Navbar.Collapse>
         </Navbar>
       <Switch>

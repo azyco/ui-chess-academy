@@ -1,13 +1,19 @@
 import React from 'react';
 
-import { Container } from 'react-bootstrap';
+import { Container, Jumbotron } from 'react-bootstrap';
+import config from '../config';
 
 export class About extends React.Component
 {
     render (){
         return(
-        <Container>
-            About-Page
+        <Container fluid>
+            <Jumbotron>
+                <h1>About {config.websiteName}</h1>
+                <p>
+                    {config.aboutDescription}
+                </p>
+            </Jumbotron>
         </Container>
         )
     }
