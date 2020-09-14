@@ -70,6 +70,12 @@ export class Login extends React.Component<any,any> {
         else if (this.state.redirect_to === 'profile') {
             return <Redirect to='/profile' />
         }
+        else if (this.state.redirect_to === 'login') {
+            return <Redirect to='/login' />
+        }
+        else if (this.state.redirect_to === 'profile') {
+            return <Redirect to='/profile' />
+        }
     }
 
     render()
