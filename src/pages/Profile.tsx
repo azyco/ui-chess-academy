@@ -1,6 +1,5 @@
 import React from 'react';
-
-// import { Container } from 'react-bootstrap';
+import { Container, Alert } from 'react-bootstrap';
 
 // import { Dashboard_Student } from './student/Dashboard_Student';
 // import { Dashboard_Coach} from './coach/Dashboard_Coach';
@@ -22,8 +21,11 @@ export class Profile extends React.Component<profile_prop_type,profile_state_typ
     
     render() {
         return(
-        <div>
-        </div>
+        <Container>
+            <Alert  variant="success">
+                You have logged in succesfully.
+            </Alert>
+        </Container>
         );
         }
 }
