@@ -15,7 +15,7 @@ export class About extends React.Component
                 </p>
             </Jumbotron>
                 <Card style={{marginTop:'2em'}}>
-                <Card.Img variant="top" src="home_carousel_placeholder.jpg" />
+                <Card.Img variant="top" src="" />
                 <Card.Body>
                     <Card.Title>Card Title</Card.Title>
                     <Card.Text>
@@ -26,7 +26,7 @@ export class About extends React.Component
                 </Card>
 
                 <Card style={{marginTop:'2em'}}>
-                <Card.Img variant="top" src="home_carousel_placeholder_2.png" />
+                <Card.Img variant="top" src="" />
                 <Card.Body>
                     <Card.Title>Card Title</Card.Title>
                     <Card.Text>
@@ -37,7 +37,7 @@ export class About extends React.Component
                 </Card>
 
                 <Card style={{marginTop:'2em'}}>
-                <Card.Img variant="top" src="home_carousel_placeholder_3.jpg" />
+                <Card.Img variant="top" src="" />
                 <Card.Body>
                     <Card.Title>Card Title</Card.Title>
                     <Card.Text>
