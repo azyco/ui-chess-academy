@@ -11,10 +11,12 @@ import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { Profile } from './pages/Profile';
 import { About } from './pages/About';
-import { Register } from './pages/Register';
+import { RegisterStudent } from './pages/RegisterStudent';
+import { RegisterCoach } from './pages/RegisterCoach';
 import config from './config';
 
-import {Navbar, Nav,} from 'react-bootstrap';
+import {Navbar, Nav, Dropdown, Button} from 'react-bootstrap';
+
 
 class App extends React.Component {
   render() {
@@ -25,9 +27,18 @@ class App extends React.Component {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="mr-auto">
-                <Nav.Link href="/profile">Profile</Nav.Link>
-                <Nav.Link href="/login">Login</Nav.Link>
-                <Nav.Link href="/about">About</Nav.Link>
+                <Button variant="dark" href="/profile">Profile</Button>
+                <Button variant="dark" href="/login">Login</Button>
+                <Dropdown>
+                  <Dropdown.Toggle variant="dark" id="dropdown-basic">
+                    Register
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item href="/register_student">Student</Dropdown.Item>
+                    <Dropdown.Item href="/register_coach" disabled>Coach</Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+                <Button variant="dark" href="/about">About</Button>
               </Nav>
             </Navbar.Collapse>
         </Navbar>
@@ -41,8 +52,11 @@ class App extends React.Component {
         <Route path="/login">
           <Login />
         </Route>
-        <Route path="/register">
-          <Register />
+        <Route path="/register_student">
+          <RegisterStudent />
+        </Route>
+        <Route path="/register_coach">
+          <RegisterCoach />
         </Route>
         <Route path="/">
           <Home />

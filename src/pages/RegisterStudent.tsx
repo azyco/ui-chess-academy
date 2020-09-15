@@ -1,6 +1,6 @@
 import React from 'react';
 import Api from '../api/backend';
-import { Container, Form, Button, Row, Col } from 'react-bootstrap';
+import { Container, Form, Button, Card } from 'react-bootstrap';
 import CryptoJS from 'crypto-js';
 
 interface IRegisterState {
@@ -10,7 +10,7 @@ interface IRegisterState {
 }
 
 
-export class Register extends React.Component<any, IRegisterState> {
+export class RegisterStudent extends React.Component<any, IRegisterState> {
     constructor(props: any) {
         super(props);
         this.state = {
@@ -22,7 +22,7 @@ export class Register extends React.Component<any, IRegisterState> {
 
     handleRegister = () => {
         const encryptedPassword = CryptoJS.SHA1(this.state.password).toString(CryptoJS.enc.Hex)
-        Api.post('/register', {email: this.state.email, password: encryptedPassword}).then((response) => {
+        Api.post('/register_student', {email: this.state.email, password: encryptedPassword}).then((response) => {
             console.log(response);
         });
         this.setState({ registerButtonEnabled: false });
@@ -40,30 +40,22 @@ export class Register extends React.Component<any, IRegisterState> {
     {
         return (
             <Container>
-                <Row>
-                    <Col>
-                        <h1>
-                            Register
-                        </h1>
-                    </Col>            
-                </Row>
-                <Row>
-                    <Col>
+                <Card bg="light">
+                    <Card.Header>Student Registration</Card.Header>
+                    <Card.Body>
                         <Form>
                             <Form.Group controlId="formBasicEmail">
-                                <Form.Label>Email address</Form.Label>
                                 <Form.Control value={this.state.email} onChange={this.onEmailChange} type="email" placeholder="Enter email" />
                             </Form.Group>
                             <Form.Group controlId="formBasicPassword">
-                                <Form.Label>Password</Form.Label>
                                 <Form.Control value={this.state.password} onChange={this.onPasswordChange} type="password" placeholder="Password" />
                             </Form.Group>
-                            <Button disabled={!this.state.registerButtonEnabled} onClick={this.handleRegister} variant="primary">
-                                Register as student
+                            <Button disabled={!this.state.registerButtonEnabled} onClick={this.handleRegister} variant="dark">
+                                Register
                             </Button>
                         </Form>
-                    </Col>
-                </Row>
+                    </Card.Body>
+                </Card>
             </Container>
         );
     }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Form, Button, Row, Col, Alert } from 'react-bootstrap';
+import { Container, Form, Button, Row, Col, Alert,Card } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom'
 import CryptoJS from 'crypto-js';
 
@@ -13,7 +13,7 @@ export class Login extends React.Component<any,any> {
             password: "",
             redirect_to: 'login',
             user_is_logged_in : false,
-            render_alert:false 
+            render_alert:'' 
         };
         this.badLoginAlert.bind(this.state);
     }
@@ -25,24 +25,29 @@ export class Login extends React.Component<any,any> {
                 this.setState({user_is_logged_in:true,redirect_to:'profile'})
             }
             else{
-                this.setState({render_alert:true})
+                this.setState({render_alert:'wronguser'})
             }
             console.log(response);
         },
         ()=>{
             console.log("Error connecting to server");
+            this.setState({render_alert:'serverdown'})
         });
     }
 
     badLoginAlert(){
-        if(this.state.render_alert)
-        {
+        if(this.state.render_alert==='wronguser'){
             return(
             <Alert variant="warning">
                 Wrong E-Mail and/or Password
-            </Alert>
-        );
-    }
+            </Alert>);
+            }
+        else if(this.state.render_alert==='serverdown'){
+            return(
+            <Alert variant="warning">
+                Error connecting to Server
+            </Alert>);
+            }
         
     }
     
@@ -59,10 +64,7 @@ export class Login extends React.Component<any,any> {
     }
 
     renderRedirect = () => {
-        if (this.state.redirect_to === 'register') {
-            return <Redirect to='/register' />
-        }
-        else if (this.state.redirect_to === 'login') {
+        if (this.state.redirect_to === 'login') {
             return <Redirect to='/login' />
         }
         else if (this.state.redirect_to === 'profile') {
@@ -73,48 +75,26 @@ export class Login extends React.Component<any,any> {
     render()
     {
         return (
-            <Container fluid="sm">
+            <Container >
                 {this.renderRedirect()}
                 {this.badLoginAlert()}
-                <Row>
-                    <Col>
-                        <h1>
-                            Login
-                        </h1>
-                    </Col>            
-                </Row>
-                <Row>
-                    <Col>
-                        <Button size="lg" variant="primary" >
-                            Login with Google
-                        </Button>
-                    </Col>  
-                </Row>
-                <Row>
-                    <Col>
+                <Card bg="light">
+                    <Card.Header>Login</Card.Header>
+                    <Card.Body>
                         <Form>
                         <Form.Group controlId="formBasicEmail">
-                        <Form.Label>Email address</Form.Label>
                         <Form.Control onChange={this.onEmailChange} value={this.state.email} type="email" placeholder="Enter email" />
                         </Form.Group>
 
                         <Form.Group controlId="formBasicPassword">
-                        <Form.Label>Password</Form.Label>
                         <Form.Control onChange={this.onPasswordChange} value={this.state.password} type="password" placeholder="Password" />
                         </Form.Group>
-                            <Button onClick={this.handleLoginClick} variant="primary">
-                                Submit
+                            <Button onClick={this.handleLoginClick} variant="dark">
+                                Login
                             </Button>
                         </Form>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <Button onClick={this.handleRegisterClick} variant="secondary">
-                                    Register
-                        </Button>
-                    </Col>
-                </Row>
+                        </Card.Body>
+                </Card>
             </Container>
         );
     }
