@@ -1,6 +1,20 @@
 import React from 'react';
+
+import config from '../config';
  
-export class Admin extends React.Component{
+type AdminProps = {
+
+}
+
+type AdminState = {
+
+}
+
+export class Admin extends React.Component<AdminProps, AdminState>{
+    constructor(props:AdminState){
+        super(props)
+    }
+
     render (){
         return(
             <div>

@@ -5,6 +5,7 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
+  Link
 } from "react-router-dom";
 
 import { Home } from './pages/Home';
@@ -15,10 +16,41 @@ import { RegisterStudent } from './pages/RegisterStudent';
 import { RegisterCoach } from './pages/RegisterCoach';
 import config from './config';
 
-import {Navbar, Nav, Dropdown, Button} from 'react-bootstrap';
+import {Navbar, Nav, NavDropdown} from 'react-bootstrap';
 
+type AppClassProps = {
 
-class App extends React.Component {
+};
+
+type AppClassState = {
+  signed_in: boolean
+  username: string
+}
+
+class App extends React.Component<AppClassProps, AppClassState>{
+  constructor(props:AppClassProps){
+    super(props);
+    this.state = {signed_in:true , username:'Mark Otto'}
+    this.signInPrompt.bind(this.state);
+  }
+
+  signInPrompt(){
+    if (this.state.signed_in){
+      return (
+        <Navbar.Text>
+          {config.loginWelcomeText}, <Link style={{textDecoration: 'none'}} to="/profile">{this.state.username}</Link>
+        </Navbar.Text>
+        );
+    }
+    else{
+      return (
+        <Navbar.Text>
+          <Link style={{textDecoration: 'none'}} to="/login">{config.loginText}</Link>
+        </Navbar.Text>
+        );
+    }
+    
+  }
   render() {
     return (
     <Router>
@@ -27,21 +59,15 @@ class App extends React.Component {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="mr-auto">
-                <Button variant="dark" href="/profile">Profile</Button>
-                <Button variant="dark" href="/login">Login</Button>
-                <Dropdown>
-                  <Dropdown.Toggle variant="dark" id="dropdown-basic">
-                    Register
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    <Dropdown.Item href="/register_student">Student</Dropdown.Item>
-                    <Dropdown.Item href="/register_coach" disabled>Coach</Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-                <Button variant="dark" href="/about">About</Button>
+                <NavDropdown title={config.registerText} id="basic-nav-dropdown">
+                  <NavDropdown.Item href="/register_student">{config.studentText}</NavDropdown.Item>
+                  <NavDropdown.Item href="/register_coach" disabled>{config.coachText}</NavDropdown.Item>
+                </NavDropdown>
+                <Nav.Link href="/about">{config.aboutText}</Nav.Link>
               </Nav>
+              {this.signInPrompt()}
             </Navbar.Collapse>
-        </Navbar>
+        </Navbar> 
       <Switch>
         <Route path="/about">
           <About />

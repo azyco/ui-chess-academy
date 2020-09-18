@@ -7,20 +7,20 @@ export class About extends React.Component
 {
     render (){
         return(
-        <Container fluid>
+            <div>
             <Jumbotron>
-                <h1>About {config.websiteName}</h1>
+                <h1>{config.aboutText} {config.websiteName}</h1>
                 <p>
                     {config.aboutDescription}
                 </p>
             </Jumbotron>
+            <Container fluid>
                 <Card style={{marginTop:'2em'}}>
                 <Card.Img variant="top" src="" />
                 <Card.Body>
-                    <Card.Title>Card Title</Card.Title>
+                    <Card.Title>{config.aboutCardTitle1}</Card.Title>
                     <Card.Text>
-                    Some quick example text to build on the card title and make up the bulk of
-                    the card's content.
+                        {config.aboutCardBody1}
                     </Card.Text>
                 </Card.Body>
                 </Card>
@@ -28,10 +28,9 @@ export class About extends React.Component
                 <Card style={{marginTop:'2em'}}>
                 <Card.Img variant="top" src="" />
                 <Card.Body>
-                    <Card.Title>Card Title</Card.Title>
+                    <Card.Title>{config.aboutCardTitle2}</Card.Title>
                     <Card.Text>
-                    Some quick example text to build on the card title and make up the bulk of
-                    the card's content.
+                        {config.aboutCardBody2}
                     </Card.Text>
                 </Card.Body>
                 </Card>
@@ -39,14 +38,14 @@ export class About extends React.Component
                 <Card style={{marginTop:'2em'}}>
                 <Card.Img variant="top" src="" />
                 <Card.Body>
-                    <Card.Title>Card Title</Card.Title>
+                    <Card.Title>{config.aboutCardTitle3}</Card.Title>
                     <Card.Text>
-                    Some quick example text to build on the card title and make up the bulk of
-                    the card's content.
+                        {config.aboutCardBody3}
                     </Card.Text>
                 </Card.Body>
                 </Card>
             </Container>
+            </div>
         )
     }
 }

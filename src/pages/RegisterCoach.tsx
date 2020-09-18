@@ -1,17 +1,22 @@
 import React from 'react';
 import Api from '../api/backend';
+import config from '../config';
+
 import { Container, Form, Button, Card } from 'react-bootstrap';
 import CryptoJS from 'crypto-js';
 
-interface IRegisterState {
-    email:   string;
-    password:  string;
-    registerButtonEnabled: boolean;
+type RegisterCoachProps = {
+
 }
 
+type RegisterCoachState = {
+    email: string,
+    password: string,
+    registerButtonEnabled: boolean
+}
 
-export class RegisterCoach extends React.Component<any, IRegisterState> {
-    constructor(props: any) {
+export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterCoachState> {
+    constructor(props: RegisterCoachProps) {
         super(props);
         this.state = {
             email: "",
@@ -40,18 +45,18 @@ export class RegisterCoach extends React.Component<any, IRegisterState> {
     {
         return (
             <Container>
-                <Card bg="light">
-                    <Card.Header>Coach Registration</Card.Header>
+                <Card bg="light" style={{marginTop:'2em'}}>
+                    <Card.Header>{config.coachRegistrationText}</Card.Header>
                     <Card.Body>
                         <Form>
                             <Form.Group controlId="formBasicEmail">
-                                <Form.Control value={this.state.email} onChange={this.onEmailChange} type="email" placeholder="Enter email" />
+                                <Form.Control value={this.state.email} onChange={this.onEmailChange} type="email" placeholder={config.emailPlaceholderText} />
                             </Form.Group>
                             <Form.Group controlId="formBasicPassword">
-                                <Form.Control value={this.state.password} onChange={this.onPasswordChange} type="password" placeholder="Password" />
+                                <Form.Control value={this.state.password} onChange={this.onPasswordChange} type="password" placeholder={config.passwordPlaceholderText} />
                             </Form.Group>
                             <Button disabled={!this.state.registerButtonEnabled} onClick={this.handleRegister} variant="dark">
-                                Register
+                                {config.registerText}
                             </Button>
                         </Form>
                     </Card.Body>
