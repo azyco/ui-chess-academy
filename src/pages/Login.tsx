@@ -1,19 +1,32 @@
 import React from 'react';
-import { Container, Form, Button, Row, Col, Alert,Card } from 'react-bootstrap';
+import { Container, Form, Button, Alert,Card } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom'
 import CryptoJS from 'crypto-js';
 
 import Api from '../api/backend';
+import config from '../config';
 
-export class Login extends React.Component<any,any> {
-    constructor(props: any) {
+type LoginProps = {
+
+}
+
+type LoginState = {
+    email: string,
+    password: string,
+    redirect_to: string,
+    user_is_logged_in : boolean,
+    render_alert: string 
+}
+
+export class Login extends React.Component<LoginProps,LoginState> {
+    constructor(props: LoginState) {
         super(props);
         this.state = {
             email: "",
             password: "",
             redirect_to: 'login',
             user_is_logged_in : false,
-            render_alert:'' 
+            render_alert:''
         };
         this.badLoginAlert.bind(this.state);
     }
@@ -25,7 +38,7 @@ export class Login extends React.Component<any,any> {
                 this.setState({user_is_logged_in:true,redirect_to:'profile'})
             }
             else{
-                this.setState({render_alert:'wronguser'})
+                this.setState({render_alert:'badlogin'})
             }
             console.log(response);
         },
@@ -36,16 +49,16 @@ export class Login extends React.Component<any,any> {
     }
 
     badLoginAlert(){
-        if(this.state.render_alert==='wronguser'){
+        if(this.state.render_alert==='badlogin'){
             return(
             <Alert variant="warning">
-                Wrong E-Mail and/or Password
+                {config.badLoginAlertText}
             </Alert>);
             }
         else if(this.state.render_alert==='serverdown'){
             return(
             <Alert variant="warning">
-                Error connecting to Server
+                {config.serverDownAlertText}
             </Alert>);
             }
         
@@ -59,12 +72,14 @@ export class Login extends React.Component<any,any> {
         this.setState({password: ev.target.value});
     }
 
-    handleRegisterClick = () => {
-        this.setState({ redirect_to: 'register' });
-    }
-
     renderRedirect = () => {
         if (this.state.redirect_to === 'login') {
+            return <Redirect to='/login' />
+        }
+        else if (this.state.redirect_to === 'profile') {
+            return <Redirect to='/profile' />
+        }
+        else if (this.state.redirect_to === 'login') {
             return <Redirect to='/login' />
         }
         else if (this.state.redirect_to === 'profile') {
@@ -78,19 +93,19 @@ export class Login extends React.Component<any,any> {
             <Container >
                 {this.renderRedirect()}
                 {this.badLoginAlert()}
-                <Card bg="light">
-                    <Card.Header>Login</Card.Header>
+                <Card bg="light" style={{marginTop:'2em'}}>
+                    <Card.Header>{config.loginText}</Card.Header>
                     <Card.Body>
                         <Form>
                         <Form.Group controlId="formBasicEmail">
-                        <Form.Control onChange={this.onEmailChange} value={this.state.email} type="email" placeholder="Enter email" />
+                        <Form.Control onChange={this.onEmailChange} value={this.state.email} type="email" placeholder={config.emailPlaceholderText} />
                         </Form.Group>
 
                         <Form.Group controlId="formBasicPassword">
-                        <Form.Control onChange={this.onPasswordChange} value={this.state.password} type="password" placeholder="Password" />
+                        <Form.Control onChange={this.onPasswordChange} value={this.state.password} type="password" placeholder={config.passwordPlaceholderText} />
                         </Form.Group>
                             <Button onClick={this.handleLoginClick} variant="dark">
-                                Login
+                                {config.loginText}
                             </Button>
                         </Form>
                         </Card.Body>
