@@ -1,22 +1,22 @@
 import React from 'react';
-import Api from '../api/backend';
-import config from '../config';
+import Api from '../../api/backend';
+import config from '../../config';
 
 import { Container, Form, Button, Card } from 'react-bootstrap';
 import CryptoJS from 'crypto-js';
 
-type RegisterStudentProps = {
+type RegisterCoachProps = {
 
 }
 
-type RegisterStudentState = {
+type RegisterCoachState = {
     email: string,
     password: string,
     registerButtonEnabled: boolean
 }
 
-export class RegisterStudent extends React.Component<RegisterStudentProps, RegisterStudentState> {
-    constructor(props: RegisterStudentProps) {
+export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterCoachState> {
+    constructor(props: RegisterCoachProps) {
         super(props);
         this.state = {
             email: "",
@@ -27,7 +27,7 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
 
     handleRegister = () => {
         const encryptedPassword = CryptoJS.SHA1(this.state.password).toString(CryptoJS.enc.Hex)
-        Api.post('/register_student', {email: this.state.email, password: encryptedPassword}).then((response) => {
+        Api.post('/coach', {email: this.state.email, password: encryptedPassword}).then((response) => {
             console.log(response);
         });
         this.setState({ registerButtonEnabled: false });
@@ -46,7 +46,7 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
         return (
             <Container>
                 <Card bg="light" style={{marginTop:'2em'}}>
-                    <Card.Header>{config.studentRegistrationText}</Card.Header>
+                    <Card.Header>{config.coachRegistrationText}</Card.Header>
                     <Card.Body>
                         <Form>
                             <Form.Group controlId="formBasicEmail">

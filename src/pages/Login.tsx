@@ -40,10 +40,9 @@ export class Login extends React.Component<LoginProps,LoginState> {
             else{
                 this.setState({render_alert:'badlogin'})
             }
-            console.log(response);
         },
-        ()=>{
-            console.log("Error connecting to server");
+        (resp)=>{
+            console.log("Error connecting to server", resp);
             this.setState({render_alert:'serverdown'})
         });
     }

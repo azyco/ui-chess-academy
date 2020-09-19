@@ -12,14 +12,14 @@ import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { Profile } from './pages/Profile';
 import { About } from './pages/About';
-import { RegisterStudent } from './pages/RegisterStudent';
-import { RegisterCoach } from './pages/RegisterCoach';
+import { RegisterStudent } from './pages/student/RegisterStudent';
+import { RegisterCoach } from './pages/coach/RegisterCoach';
 import config from './config';
+import Api from './api/backend';
 
 import {Navbar, Nav, NavDropdown} from 'react-bootstrap';
 
 type AppClassProps = {
-
 };
 
 type AppClassState = {
@@ -30,8 +30,20 @@ type AppClassState = {
 class App extends React.Component<AppClassProps, AppClassState>{
   constructor(props:AppClassProps){
     super(props);
-    this.state = {signed_in:true , username:'Mark Otto'}
+    this.state = {
+      signed_in: false,
+      username: ''
+    }
     this.signInPrompt.bind(this.state);
+  }
+
+  componentWillMount() {
+    Api.get('/profile').then((resp) => {
+      console.log(resp.data);
+      this.setState({ signed_in: (resp.data.id !== 0), username: resp.data.email });
+    }).catch((err) => {
+      this.setState({ signed_in: false, username: '' });
+    });
   }
 
   signInPrompt(){
@@ -49,8 +61,8 @@ class App extends React.Component<AppClassProps, AppClassState>{
         </Navbar.Text>
         );
     }
-    
   }
+
   render() {
     return (
     <Router>
@@ -73,7 +85,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
           <About />
         </Route>
         <Route path="/profile">
-          <Profile />
+          <Profile profile={{ username: this.state.username }}/>
         </Route>
         <Route path="/login">
           <Login />

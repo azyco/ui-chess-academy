@@ -9,17 +9,21 @@ import config from '../config';
 // import { Class_Coach} from './coach/Class_Coach';
 
 type ProfileProps = {
-    
+    profile: any;
 };
 
 type ProfileState = {
+    username: string;
     user_is_student:boolean;
 };
 
 export class Profile extends React.Component<ProfileProps,ProfileState> {
-    constructor(props:ProfileState){
+    constructor(props:ProfileProps){
         super(props);
-        this.state= {user_is_student:false};
+        this.state= {
+            username: this.props.profile.username,
+            user_is_student:false
+        };
     }
     
     render() {
