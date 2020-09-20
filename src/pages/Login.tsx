@@ -7,25 +7,23 @@ import Api from '../api/backend';
 import config from '../config';
 
 type LoginProps = {
-
+    onLogin: any,
 }
 
 type LoginState = {
     email: string,
     password: string,
     redirect_to: string,
-    user_is_logged_in : boolean,
     render_alert: string 
 }
 
 export class Login extends React.Component<LoginProps,LoginState> {
-    constructor(props: LoginState) {
+    constructor(props: LoginProps) {
         super(props);
         this.state = {
             email: "",
             password: "",
             redirect_to: 'login',
-            user_is_logged_in : false,
             render_alert:''
         };
         this.badLoginAlert.bind(this.state);
@@ -34,8 +32,10 @@ export class Login extends React.Component<LoginProps,LoginState> {
     handleLoginClick = ()=>{
         const password_hash = CryptoJS.SHA1(this.state.password).toString(CryptoJS.enc.Hex);
         Api.post('/login', {email: this.state.email, password_hash: password_hash}).then((response) => {
-            if(response.data.exists){
-                this.setState({user_is_logged_in:true,redirect_to:'profile'})
+            console.log(response);
+            if(response.status===200){
+                this.props.onLogin(response.data);
+                this.setState({redirect_to:'profile'})
             }
             else{
                 this.setState({render_alert:'badlogin'})
@@ -73,12 +73,6 @@ export class Login extends React.Component<LoginProps,LoginState> {
 
     renderRedirect = () => {
         if (this.state.redirect_to === 'login') {
-            return <Redirect to='/login' />
-        }
-        else if (this.state.redirect_to === 'profile') {
-            return <Redirect to='/profile' />
-        }
-        else if (this.state.redirect_to === 'login') {
             return <Redirect to='/login' />
         }
         else if (this.state.redirect_to === 'profile') {
