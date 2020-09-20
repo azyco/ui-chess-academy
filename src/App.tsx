@@ -17,14 +17,15 @@ import { RegisterCoach } from './pages/coach/RegisterCoach';
 import config from './config';
 import Api from './api/backend';
 
-import {Navbar, Nav, NavDropdown} from 'react-bootstrap';
+import {Navbar, Nav} from 'react-bootstrap';
 
 type AppClassProps = {
 };
 
 type AppClassState = {
-  signed_in: boolean
-  username: string
+  signed_in: boolean,
+  username: string,
+  user_type: string
 }
 
 class App extends React.Component<AppClassProps, AppClassState>{
@@ -32,20 +33,46 @@ class App extends React.Component<AppClassProps, AppClassState>{
     super(props);
     this.state = {
       signed_in: false,
-      username: ''
+      username: '',
+      user_type: ''
     }
     this.signInPrompt.bind(this.state);
+    this.studentRegister.bind(this.state)
   }
 
   componentWillMount() {
     Api.get('/profile').then((resp) => {
       console.log(resp.data);
-      this.setState({ signed_in: (resp.data.id !== 0), username: resp.data.email });
+      this.createLoginState(resp.data);
     }).catch((err) => {
       this.setState({ signed_in: false, username: '' });
     });
   }
 
+  logoutCallback = () => {
+    this.setState({signed_in: false,
+      username: '',
+      user_type: ''});
+  }
+
+  loginCallback = (loginInfo: any) => {
+    this.createLoginState(loginInfo);
+  }
+
+  /**
+   * This function will set the global state from the http response data
+   * the http response data is available from the backend API response.
+   * @param loginResponseInfo HTTP response struct with login data
+   */
+  createLoginState = (loginResponseInfo: any) => {
+    this.setState({signed_in: (loginResponseInfo.id !== 0), username: loginResponseInfo.email, user_type:loginResponseInfo.user_type});
+  }
+
+  studentRegister(){
+    if (!this.state.signed_in){
+      return(<Nav.Link href="/register_student">{config.registerText}</Nav.Link>);
+    }
+  }
   signInPrompt(){
     if (this.state.signed_in){
       return (
@@ -66,29 +93,26 @@ class App extends React.Component<AppClassProps, AppClassState>{
   render() {
     return (
     <Router>
-        <Navbar bg="dark" variant="dark" expand="lg">
-            <Navbar.Brand href="/">{config.websiteName}</Navbar.Brand>
-            <Navbar.Toggle aria-controls="basic-navbar-nav" />
-            <Navbar.Collapse id="basic-navbar-nav">
-              <Nav className="mr-auto">
-                <NavDropdown title={config.registerText} id="basic-nav-dropdown">
-                  <NavDropdown.Item href="/register_student">{config.studentText}</NavDropdown.Item>
-                  <NavDropdown.Item href="/register_coach" disabled>{config.coachText}</NavDropdown.Item>
-                </NavDropdown>
-                <Nav.Link href="/about">{config.aboutText}</Nav.Link>
-              </Nav>
-              {this.signInPrompt()}
-            </Navbar.Collapse>
-        </Navbar> 
+      <Navbar bg="dark" variant="dark" expand="lg">
+          <Navbar.Brand href="/">{config.websiteName}</Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="mr-auto">
+              {this.studentRegister()}
+              <Nav.Link href="/about">{config.aboutText}</Nav.Link>
+            </Nav>
+            {this.signInPrompt()}
+          </Navbar.Collapse>
+      </Navbar>
       <Switch>
         <Route path="/about">
           <About />
         </Route>
         <Route path="/profile">
-          <Profile profile={{ username: this.state.username }}/>
+          <Profile onLogout={this.logoutCallback} profile={{ username: this.state.username }}/>
         </Route>
         <Route path="/login">
-          <Login />
+          <Login onLogin={this.loginCallback}/>
         </Route>
         <Route path="/register_student">
           <RegisterStudent />

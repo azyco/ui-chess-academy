@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Alert } from 'react-bootstrap';
+import { Container, Alert, Button } from 'react-bootstrap';
 
 import config from '../config';
 
@@ -10,6 +10,7 @@ import config from '../config';
 
 type ProfileProps = {
     profile: any;
+    onLogout: any
 };
 
 type ProfileState = {
@@ -32,7 +33,12 @@ export class Profile extends React.Component<ProfileProps,ProfileState> {
             <Alert  variant="success">
                 You have logged in succesfully.
             </Alert>
-        </Container>
+            <Container>
+                <Button onClick={this.props.onLogout}>
+                    Logout
+                </Button>
+            </Container>
+        </div>
         );
         }
 }
