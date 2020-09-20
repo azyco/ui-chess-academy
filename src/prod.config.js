@@ -1,5 +1,5 @@
 export default {
-    apiUrl: "https://rghose.in:8443/",
+    apiUrl: "https://ec2-13-228-79-203.ap-southeast-1.compute.amazonaws.com:8443/",
     websiteName: "Generic Chess Academy",
     websiteDescription: "We are the biggest chess academy in Bengal. Register as a student to take a glimpse of the different courses we have.",
     aboutDescription: "Some text to show that data can be loaded from a config file",

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Alert, Button } from 'react-bootstrap';
 
-import config from '../config';
+// import config from '../config';
 
 // import { Dashboard_Student } from './student/Dashboard_Student';
 // import { Dashboard_Coach} from './coach/Dashboard_Coach';
