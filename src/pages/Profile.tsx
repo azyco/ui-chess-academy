@@ -14,6 +14,7 @@ type ProfileProps = {
 };
 
 type ProfileState = {
+    signed_in: boolean;
     username: string;
     user_is_student:boolean;
 };
@@ -22,23 +23,39 @@ export class Profile extends React.Component<ProfileProps,ProfileState> {
     constructor(props:ProfileProps){
         super(props);
         this.state= {
+            signed_in: this.props.profile.signed_in,
             username: this.props.profile.username,
             user_is_student:false
         };
     }
-    
+
+    componentWillReceiveProps(nextProps: any) {
+        if (nextProps.profile && nextProps.profile.signed_in !== this.state.signed_in) {
+            this.setState({
+                signed_in: nextProps.profile.signed_in,
+                username: nextProps.profile.username
+            });
+        }
+    }
+
+    renderWhenLoggedIn = () => {
+        if(this.state.signed_in) {
+            return (
+                <div>
+                    <Alert variant="success">You have logged in succesfully.</Alert>
+                    <Button onClick={this.props.onLogout}>
+                        Logout
+                    </Button>
+                </div>
+            );
+        }
+    }
+
     render() {
         return(
         <Container>
-            <Alert  variant="success">
-                You have logged in succesfully.
-            </Alert>
-            <Container>
-                <Button onClick={this.props.onLogout}>
-                    Logout
-                </Button>
-            </Container>
-        </div>
+            {this.renderWhenLoggedIn()}
+        </Container>
         );
-        }
+    }
 }

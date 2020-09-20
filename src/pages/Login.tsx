@@ -32,7 +32,8 @@ export class Login extends React.Component<LoginProps,LoginState> {
     handleLoginClick = ()=>{
         const password_hash = CryptoJS.SHA1(this.state.password).toString(CryptoJS.enc.Hex);
         Api.post('/login', {email: this.state.email, password_hash: password_hash}).then((response) => {
-            if(response.data.exists){
+            console.log(response);
+            if(response.status===200){
                 this.props.onLogin(response.data);
                 this.setState({redirect_to:'profile'})
             }

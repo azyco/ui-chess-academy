@@ -50,9 +50,14 @@ class App extends React.Component<AppClassProps, AppClassState>{
   }
 
   logoutCallback = () => {
-    this.setState({signed_in: false,
-      username: '',
-      user_type: ''});
+    Api.delete('/login').then(
+      (response)=>{
+        console.log(response);
+        this.setState({signed_in: false,
+          username: '',
+          user_type: ''});
+      }
+    );
   }
 
   loginCallback = (loginInfo: any) => {
@@ -109,7 +114,8 @@ class App extends React.Component<AppClassProps, AppClassState>{
           <About />
         </Route>
         <Route path="/profile">
-          <Profile onLogout={this.logoutCallback} profile={{ username: this.state.username }}/>
+          <Profile onLogout={this.logoutCallback} 
+            profile={{ signed_in: this.state.signed_in, username: this.state.username }}/>
         </Route>
         <Route path="/login">
           <Login onLogin={this.loginCallback}/>
