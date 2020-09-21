@@ -17,7 +17,7 @@ import { RegisterCoach } from './pages/coach/RegisterCoach';
 import config from './config';
 import Api from './api/backend';
 
-import {Navbar, Nav} from 'react-bootstrap';
+import {Navbar, Nav, Alert} from 'react-bootstrap';
 
 type AppClassProps = {
 };
@@ -26,6 +26,14 @@ type AppClassState = {
   signed_in: boolean,
   username: string,
   user_type: string
+  show_alert: boolean,
+  alert_text: string,
+  alert_type: string
+}
+
+type alertDetailsType = {
+  alert_type: string,
+  alert_text: string,
 }
 
 class App extends React.Component<AppClassProps, AppClassState>{
@@ -34,10 +42,14 @@ class App extends React.Component<AppClassProps, AppClassState>{
     this.state = {
       signed_in: false,
       username: '',
-      user_type: ''
+      user_type: '',
+      show_alert: false,
+      alert_text: '',
+      alert_type: ''
     }
     this.signInPrompt.bind(this.state);
-    this.studentRegister.bind(this.state)
+    this.studentRegister.bind(this.state);
+    this.renderAlert.bind(this.state);
   }
 
   componentWillMount() {
@@ -58,6 +70,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
           user_type: ''});
       }
     );
+
   }
 
   loginCallback = (loginInfo: any) => {
@@ -78,6 +91,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
       return(<Nav.Link href="/register_student">{config.registerText}</Nav.Link>);
     }
   }
+
   signInPrompt(){
     if (this.state.signed_in){
       return (
@@ -95,6 +109,20 @@ class App extends React.Component<AppClassProps, AppClassState>{
     }
   }
 
+  alertCallback = (alert_details:alertDetailsType) => {
+    this.setState({show_alert:true, alert_text:alert_details.alert_text, alert_type:alert_details.alert_type});
+  }
+
+  renderAlert(){
+    if(this.state.show_alert){
+      return (
+      <Alert variant={this.state.alert_type} onClose={() => this.setState({show_alert:false})}  dismissible>
+        {this.state.alert_text}
+      </Alert>
+      );
+    }
+  }
+
   render() {
     return (
     <Router>
@@ -109,22 +137,23 @@ class App extends React.Component<AppClassProps, AppClassState>{
             {this.signInPrompt()}
           </Navbar.Collapse>
       </Navbar>
+      {this.renderAlert()}
       <Switch>
         <Route path="/about">
           <About />
         </Route>
         <Route path="/profile">
-          <Profile onLogout={this.logoutCallback} 
+          <Profile onAlert={this.alertCallback} onLogout={this.logoutCallback} 
             profile={{ signed_in: this.state.signed_in, username: this.state.username }}/>
         </Route>
         <Route path="/login">
-          <Login onLogin={this.loginCallback}/>
+          <Login onAlert={this.alertCallback} onLogin={this.loginCallback}/>
         </Route>
         <Route path="/register_student">
-          <RegisterStudent />
+          <RegisterStudent onAlert={this.alertCallback}/>
         </Route>
         <Route path="/register_coach">
-          <RegisterCoach />
+          <RegisterCoach onAlert={this.alertCallback}/>
         </Route>
         <Route path="/">
           <Home />

@@ -3,5 +3,6 @@ import config from '../config';
 
 export default axios.create({
   baseURL: config.apiUrl,
-  withCredentials: true
+  withCredentials: true,
+  timeout: 10000
 });

@@ -18,7 +18,9 @@ export default {
     aboutCardBody2 : "aboutCardBody2",
     aboutCardBody3 : "aboutCardBody3",
     badLoginAlertText : "Wrong E-Mail and/or Password",
-    serverDownAlertText: "Error connecting to Server",
+    serverDownAlertText: "There was a problem processing the request",
     emailPlaceholderText: "Email",
     passwordPlaceholderText: "Password",
+    loginSuccessfulText: "Login Successful",
+    registrationSuccessfulText: "Registration Successful"
 };
