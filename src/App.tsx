@@ -24,7 +24,7 @@ type AppClassProps = {
 
 type AppClassState = {
   signed_in: boolean,
-  username: string,
+  user_email: string,
   user_type: string
   show_alert: boolean,
   alert_text: string,
@@ -41,7 +41,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
     super(props);
     this.state = {
       signed_in: false,
-      username: '',
+      user_email: '',
       user_type: '',
       show_alert: false,
       alert_text: '',
@@ -57,7 +57,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
       console.log(resp.data);
       this.createLoginState(resp.data);
     }).catch((err) => {
-      this.setState({ signed_in: false, username: '' });
+      this.setState({ signed_in: false, user_email: '' });
     });
   }
 
@@ -66,7 +66,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
       (response)=>{
         console.log(response);
         this.setState({signed_in: false,
-          username: '',
+          user_email: '',
           user_type: ''});
       }
     );
@@ -83,7 +83,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
    * @param loginResponseInfo HTTP response struct with login data
    */
   createLoginState = (loginResponseInfo: any) => {
-    this.setState({signed_in: (loginResponseInfo.id !== 0), username: loginResponseInfo.email, user_type:loginResponseInfo.user_type});
+    this.setState({signed_in: (loginResponseInfo.id !== 0), user_email: loginResponseInfo.email, user_type:loginResponseInfo.user_type});
   }
 
   studentRegister(){
@@ -96,7 +96,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
     if (this.state.signed_in){
       return (
         <Navbar.Text>
-          {config.loginWelcomeText}, <Link style={{textDecoration: 'none'}} to="/profile">{this.state.username}</Link>
+          {config.loginWelcomeText}, <Link style={{textDecoration: 'none'}} to="/profile">{this.state.user_email}</Link>
         </Navbar.Text>
         );
     }
@@ -144,7 +144,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
         </Route>
         <Route path="/profile">
           <Profile onAlert={this.alertCallback} onLogout={this.logoutCallback} 
-            profile={{ signed_in: this.state.signed_in, username: this.state.username }}/>
+            user_profile={{ user_type:this.state.user_type, signed_in: this.state.signed_in, user_email: this.state.user_email }}/>
         </Route>
         <Route path="/login">
           <Login onAlert={this.alertCallback} onLogin={this.loginCallback}/>

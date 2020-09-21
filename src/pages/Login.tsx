@@ -15,6 +15,8 @@ type LoginState = {
     email: string,
     password: string,
     redirect_to: string,
+    email_is_invalid: boolean,
+    password_is_invalid: boolean,
 }
 
 export class Login extends React.Component<LoginProps,LoginState> {
@@ -24,11 +26,16 @@ export class Login extends React.Component<LoginProps,LoginState> {
             email: "",
             password: "",
             redirect_to: 'login',
+            email_is_invalid:true,
+            password_is_invalid:true
         };
+        this.handleLoginClick.bind(this.state);
     }
-    /*
-    bad login results in server down error
-    */
+
+    isLoginDisabled(){
+        return this.state.email_is_invalid || this.state.password_is_invalid;
+    }
+
     handleLoginClick = ()=>{
         const password_hash = CryptoJS.SHA1(this.state.password).toString(CryptoJS.enc.Hex);
         Api.post('/login', {email: this.state.email, password_hash: password_hash}).then((response) => {
@@ -54,11 +61,11 @@ export class Login extends React.Component<LoginProps,LoginState> {
     }
     
     onEmailChange = (ev: any) => {
-        this.setState({email: ev.target.value});
+        this.setState({email: ev.target.value, email_is_invalid:!ev.target.value});
     }
 
     onPasswordChange = (ev: any) => {
-        this.setState({password: ev.target.value});
+        this.setState({password: ev.target.value, password_is_invalid:!ev.target.value});
     }
 
     renderRedirect = () => {
@@ -77,13 +84,19 @@ export class Login extends React.Component<LoginProps,LoginState> {
                     <Card.Body>
                         <Form>
                         <Form.Group controlId="formBasicEmail">
-                        <Form.Control onChange={this.onEmailChange} value={this.state.email} type="email" placeholder={config.emailPlaceholderText} />
+                        <Form.Control onChange={this.onEmailChange} value={this.state.email} type="email" placeholder={config.emailPlaceholderText} isInvalid={this.state.email_is_invalid}/>
+                        <Form.Control.Feedback type="invalid">
+                            Email can't be empty
+                        </Form.Control.Feedback>
                         </Form.Group>
 
                         <Form.Group controlId="formBasicPassword">
-                        <Form.Control onChange={this.onPasswordChange} value={this.state.password} type="password" placeholder={config.passwordPlaceholderText} />
+                        <Form.Control onChange={this.onPasswordChange} value={this.state.password} type="password" placeholder={config.passwordPlaceholderText} isInvalid={this.state.password_is_invalid}/>
+                        <Form.Control.Feedback type="invalid">
+                            Password can't be empty
+                        </Form.Control.Feedback>
                         </Form.Group>
-                            <Button onClick={this.handleLoginClick} className="float-right" variant="dark">
+                            <Button onClick={this.handleLoginClick} className="float-right" variant="dark" disabled={this.isLoginDisabled()}>
                                 {config.loginText}
                             </Button>
                         </Form>
