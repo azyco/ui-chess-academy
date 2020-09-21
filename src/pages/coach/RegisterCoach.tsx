@@ -6,7 +6,7 @@ import { Container, Form, Button, Card } from 'react-bootstrap';
 import CryptoJS from 'crypto-js';
 
 type RegisterCoachProps = {
-
+    onAlert: Function
 }
 
 type RegisterCoachState = {
@@ -29,6 +29,7 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
         const encryptedPassword = CryptoJS.SHA1(this.state.password).toString(CryptoJS.enc.Hex)
         Api.post('/coach', {email: this.state.email, password: encryptedPassword}).then((response) => {
             console.log(response);
+            this.props.onAlert({alert_type:"success",alert_text:config.registrationSuccessfulText});
         });
         this.setState({ registerButtonEnabled: false });
     }
@@ -55,7 +56,7 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
                             <Form.Group controlId="formBasicPassword">
                                 <Form.Control value={this.state.password} onChange={this.onPasswordChange} type="password" placeholder={config.passwordPlaceholderText} />
                             </Form.Group>
-                            <Button disabled={!this.state.registerButtonEnabled} onClick={this.handleRegister} variant="dark">
+                            <Button disabled={!this.state.registerButtonEnabled} className="float-right" onClick={this.handleRegister} variant="dark">
                                 {config.registerText}
                             </Button>
                         </Form>

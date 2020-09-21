@@ -6,7 +6,7 @@ import { Container, Form, Button, Card } from 'react-bootstrap';
 import CryptoJS from 'crypto-js';
 
 type RegisterStudentProps = {
-
+    onAlert: Function
 }
 
 type RegisterStudentState = {
@@ -24,11 +24,16 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
             registerButtonEnabled: true
         };
     }
-
+    /*
+    need something to handle bad registration details, like conflicting emails, short/insecure passwords, or incorrect filling of user details.
+    registration button is not to be disabled on such cases
+    use onAlert to notify edits to be made
+    */
     handleRegister = () => {
         const encryptedPassword = CryptoJS.SHA1(this.state.password).toString(CryptoJS.enc.Hex)
         Api.post('/student', {email: this.state.email, password: encryptedPassword}).then((response) => {
             console.log(response);
+            this.props.onAlert({alert_type:"success",alert_text:config.registrationSuccessfulText});
         });
         this.setState({ registerButtonEnabled: false });
     }
@@ -55,7 +60,7 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
                             <Form.Group controlId="formBasicPassword">
                                 <Form.Control value={this.state.password} onChange={this.onPasswordChange} type="password" placeholder={config.passwordPlaceholderText} />
                             </Form.Group>
-                            <Button disabled={!this.state.registerButtonEnabled} onClick={this.handleRegister} variant="dark">
+                            <Button disabled={!this.state.registerButtonEnabled} className="float-right" onClick={this.handleRegister} variant="dark">
                                 {config.registerText}
                             </Button>
                         </Form>
