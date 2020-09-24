@@ -99,8 +99,8 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
             this.props.onAlert({alert_type:"success",alert_text:config.registrationSuccessfulText});
         }).catch((error)=>{
             console.log(error.response);
-            if(error.response.data.error_type === 'duplicate'){
-                this.props.onAlert({alert_type:"warning",alert_text:"E-Mail in use. User already exists."});    
+            if(error.response.data.code === 'ER_DUP_ENTRY'){
+                this.props.onAlert({alert_type:"warning",alert_text:"E-Mail/Contact in use."});    
             }
             else{
                 this.props.onAlert({alert_type:"warning",alert_text:"There was problem processing the request"});
