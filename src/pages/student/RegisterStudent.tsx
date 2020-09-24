@@ -76,37 +76,38 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
     use onAlert to notify edits to be made
     */
     handleRegister = () => {
-        const encryptedPassword = CryptoJS.SHA1(this.state.password).toString(CryptoJS.enc.Hex)
-        Api.post('/student', {
-            email: this.state.email,
-            password: encryptedPassword,
-            fullname:this.state.fullname,
-            country:this.state.country,
-            state:this.state.state,
-            contact:this.state.contact,
-            contact_code:this.state.contact_code,
-            description:this.state.description,
-            fide_id:this.state.fide_id,
-            lichess_id:this.state.lichess_id,
-            alt_contact:this.state.alt_contact,
-            alt_contact_code:this.state.alt_contact_code,
-            parent: (this.state.parent_is_disabled)? '':this.state.parent,
-            photo_blob: this.state.photo_blob,
-            dob:this.state.dob.toISOString().slice(0, 19).replace('T', ' ')
-        }
-        ).then((response) => {
-            console.log(response);
-            this.props.onAlert({alert_type:"success",alert_text:config.registrationSuccessfulText});
-        }).catch((error)=>{
-            console.log(error.response);
-            if(error.response.data.code === 'ER_DUP_ENTRY'){
-                this.props.onAlert({alert_type:"warning",alert_text:"E-Mail/Contact in use."});    
-            }
-            else{
-                this.props.onAlert({alert_type:"warning",alert_text:"There was problem processing the request"});
-            }
-        });
-        this.setState({ registerButtonClicked: true });
+        // const encryptedPassword = CryptoJS.SHA1(this.state.password).toString(CryptoJS.enc.Hex)
+        // Api.post('/student', {
+        //     email: this.state.email,
+        //     password: encryptedPassword,
+        //     fullname:this.state.fullname,
+        //     country:this.state.country,
+        //     state:this.state.state,
+        //     contact:this.state.contact,
+        //     contact_code:this.state.contact_code,
+        //     description:this.state.description,
+        //     fide_id:this.state.fide_id,
+        //     lichess_id:this.state.lichess_id,
+        //     alt_contact:this.state.alt_contact,
+        //     alt_contact_code:this.state.alt_contact_code,
+        //     parent: (this.state.parent_is_disabled)? '':this.state.parent,
+        //     photo_blob: this.state.photo_blob,
+        //     dob:this.state.dob.toISOString().slice(0, 19).replace('T', ' ')
+        // }
+        // ).then((response) => {
+        //     console.log(response);
+        //     this.props.onAlert({alert_type:"success",alert_text:config.registrationSuccessfulText});
+        // }).catch((error)=>{
+        //     console.log(error.response);
+        //     if(error.response.data.code === 'ER_DUP_ENTRY'){
+        //         this.props.onAlert({alert_type:"warning",alert_text:"E-Mail/Contact in use."});    
+        //     }
+        //     else{
+        //         this.props.onAlert({alert_type:"warning",alert_text:"There was problem processing the request"});
+        //     }
+        // });
+        // this.setState({ registerButtonClicked: true });
+        console.log(this.state);
     }
 
     isRegistrationDisabled(){
@@ -114,8 +115,6 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
         this.state.email_is_invalid || 
         this.state.password_is_invalid ||
         this.state.fullname_is_invalid ||
-        this.state.country_is_invalid ||
-        this.state.state_is_invalid ||
         this.state.contact_code_is_invalid ||
         this.state.contact_is_invalid ||
         this.state.dob_is_invalid ||
@@ -149,7 +148,7 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
     }
 
     onContactChange = (ev: any)=>{
-        this.setState({contact: ev.target.value, contact_is_invalid:!ev.target.value});
+        this.setState({contact: ev.target.value, contact_is_invalid:ev.target.value});
     }
 
     onAltContactCodeChange = (ev: any)=>{
@@ -157,7 +156,8 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
     }
 
     onContactCodeChange = (ev: any)=>{
-        this.setState({contact_code: ev.target.value, contact_code_is_invalid:!ev.target.value});
+        console.log(ev);
+        this.setState({contact_code: ev.target.value, contact_code_is_invalid:!parseInt(ev.target.value)});
     }
 
     onLichessIDChange = (ev: any)=>{
@@ -169,11 +169,11 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
     }
 
     onCountryChange = (ev: any)=>{
-        this.setState({country: ev.target.value, country_is_invalid:!ev.target.value});
+        this.setState({country: ev.target.value, country_is_invalid:(ev.target.value==='Select your Country')});
     }
 
     onStateChange = (ev: any)=>{
-        this.setState({state: ev.target.value, state_is_invalid:!ev.target.value});
+        this.setState({state: ev.target.value, state_is_invalid:(ev.target.value==='Select your State')});
     }
 
     onDescriptionChange = (ev: any) =>{
@@ -242,16 +242,20 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
                             <Form.Label>Country and State</Form.Label>
                             <Form.Row>
                                 <Form.Group as={Col} controlId="formGridCountry">
-                                        <Form.Control onChange={this.onCountryChange} placeholder={config.countryText} isInvalid={this.state.country_is_invalid}/>
+                                        <Form.Control custom as="select" onChange={this.onCountryChange} isInvalid={this.state.country_is_invalid} defaultValue={config.countrySelectList[0]}>
+                                            {config.countrySelectList.map((option_value:string) => (<option value={option_value} >{option_value}</option>))}
+                                        </Form.Control>
                                         <Form.Control.Feedback type="invalid" >
-                                            Country can't be empty
+                                            Select your Country
                                         </Form.Control.Feedback>
                                 </Form.Group>
 
                                 <Form.Group as={Col} controlId="formGridState">
-                                        <Form.Control onChange={this.onStateChange} placeholder={config.stateText} isInvalid={this.state.state_is_invalid}/>
+                                        <Form.Control custom as="select" onChange={this.onStateChange} isInvalid={this.state.state_is_invalid} defaultValue={config.countrySelectList[0]}>
+                                            {config.stateSelectList.map((option_value:string) => (<option value={option_value} >{option_value}</option>))}
+                                        </Form.Control>
                                         <Form.Control.Feedback type="invalid" >
-                                            State can't be empty
+                                            Select your State
                                         </Form.Control.Feedback>
                                 </Form.Group>
                             </Form.Row>
@@ -271,7 +275,9 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
                             <Form.Label>Contact Number</Form.Label>
                             <Form.Row>
                                 <Form.Group sm={4} as={Col} controlId="formGridContact">   
-                                    <Form.Control onChange={this.onContactCodeChange} placeholder="Code" isInvalid={this.state.contact_code_is_invalid}/>
+                                    <Form.Control as="select" onChange={this.onContactCodeChange} isInvalid={this.state.contact_code_is_invalid} >
+                                        {config.contactCodeSelectList.map((option_value:string) => (<option value={option_value} >{option_value}</option>))}
+                                    </Form.Control>
                                     <Form.Control.Feedback type="invalid">
                                         Contact Code cannot be empty
                                     </Form.Control.Feedback>
@@ -279,14 +285,16 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
                                 <Form.Group sm={8} as={Col} controlId="formGridContact">
                                     <Form.Control onChange={this.onContactChange} placeholder="Number" isInvalid={this.state.contact_is_invalid} />
                                     <Form.Control.Feedback type="invalid">
-                                        Contact cannot be empty
+                                        Contact Number cannot be empty
                                     </Form.Control.Feedback>
                                 </Form.Group>
                             </Form.Row>
                             <Form.Label>Alternate Contact Number</Form.Label>
                             <Form.Row>
                                 <Form.Group sm={4} as={Col} controlId="formGridAltContact">
-                                    <Form.Control onChange={this.onAltContactCodeChange} placeholder="Code" />
+                                    <Form.Control as="select" onChange={this.onAltContactCodeChange} >
+                                        {config.contactCodeSelectList.map((option_value:string) => (<option value={option_value} >{option_value}</option>))}
+                                    </Form.Control>
                                 </Form.Group>
                                 <Form.Group sm={8} as={Col} controlId="formGridContact">
                                     <Form.Control onChange={this.onAltContactChange} placeholder="Number" />

@@ -25,5 +25,8 @@ export default {
     emailPlaceholderText: "Email",
     passwordPlaceholderText: "Password",
     loginSuccessfulText: "Login Successful",
-    registrationSuccessfulText: "Registration Successful"
+    registrationSuccessfulText: "Registration Successful",
+    countrySelectList: ['Select your Country','India (IND)'],
+    stateSelectList: ['Select your State','Andhra Pradesh', 'Assam', 'Arunachal Pradesh', 'Bihar', 'Goa', 'Gujarat', 'Jammu and Kashmir', 'Jharkhand', 'West Bengal', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Orissa', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Tripura', 'Uttaranchal', 'Uttar Pradesh', 'Haryana', 'Himachal Pradesh', 'Chhattisgarh','Andaman and Nicobar','Pondicherry','Dadra and Nagar Haveli','Daman and Diu','Delhi','Chandigarh','Lakshadweep'],
+    contactCodeSelectList: ['Select your Code','91']
 };
