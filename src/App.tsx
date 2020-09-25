@@ -19,13 +19,41 @@ import Api from './api/backend';
 
 import {Navbar, Nav, Alert} from 'react-bootstrap';
 
+type userDetailsType = {
+  id: number,
+  user_type: string,
+  email: string,
+  created_at: string
+  fullname: string,
+  country: string,
+  state: string,
+  description: string,
+  user_image: Blob,
+  fide_id: string,
+  lichess_id: string,
+  contact: number,
+  contact_code: number,
+  alt_contact: number,
+  alt_contact_code: number,
+  dob: Date,
+  parent: string,
+  is_private_contact: boolean,
+  is_private_alt_contact: boolean,
+  is_private_dob: boolean,
+  is_private_parent: boolean
+}
+
+type loginResponseType = {
+  user_details: userDetailsType,
+}
+
 type AppClassProps = {
+
 };
 
 type AppClassState = {
   signed_in: boolean,
-  user_email: string,
-  user_type: string
+  user_details: userDetailsType|null,
   show_alert: boolean,
   alert_text: string,
   alert_type: string
@@ -41,8 +69,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
     super(props);
     this.state = {
       signed_in: false,
-      user_email: '',
-      user_type: '',
+      user_details: null,
       show_alert: false,
       alert_text: '',
       alert_type: ''
@@ -56,8 +83,9 @@ class App extends React.Component<AppClassProps, AppClassState>{
     Api.get('/profile').then((resp) => {
       console.log(resp.data);
       this.createLoginState(resp.data);
-    }).catch((err) => {
-      this.setState({ signed_in: false, user_email: '' });
+    }).catch((error) => {
+      console.log("Session Reset\n",error);
+      this.setState({ user_details: null });
     });
   }
 
@@ -65,15 +93,19 @@ class App extends React.Component<AppClassProps, AppClassState>{
     Api.delete('/login').then(
       (response)=>{
         console.log(response);
-        this.setState({signed_in: false,
-          user_email: '',
-          user_type: ''});
+        this.setState({
+          signed_in: false,
+          user_details: null
+        });
+        this.alertCallback({alert_type:"success", alert_text:"Logged out successfully"});
       }
-    );
-
+    ).catch((error)=>{
+      console.log(error.response)
+      this.alertCallback({alert_type:"warning",alert_text:config.serverDownAlertText});
+    });
   }
 
-  loginCallback = (loginInfo: any) => {
+  loginCallback = (loginInfo: loginResponseType) => {
     this.createLoginState(loginInfo);
   }
 
@@ -82,13 +114,13 @@ class App extends React.Component<AppClassProps, AppClassState>{
    * the http response data is available from the backend API response.
    * @param loginResponseInfo HTTP response struct with login data
    */
-  createLoginState = (loginResponseInfo: any) => {
-    this.setState({signed_in: (loginResponseInfo.id !== 0), user_email: loginResponseInfo.email, user_type:loginResponseInfo.user_type});
+  createLoginState = (loginResponseInfo: loginResponseType) => {
+    this.setState({signed_in: (!!loginResponseInfo.user_details), user_details: loginResponseInfo.user_details },()=>{console.log(this.state.signed_in);});
   }
 
   studentRegister(){
     if (!this.state.signed_in){
-      return(<Nav.Link href="/register_student">{config.registerText}</Nav.Link>);
+      return(<Nav.Link href="/student/register">{config.registerText}</Nav.Link>);
     }
   }
 
@@ -96,7 +128,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
     if (this.state.signed_in){
       return (
         <Navbar.Text>
-          {config.loginWelcomeText}, <Link style={{textDecoration: 'none'}} to="/profile">{this.state.user_email}</Link>
+          {config.loginWelcomeText}, <Link style={{textDecoration: 'none'}} to="/profile">{this.state.user_details?.fullname}</Link>
         </Navbar.Text>
         );
     }
@@ -143,16 +175,15 @@ class App extends React.Component<AppClassProps, AppClassState>{
           <About />
         </Route>
         <Route path="/profile">
-          <Profile onAlert={this.alertCallback} onLogout={this.logoutCallback} 
-            user_profile={{ user_type:this.state.user_type, signed_in: this.state.signed_in, user_email: this.state.user_email }}/>
+          <Profile onAlert={this.alertCallback} onLogout={this.logoutCallback} user_details={this.state.user_details} />
         </Route>
         <Route path="/login">
           <Login onAlert={this.alertCallback} onLogin={this.loginCallback}/>
         </Route>
-        <Route path="/register_student">
+        <Route path="/student/register">
           <RegisterStudent onAlert={this.alertCallback}/>
         </Route>
-        <Route path="/register_coach">
+        <Route path="/coach/register">
           <RegisterCoach onAlert={this.alertCallback}/>
         </Route>
         <Route path="/">

@@ -116,7 +116,7 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
         const valid_test = ev.target.value.length >= 6;
         this.setState({password: ev.target.value, password_is_invalid:!valid_test});
     }
-
+    
     onDateChange = (ev:any) => {
         const entered_date:Date = new Date(ev.target.value);
         const today:Date = new Date();
@@ -175,6 +175,12 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
         
     }
 
+    optionGenerator = (option_value:string) => (
+    <option value={option_value} key={option_value}>
+        {option_value}
+        </option>
+    )
+
     render()
     {
         return (
@@ -211,13 +217,13 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
                             <Form.Row>
                                 <Form.Group md={6} as={Col} controlId="formGridCountry">
                                         <Form.Control custom as="select" onChange={this.onCountryChange}>
-                                            {config.countrySelectList.map((option_value:string) => (<option value={option_value} >{option_value}</option>))}
+                                            {config.countrySelectList.map(this.optionGenerator)}
                                         </Form.Control>
                                 </Form.Group>
 
                                 <Form.Group md={6} as={Col} controlId="formGridState">
                                         <Form.Control custom as="select" onChange={this.onStateChange} defaultValue={config.countrySelectList[0]}>
-                                            {config.stateSelectList.map((option_value:string) => (<option value={option_value} >{option_value}</option>))}
+                                            {config.stateSelectList.map((this.optionGenerator))}
                                         </Form.Control>
                                 </Form.Group>
                             </Form.Row>
@@ -229,15 +235,15 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
                                         {config.dobInvalidFeedback}
                                     </Form.Control.Feedback>
                                 </Form.Group>
-                                <Form.Group sm={8} as={Col} controlId="formGridState">
+                                <Form.Group sm={8} as={Col} controlId="formGridDate">
                                     <Form.Control readOnly value={this.state.dob.toDateString()}  />
                                 </Form.Group>
                             </Form.Row>
                             <Form.Label>{config.contactLabel}</Form.Label>
                             <Form.Row>
-                                <Form.Group xs={4} as={Col} controlId="formGridContact">  
+                                <Form.Group xs={4} as={Col} controlId="formGridContactCode">  
                                     <Form.Control custom as="select" onChange={this.onContactCodeChange} >
-                                        {config.countryCodeSelectList.map((option_value:string) => (<option value={option_value} >{option_value}</option>))}
+                                        {config.countryCodeSelectList.map((this.optionGenerator))}
                                     </Form.Control>
                                 </Form.Group>
                                 <Form.Group xs={8} as={Col} controlId="formGridContact">
@@ -249,12 +255,12 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
                             </Form.Row>
                             <Form.Label>{config.altContactLabel}</Form.Label>
                             <Form.Row>
-                                <Form.Group xs={4} as={Col} controlId="formGridAltContact">
+                                <Form.Group xs={4} as={Col} controlId="formGridAltContactCode">
                                     <Form.Control custom as="select" onChange={this.onAltContactCodeChange} >
-                                        {config.countryCodeSelectList.map((option_value:string) => (<option value={option_value} >{option_value}</option>))}
+                                        {config.countryCodeSelectList.map((this.optionGenerator))}
                                     </Form.Control>
                                 </Form.Group>
-                                <Form.Group xs={8} as={Col} controlId="formGridContact">
+                                <Form.Group xs={8} as={Col} controlId="formGridAltContact">
                                     <Form.Control type="number" onChange={this.onAltContactChange} placeholder={config.altContactLabel} isInvalid={this.state.alt_contact_is_invalid} />
                                     <Form.Control.Feedback type="invalid">
                                         {config.altContactInvalidFeedback}

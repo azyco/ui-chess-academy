@@ -1,10 +1,10 @@
 import React from 'react';
  
-export class Dashboard_Coach extends React.Component{
+export class ClassStudent extends React.Component{
     render (){
         return(
             <div>
-                coach_dashboard
+                Student-class
             </div>
         )
     }
