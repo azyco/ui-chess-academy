@@ -9,6 +9,9 @@ export default {
     studentText : "Student",
     aboutText: "About",
     registerText : "Register",
+    countryText: "Country",
+    stateText: "State",
+    fullNameText: "Full Name",
     studentRegistrationText : "Student Registration",
     coachRegistrationText : "Coach Registration",
     aboutCardTitle1 : "aboutCardTitle1",
@@ -18,7 +21,9 @@ export default {
     aboutCardBody2 : "aboutCardBody2",
     aboutCardBody3 : "aboutCardBody3",
     badLoginAlertText : "Wrong E-Mail and/or Password",
-    serverDownAlertText: "Error connecting to Server",
+    serverDownAlertText: "There was a problem processing the request",
     emailPlaceholderText: "Email",
     passwordPlaceholderText: "Password",
+    loginSuccessfulText: "Login Successful",
+    registrationSuccessfulText: "Registration Successful"
 };
