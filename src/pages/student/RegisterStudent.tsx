@@ -2,7 +2,7 @@ import React from 'react';
 import Api from '../../api/backend';
 import config from '../../config';
 
-import { Container, Form, Button, Card, Col} from 'react-bootstrap';
+import { Container, Form, Button, Card, Col } from 'react-bootstrap';
 import CryptoJS from 'crypto-js';
 
 type RegisterStudentProps = {
@@ -13,16 +13,14 @@ type RegisterStudentState = {
     fullname: string,
     fullname_is_invalid: boolean,
     country: string,
-    country_is_invalid: boolean,
     state: string,
-    state_is_invalid: boolean,
     description: string,
     fide_id: string,
     lichess_id: string,
     contact: string,
     contact_is_invalid: boolean,
     contact_code: string,
-    contact_code_is_invalid: boolean,
+    alt_contact_is_invalid: boolean,
     alt_contact: string,
     alt_contact_code: string,
     email: string,
@@ -44,19 +42,17 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
         this.state = {
             fullname: "",
             fullname_is_invalid: true,
-            country: "",
-            country_is_invalid: true,
-            state: "",
-            state_is_invalid: true,
+            country: config.countrySelectList[0],
+            state: config.stateSelectList[0],
             description: "",
             fide_id: "",
             lichess_id: "",
             contact: "",
             contact_is_invalid: true,
-            contact_code: "",
-            contact_code_is_invalid: true,
+            contact_code: config.countryCodeSelectList[0],
             alt_contact: "",
-            alt_contact_code: "",
+            alt_contact_is_invalid: false,
+            alt_contact_code: config.countryCodeSelectList[0],
             email: "",
             email_is_invalid:true,
             password: "",
@@ -76,12 +72,16 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
     use onAlert to notify edits to be made
     */
     handleRegister = () => {
-        const encryptedPassword = CryptoJS.SHA1(this.state.password).toString(CryptoJS.enc.Hex)
+        const encryptedPassword = CryptoJS.SHA1(this.state.password).toString(CryptoJS.enc.Hex);
+        const dob_sql = this.state.dob.toISOString().slice(0, 19).replace('T', ' ');
+        const parent = (this.state.parent_is_disabled)? '':this.state.parent;
+        const country_sql_length = this.state.country.length;
+        const country_sql = this.state.country.substring(country_sql_length-4,country_sql_length-1);
         Api.post('/student', {
             email: this.state.email,
             password: encryptedPassword,
             fullname:this.state.fullname,
-            country:this.state.country,
+            country:country_sql,
             state:this.state.state,
             contact:this.state.contact,
             contact_code:this.state.contact_code,
@@ -90,9 +90,9 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
             lichess_id:this.state.lichess_id,
             alt_contact:this.state.alt_contact,
             alt_contact_code:this.state.alt_contact_code,
-            parent: (this.state.parent_is_disabled)? '':this.state.parent,
+            parent: parent,
             photo_blob: this.state.photo_blob,
-            dob:this.state.dob.toISOString().slice(0, 19).replace('T', ' ')
+            dob:dob_sql
         }
         ).then((response) => {
             console.log(response);
@@ -110,54 +110,59 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
     }
 
     isRegistrationDisabled(){
-        return this.state.registerButtonClicked || 
-        this.state.email_is_invalid || 
+        return this.state.registerButtonClicked ||
+        this.state.email_is_invalid ||
         this.state.password_is_invalid ||
         this.state.fullname_is_invalid ||
-        this.state.country_is_invalid ||
-        this.state.state_is_invalid ||
-        this.state.contact_code_is_invalid ||
         this.state.contact_is_invalid ||
+        this.state.alt_contact_is_invalid ||
         this.state.dob_is_invalid ||
         ((this.state.parent_is_disabled)?false:this.state.parent_is_invalid);
     }
 
     onEmailChange = (ev: any) => {
-        this.setState({email: ev.target.value, email_is_invalid:!ev.target.value});
+        const valid_test = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(ev.target.value);
+        this.setState({email: ev.target.value, email_is_invalid:!valid_test});
     }
 
     onPasswordChange = (ev: any) => {
-        this.setState({password: ev.target.value, password_is_invalid:!ev.target.value});
+        const valid_test = ev.target.value.length >= 6;
+        this.setState({password: ev.target.value, password_is_invalid:!valid_test});
     }
     
     onDateChange = (ev:any) => {
         const entered_date:Date = new Date(ev.target.value);
         const today:Date = new Date();
+        const date_invalid_test = isNaN(entered_date.getDate()) || (entered_date >= today);
+        const parent_disabled_test = (Math.abs(today.valueOf() - entered_date.valueOf()) /  (1000 * 60 * 60 * 24 * 365)) >= 18;
         this.setState({
             dob: entered_date,
-            dob_is_invalid: isNaN(entered_date.getDate()) || (entered_date >= today),
-            parent_is_disabled: (Math.abs(today.valueOf() - entered_date.valueOf()) /  (1000 * 60 * 60 * 24 * 365)) >= 18
+            dob_is_invalid: date_invalid_test,
+            parent_is_disabled: parent_disabled_test
         });
     };
 
     onFullNameChange = (ev: any)=>{
-        this.setState({fullname: ev.target.value, fullname_is_invalid:!ev.target.value});
+        const valid_test = ev.target.value.length >= 2;
+        this.setState({fullname: ev.target.value, fullname_is_invalid:!valid_test});
     }
 
     onAltContactChange = (ev: any)=>{
-        this.setState({alt_contact: ev.target.value});
+        const valid_test = (ev.target.value.length >= 10 && ev.target.value.length <=12) || (ev.target.value==='');
+        this.setState({alt_contact: ev.target.value, alt_contact_is_invalid: !valid_test});
     }
 
     onContactChange = (ev: any)=>{
-        this.setState({contact: ev.target.value, contact_is_invalid:!ev.target.value});
+        const valid_test = (ev.target.value.length >= 10) && (ev.target.value.length <=12);
+        this.setState({contact: ev.target.value, contact_is_invalid:!valid_test});
     }
 
     onAltContactCodeChange = (ev: any)=>{
-        this.setState({alt_contact_code: ev.target.value});
+        this.setState({alt_contact_code: (ev.target.value===config.countryCodeSelectList[0])? '' : ev.target.value.slice(1)});
     }
 
     onContactCodeChange = (ev: any)=>{
-        this.setState({contact_code: ev.target.value, contact_code_is_invalid:!ev.target.value});
+        this.setState({contact_code: ev.target.value.slice(1)});
     }
 
     onLichessIDChange = (ev: any)=>{
@@ -169,11 +174,11 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
     }
 
     onCountryChange = (ev: any)=>{
-        this.setState({country: ev.target.value, country_is_invalid:!ev.target.value});
+        this.setState({country: ev.target.value});
     }
 
     onStateChange = (ev: any)=>{
-        this.setState({state: ev.target.value, state_is_invalid:!ev.target.value});
+        this.setState({state: ev.target.value});
     }
 
     onDescriptionChange = (ev: any) =>{
@@ -189,16 +194,22 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
         
     }
 
+    optionGenerator = (option_value:string) => (
+    <option value={option_value} key={option_value}>
+        {option_value}
+        </option>
+    )
+
     showParent(){
         if(!this.state.parent_is_disabled){
             return(
                 <div>
-                    <Form.Label>Parent Name</Form.Label>
+                    <Form.Label>{config.parentLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group as={Col} controlId="formGridParent">
-                            <Form.Control onChange={this.onParentChange} placeholder="Parent Name" isInvalid={this.state.parent_is_invalid} />
+                            <Form.Control onChange={this.onParentChange} placeholder={config.parentLabel} isInvalid={this.state.parent_is_invalid} />
                             <Form.Control.Feedback type="invalid" >
-                                Parent Name can't be empty
+                                {config.parentInvalidFeedback}
                             </Form.Control.Feedback>
                         </Form.Group>
                     </Form.Row>
@@ -215,102 +226,104 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
                     <Card.Header>{config.studentRegistrationText}</Card.Header>
                     <Card.Body>
                         <Form>
-                            <Form.Label>E-Mail and Password</Form.Label>
+                            <Form.Label>{config.emailAndPasswordLabel}</Form.Label>
                             <Form.Row>
-                                <Form.Group as={Col} controlId="formGridEmail">
-                                        <Form.Control onChange={this.onEmailChange} type="email" placeholder={config.emailPlaceholderText} isInvalid={this.state.email_is_invalid}/>
-                                        <Form.Control.Feedback type="invalid" >
-                                            Email can't be empty
-                                        </Form.Control.Feedback>
+                                <Form.Group md={6} as={Col} controlId="formGridEmail">
+                                    <Form.Control onChange={this.onEmailChange} type="email" placeholder={config.emailPlaceholderText} isInvalid={this.state.email_is_invalid}/>
+                                    <Form.Control.Feedback type="invalid" >
+                                        {config.emailInvalidFeedback}
+                                    </Form.Control.Feedback>
                                 </Form.Group>
-                                <Form.Group as={Col} controlId="formGridPassword">
+                                <Form.Group md={6} as={Col} controlId="formGridPassword">
                                     <Form.Control onChange={this.onPasswordChange} type="password" placeholder={config.passwordPlaceholderText} isInvalid={this.state.password_is_invalid}/>
                                     <Form.Control.Feedback type="invalid" >
-                                        Password can't be empty
+                                        {config.passwordInvalidFeedback}
                                     </Form.Control.Feedback>
                                 </Form.Group>
                             </Form.Row>
-                            <Form.Label>Full Name</Form.Label>
+                            <Form.Label>{config.fullNameLabel}</Form.Label>
                             <Form.Row>
                                 <Form.Group as={Col} controlId="formGridFullName">                        
-                                        <Form.Control onChange={this.onFullNameChange} placeholder={config.fullNameText} isInvalid={this.state.fullname_is_invalid}/>
+                                        <Form.Control onChange={this.onFullNameChange} placeholder={config.fullNameLabel} isInvalid={this.state.fullname_is_invalid}/>
                                         <Form.Control.Feedback type="invalid" >
-                                            Full Name can't be empty
+                                            {config.fullNameInvalidFeedback}
                                         </Form.Control.Feedback>
                                 </Form.Group>
                             </Form.Row>
-                            <Form.Label>Country and State</Form.Label>
+                            <Form.Label>{config.countryAndStateLabel}</Form.Label>
                             <Form.Row>
-                                <Form.Group as={Col} controlId="formGridCountry">
-                                        <Form.Control onChange={this.onCountryChange} placeholder={config.countryText} isInvalid={this.state.country_is_invalid}/>
-                                        <Form.Control.Feedback type="invalid" >
-                                            Country can't be empty
-                                        </Form.Control.Feedback>
+                                <Form.Group md={6} as={Col} controlId="formGridCountry">
+                                        <Form.Control custom as="select" onChange={this.onCountryChange}>
+                                            {config.countrySelectList.map(this.optionGenerator)}
+                                        </Form.Control>
                                 </Form.Group>
 
-                                <Form.Group as={Col} controlId="formGridState">
-                                        <Form.Control onChange={this.onStateChange} placeholder={config.stateText} isInvalid={this.state.state_is_invalid}/>
-                                        <Form.Control.Feedback type="invalid" >
-                                            State can't be empty
-                                        </Form.Control.Feedback>
+                                <Form.Group md={6} as={Col} controlId="formGridState">
+                                        <Form.Control custom as="select" onChange={this.onStateChange} defaultValue={config.countrySelectList[0]}>
+                                            {config.stateSelectList.map((this.optionGenerator))}
+                                        </Form.Control>
                                 </Form.Group>
                             </Form.Row>
-                            <Form.Label>Date of Birth</Form.Label>
+                            <Form.Label>{config.dobLabel}</Form.Label>
                             <Form.Row>
                                 <Form.Group sm={4} as={Col} controlId="formGridDOB">
-                                    <Form.Control onChange={this.onDateChange} isInvalid={this.state.dob_is_invalid} placeholder="Date of Birth" />
+                                    <Form.Control onChange={this.onDateChange} isInvalid={this.state.dob_is_invalid} placeholder={config.dobLabel} />
                                     <Form.Control.Feedback type="invalid" >
-                                        Enter a valid Date
+                                        {config.dobInvalidFeedback}
                                     </Form.Control.Feedback>
                                 </Form.Group>
-                                <Form.Group sm={8} as={Col} controlId="formGridState">
+                                <Form.Group sm={8} as={Col} controlId="formGridDate">
                                     <Form.Control readOnly value={this.state.dob.toDateString()}  />
                                 </Form.Group>
                             </Form.Row>
                             {this.showParent()}
-                            <Form.Label>Contact Number</Form.Label>
+                            <Form.Label>{config.contactLabel}</Form.Label>
                             <Form.Row>
-                                <Form.Group sm={4} as={Col} controlId="formGridContact">   
-                                    <Form.Control onChange={this.onContactCodeChange} placeholder="Code" isInvalid={this.state.contact_code_is_invalid}/>
-                                    <Form.Control.Feedback type="invalid">
-                                        Contact Code cannot be empty
-                                    </Form.Control.Feedback>
+                                <Form.Group xs={4} as={Col} controlId="formGridContactCode">  
+                                    <Form.Control custom as="select" onChange={this.onContactCodeChange} >
+                                        {config.countryCodeSelectList.map((this.optionGenerator))}
+                                    </Form.Control>
                                 </Form.Group>
-                                <Form.Group sm={8} as={Col} controlId="formGridContact">
-                                    <Form.Control onChange={this.onContactChange} placeholder="Number" isInvalid={this.state.contact_is_invalid} />
+                                <Form.Group xs={8} as={Col} controlId="formGridContact">
+                                    <Form.Control type="number" onChange={this.onContactChange} placeholder={config.contactLabel} isInvalid={this.state.contact_is_invalid} />
                                     <Form.Control.Feedback type="invalid">
-                                        Contact cannot be empty
+                                        {config.contactInvalidFeedback}
                                     </Form.Control.Feedback>
                                 </Form.Group>
                             </Form.Row>
-                            <Form.Label>Alternate Contact Number</Form.Label>
+                            <Form.Label>{config.altContactLabel}</Form.Label>
                             <Form.Row>
-                                <Form.Group sm={4} as={Col} controlId="formGridAltContact">
-                                    <Form.Control onChange={this.onAltContactCodeChange} placeholder="Code" />
+                                <Form.Group xs={4} as={Col} controlId="formGridAltContactCode">
+                                    <Form.Control custom as="select" onChange={this.onAltContactCodeChange} >
+                                        {config.countryCodeSelectList.map((this.optionGenerator))}
+                                    </Form.Control>
                                 </Form.Group>
-                                <Form.Group sm={8} as={Col} controlId="formGridContact">
-                                    <Form.Control onChange={this.onAltContactChange} placeholder="Number" />
+                                <Form.Group xs={8} as={Col} controlId="formGridAltContact">
+                                    <Form.Control type="number" onChange={this.onAltContactChange} placeholder={config.altContactLabel} isInvalid={this.state.alt_contact_is_invalid} />
+                                    <Form.Control.Feedback type="invalid">
+                                        {config.altContactInvalidFeedback}
+                                    </Form.Control.Feedback>
                                 </Form.Group>
                             </Form.Row>
-                            <Form.Label>Describe yourself</Form.Label>
+                            <Form.Label>{config.descriptionLabel}</Form.Label>
                             <Form.Row>
                                 <Form.Group as={Col} controlId="formGridDescription">
-                                        <Form.Control as="textarea" onChange={this.onDescriptionChange} placeholder="Write something about yourself" />
+                                        <Form.Control as="textarea" onChange={this.onDescriptionChange} placeholder={config.descriptionPlaceholder} />
                                 </Form.Group>
                             </Form.Row>
-                            <Form.Label>Fide ID and Lichess ID</Form.Label>
+                            <Form.Label>{config.fideLichessLabel}</Form.Label>
                             <Form.Row>
-                                <Form.Group as={Col} controlId="formGridFideID">
-                                        <Form.Control onChange={this.onFideIDChange} placeholder="Fide ID" />
+                                <Form.Group md={6} as={Col} controlId="formGridFideID">
+                                        <Form.Control onChange={this.onFideIDChange} placeholder={config.fideLabel} />
                                 </Form.Group>
-                                <Form.Group as={Col} controlId="formGridLichessID">
-                                        <Form.Control onChange={this.onLichessIDChange}placeholder="Lichess ID" />
+                                <Form.Group md={6} as={Col} controlId="formGridLichessID">
+                                        <Form.Control onChange={this.onLichessIDChange}placeholder={config.lichessLabel} />
                                 </Form.Group>
                             </Form.Row>
-                            {/* <Form.Label>User Photo</Form.Label>
+                            {/* <Form.Label>{config.imageLabel}</Form.Label>
                             <Form.Row>
                                 <Form.Group as={Col} >
-                                        <Form.File type="file" id="formGridphoto" onChange={this.onPhotoChange} label="Upload your photo" custom />
+                                        <Form.File type="file" id="formGridphoto" onChange={this.onPhotoChange} label={config.imagePlaceholder} custom />
                                 </Form.Group>
                             </Form.Row> */}
                         </Form>
