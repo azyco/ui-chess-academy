@@ -73,7 +73,7 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
     */
     handleRegister = () => {
         const encryptedPassword = CryptoJS.SHA1(this.state.password).toString(CryptoJS.enc.Hex);
-        const dob_sql = this.state.dob.toISOString().slice(0, 19).replace('T', ' ');
+        const dob_sql = this.state.dob.getFullYear()+"-"+(this.state.dob.getMonth()+1)+"-"+this.state.dob.getDate();
         const parent = (this.state.parent_is_disabled)? '':this.state.parent;
         const country_sql_length = this.state.country.length;
         const country_sql = this.state.country.substring(country_sql_length-4,country_sql_length-1);
@@ -99,7 +99,7 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
             this.props.onAlert({alert_type:"success",alert_text:config.registrationSuccessfulText});
         }).catch((error)=>{
             console.log(error.response);
-            if(error.response.data.code === 'ER_DUP_ENTRY'){
+            if(error.response.data.error_code === 'ER_DUP_ENTRY'){
                 this.props.onAlert({alert_type:"warning",alert_text:"E-Mail/Contact in use."});    
             }
             else{
@@ -222,8 +222,8 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
     {
         return (
             <Container>
-                <Card bg="light" style={{marginTop:'2em'}}>
-                    <Card.Header>{config.studentRegistrationText}</Card.Header>
+                <Card bg="light" style={{marginTop:'1em'}}>
+                    <Card.Header as="h5" >{config.studentRegistrationText}</Card.Header>
                     <Card.Body>
                         <Form>
                             <Form.Label>{config.emailAndPasswordLabel}</Form.Label>

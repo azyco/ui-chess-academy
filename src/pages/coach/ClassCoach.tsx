@@ -4,7 +4,7 @@ export class ClassCoach extends React.Component{
     render (){
         return(
             <div>
-                coach_class
+                View and create class schedules
             </div>
         )
     }

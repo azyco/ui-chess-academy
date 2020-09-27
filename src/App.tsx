@@ -17,7 +17,7 @@ import { RegisterCoach } from './pages/coach/RegisterCoach';
 import config from './config';
 import Api from './api/backend';
 
-import {Navbar, Nav, Alert} from 'react-bootstrap';
+import {Navbar, Nav, Alert, Button} from 'react-bootstrap';
 
 type userDetailsType = {
   id: number,
@@ -43,8 +43,32 @@ type userDetailsType = {
   is_private_parent: boolean
 }
 
+type userDetailsTypeResponse = {
+  id: number,
+  user_type: string,
+  email: string,
+  created_at: string
+  fullname: string,
+  country: string,
+  state: string,
+  description: string,
+  user_image: Blob,
+  fide_id: string,
+  lichess_id: string,
+  contact: number,
+  contact_code: number,
+  alt_contact: number,
+  alt_contact_code: number,
+  dob: string,
+  parent: string,
+  is_private_contact: boolean,
+  is_private_alt_contact: boolean,
+  is_private_dob: boolean,
+  is_private_parent: boolean
+}
+
 type loginResponseType = {
-  user_details: userDetailsType,
+  user_details: userDetailsTypeResponse,
 }
 
 type AppClassProps = {
@@ -115,7 +139,30 @@ class App extends React.Component<AppClassProps, AppClassState>{
    * @param loginResponseInfo HTTP response struct with login data
    */
   createLoginState = (loginResponseInfo: loginResponseType) => {
-    this.setState({signed_in: (!!loginResponseInfo.user_details), user_details: loginResponseInfo.user_details },()=>{console.log(this.state.signed_in);});
+    const data:userDetailsType = {
+      id: loginResponseInfo.user_details.id,
+      user_type: loginResponseInfo.user_details.user_type,
+      email: loginResponseInfo.user_details.email,
+      created_at: loginResponseInfo.user_details.created_at,
+      fullname: loginResponseInfo.user_details.fullname,
+      country: loginResponseInfo.user_details.country,
+      state: loginResponseInfo.user_details.state,
+      description: loginResponseInfo.user_details.description,
+      user_image: loginResponseInfo.user_details.user_image,
+      fide_id: loginResponseInfo.user_details.fide_id,
+      lichess_id: loginResponseInfo.user_details.lichess_id,
+      contact: loginResponseInfo.user_details.contact,
+      contact_code: loginResponseInfo.user_details.contact_code,
+      alt_contact: loginResponseInfo.user_details.alt_contact,
+      alt_contact_code: loginResponseInfo.user_details.alt_contact_code,
+      dob: new Date(loginResponseInfo.user_details.dob),
+      parent: loginResponseInfo.user_details.parent,
+      is_private_contact: loginResponseInfo.user_details.is_private_contact,
+      is_private_alt_contact: loginResponseInfo.user_details.is_private_alt_contact,
+      is_private_dob: loginResponseInfo.user_details.is_private_dob,
+      is_private_parent: loginResponseInfo.user_details.is_private_parent
+    }
+    this.setState({signed_in: (!!loginResponseInfo.user_details), user_details: data },()=>{console.log(this.state.signed_in);});
   }
 
   studentRegister(){
@@ -127,9 +174,9 @@ class App extends React.Component<AppClassProps, AppClassState>{
   signInPrompt(){
     if (this.state.signed_in){
       return (
-        <Navbar.Text>
-          {config.loginWelcomeText}, <Link style={{textDecoration: 'none'}} to="/profile">{this.state.user_details?.fullname}</Link>
-        </Navbar.Text>
+          <Navbar.Text>
+            {config.loginWelcomeText}, <Link style={{textDecoration: 'none'}} to="/profile">{this.state.user_details?.fullname}</Link>
+          </Navbar.Text>
         );
     }
     else{
@@ -148,7 +195,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
   renderAlert(){
     if(this.state.show_alert){
       return (
-      <Alert variant={this.state.alert_type} onClose={() => this.setState({show_alert:false})}  dismissible>
+      <Alert style={{marginBottom:0}} variant={this.state.alert_type} onClose={() => this.setState({show_alert:false})}  dismissible>
         {this.state.alert_text}
       </Alert>
       );

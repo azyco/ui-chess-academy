@@ -30,7 +30,7 @@ export default {
     countryCodeSelectList: ['+91'],
     emailAndPasswordLabel: 'E-Mail and Password',
     emailInvalidFeedback: 'Enter a valid Email',
-    passwordInvalidFeedback: 'Enter a valid Password',
+    passwordInvalidFeedback: 'Password must be atleast 6 letters long',
     fullNameLabel: 'Full Name',
     fullNameInvalidFeedback: 'Full Name must contain atleast 2 letters',
     countryAndStateLabel: 'Country and State',

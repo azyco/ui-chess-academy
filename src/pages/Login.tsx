@@ -26,14 +26,14 @@ export class Login extends React.Component<LoginProps,LoginState> {
             email: "",
             password: "",
             redirect_to: 'login',
-            email_is_invalid:true,
-            password_is_invalid:true
+            email_is_invalid: false,
+            password_is_invalid: false
         };
         this.handleLoginClick.bind(this.state);
     }
 
     isLoginDisabled(){
-        return this.state.email_is_invalid || this.state.password_is_invalid;
+        return this.state.email.length === 0 || this.state.email_is_invalid || this.state.password.length === 0 || this.state.password_is_invalid;
     }
 
     handleLoginClick = ()=>{
@@ -61,7 +61,8 @@ export class Login extends React.Component<LoginProps,LoginState> {
     }
     
     onEmailChange = (ev: any) => {
-        this.setState({email: ev.target.value, email_is_invalid:!ev.target.value});
+        const valid_test = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(ev.target.value);
+        this.setState({email: ev.target.value, email_is_invalid:!valid_test});
     }
 
     onPasswordChange = (ev: any) => {
@@ -79,14 +80,14 @@ export class Login extends React.Component<LoginProps,LoginState> {
         return (
             <Container >
                 {this.renderRedirect()}
-                <Card bg="light" style={{marginTop:'2em'}}>
-                    <Card.Header>{config.loginText}</Card.Header>
+                <Card bg="light" style={{marginTop:'1em'}}>
+                    <Card.Header as="h5">{config.loginText}</Card.Header>
                     <Card.Body>
                         <Form>
                         <Form.Group controlId="formBasicEmail">
                         <Form.Control onChange={this.onEmailChange} value={this.state.email} type="email" placeholder={config.emailPlaceholderText} isInvalid={this.state.email_is_invalid}/>
                         <Form.Control.Feedback type="invalid">
-                            Email can't be empty
+                            Please enter a valid email address
                         </Form.Control.Feedback>
                         </Form.Group>
 

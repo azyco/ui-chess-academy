@@ -3,12 +3,8 @@ import { Redirect } from 'react-router-dom'
 
 import { DashboardStudent } from './student/DashboardStudent';
 import { DashboardCoach } from './coach/DashboardCoach';
-import { ClassStudent } from './student/ClassStudent';
-import { ClassCoach } from './coach/ClassCoach';
 import { Admin } from './Admin';
 
-//import { ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
-//import 'react-pro-sidebar/dist/css/styles.css';
 //import config from '../config';
 
 type userDetailsType = {
