@@ -5,12 +5,11 @@ import {
     Button,
     Row, Col,
     Nav, Tab,
-    Form,
     Card
 } from 'react-bootstrap';
 
-import config from '../config';
- 
+//import config from '../config';
+
 type AdminProps = {
     onAlert: Function,
     onLogout: any,
@@ -46,12 +45,12 @@ type userDetailsType = {
 }
 
 export class Admin extends React.Component<AdminProps, AdminState>{
-    constructor(props:AdminProps){
+    constructor(props: AdminProps) {
         super(props);
     }
 
-    render (){
-        return(
+    render() {
+        return (
             <Container fluid >
                 <Tab.Container id="left-tabs-example" defaultActiveKey="profile">
                     <Row>

@@ -1,8 +1,8 @@
 import React from 'react';
- 
-export class AssignmentsCoach extends React.Component{
-    render (){
-        return(
+
+export class AssignmentsCoach extends React.Component {
+    render() {
+        return (
             <div>
                 Create assignments
             </div>

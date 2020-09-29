@@ -32,47 +32,48 @@ type userDetailsType = {
 }
 
 type ProfileProps = {
-    user_details: userDetailsType|null,
+    user_details: userDetailsType | null,
     onLogout: Function,
-    onAlert: Function
+    onAlert: Function,
+    updateState: Function
 };
 
 type ProfileState = {
-    signed_in : boolean
+    signed_in: boolean
 };
 
-export class Profile extends React.Component<ProfileProps,ProfileState> {
-    constructor(props:ProfileProps){
+export class Profile extends React.Component<ProfileProps, ProfileState> {
+    constructor(props: ProfileProps) {
         super(props);
-        this.state= {
+        this.state = {
             signed_in: (!!this.props.user_details)
         };
     }
 
     componentWillReceiveProps(nextProps: ProfileProps) {
-        if ( nextProps.user_details !== this.props.user_details) {
+        if (nextProps.user_details !== this.props.user_details) {
             this.setState({
                 signed_in: (!!nextProps.user_details),
             });
         }
     }
 
-    render(){
-        if(this.state.signed_in) {
-            if(this.props.user_details?.user_type === 'student'){
-                return (<DashboardStudent user_details={this.props.user_details} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
+    render() {
+        if (this.state.signed_in) {
+            if (this.props.user_details?.user_type === 'student') {
+                return (<DashboardStudent updateState={this.props.updateState} user_details={this.props.user_details} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
             }
-            else if(this.props.user_details?.user_type === 'coach'){
-                return (<DashboardCoach user_details={this.props.user_details} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
+            else if (this.props.user_details?.user_type === 'coach') {
+                return (<DashboardCoach updateState={this.props.updateState} user_details={this.props.user_details} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
             }
-            else if(this.props.user_details?.user_type === 'admin '){
+            else if (this.props.user_details?.user_type === 'admin ') {
                 return (<Admin user_details={this.props.user_details} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
             }
-            else{
+            else {
                 return (<Redirect to='/' />);
             }
         }
-        else{
+        else {
             return (<Redirect to='/' />);
         }
     }

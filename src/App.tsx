@@ -17,7 +17,7 @@ import { RegisterCoach } from './pages/coach/RegisterCoach';
 import config from './config';
 import Api from './api/backend';
 
-import {Navbar, Nav, Alert, Button} from 'react-bootstrap';
+import { Navbar, Nav, Alert } from 'react-bootstrap';
 
 type userDetailsType = {
   id: number,
@@ -77,7 +77,7 @@ type AppClassProps = {
 
 type AppClassState = {
   signed_in: boolean,
-  user_details: userDetailsType|null,
+  user_details: userDetailsType | null,
   show_alert: boolean,
   alert_text: string,
   alert_type: string
@@ -89,7 +89,7 @@ type alertDetailsType = {
 }
 
 class App extends React.Component<AppClassProps, AppClassState>{
-  constructor(props:AppClassProps){
+  constructor(props: AppClassProps) {
     super(props);
     this.state = {
       signed_in: false,
@@ -108,24 +108,24 @@ class App extends React.Component<AppClassProps, AppClassState>{
       console.log(resp.data);
       this.createLoginState(resp.data);
     }).catch((error) => {
-      console.log("Session Reset\n",error);
+      console.log("Session Reset\n", error);
       this.setState({ user_details: null });
     });
   }
 
   logoutCallback = () => {
     Api.delete('/login').then(
-      (response)=>{
+      (response) => {
         console.log(response);
         this.setState({
           signed_in: false,
           user_details: null
         });
-        this.alertCallback({alert_type:"success", alert_text:"Logged out successfully"});
+        this.alertCallback({ alert_type: "success", alert_text: "Logged out successfully" });
       }
-    ).catch((error)=>{
-      console.log(error.response)
-      this.alertCallback({alert_type:"warning",alert_text:config.serverDownAlertText});
+    ).catch((error) => {
+      console.log(error)
+      this.alertCallback({ alert_type: "warning", alert_text: config.serverDownAlertText });
     });
   }
 
@@ -139,7 +139,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
    * @param loginResponseInfo HTTP response struct with login data
    */
   createLoginState = (loginResponseInfo: loginResponseType) => {
-    const data:userDetailsType = {
+    const data: userDetailsType = {
       id: loginResponseInfo.user_details.id,
       user_type: loginResponseInfo.user_details.user_type,
       email: loginResponseInfo.user_details.email,
@@ -162,50 +162,60 @@ class App extends React.Component<AppClassProps, AppClassState>{
       is_private_dob: loginResponseInfo.user_details.is_private_dob,
       is_private_parent: loginResponseInfo.user_details.is_private_parent
     }
-    this.setState({signed_in: (!!loginResponseInfo.user_details), user_details: data },()=>{console.log(this.state.signed_in);});
+    this.setState({ signed_in: (!!loginResponseInfo.user_details), user_details: data }, () => { console.log(this.state); });
   }
 
-  studentRegister(){
-    if (!this.state.signed_in){
-      return(<Nav.Link href="/student/register">{config.registerText}</Nav.Link>);
+  updateStateCallback = () => {
+    Api.get('/relogin').then((resp) => {
+      console.log(resp.data);
+      this.createLoginState(resp.data);
+    }).catch((error) => {
+      console.log("Session Reset\n", error);
+      this.setState({ user_details: null });
+    });
+  }
+
+  studentRegister() {
+    if (!this.state.signed_in) {
+      return (<Nav.Link href="/student/register">{config.registerText}</Nav.Link>);
     }
   }
 
-  signInPrompt(){
-    if (this.state.signed_in){
-      return (
-          <Navbar.Text>
-            {config.loginWelcomeText}, <Link style={{textDecoration: 'none'}} to="/profile">{this.state.user_details?.fullname}</Link>
-          </Navbar.Text>
-        );
-    }
-    else{
+  signInPrompt() {
+    if (this.state.signed_in) {
       return (
         <Navbar.Text>
-          <Link style={{textDecoration: 'none'}} to="/login">{config.loginText}</Link>
+          {config.loginWelcomeText}, <Link style={{ textDecoration: 'none' }} to="/profile">{this.state.user_details?.fullname}</Link>
         </Navbar.Text>
-        );
+      );
+    }
+    else {
+      return (
+        <Navbar.Text>
+          <Link style={{ textDecoration: 'none' }} to="/login">{config.loginText}</Link>
+        </Navbar.Text>
+      );
     }
   }
 
-  alertCallback = (alert_details:alertDetailsType) => {
-    this.setState({show_alert:true, alert_text:alert_details.alert_text, alert_type:alert_details.alert_type});
+  alertCallback = (alert_details: alertDetailsType) => {
+    this.setState({ show_alert: true, alert_text: alert_details.alert_text, alert_type: alert_details.alert_type });
   }
 
-  renderAlert(){
-    if(this.state.show_alert){
+  renderAlert() {
+    if (this.state.show_alert) {
       return (
-      <Alert style={{marginBottom:0}} variant={this.state.alert_type} onClose={() => this.setState({show_alert:false})}  dismissible>
-        {this.state.alert_text}
-      </Alert>
+        <Alert style={{ marginBottom: 0 }} variant={this.state.alert_type} onClose={() => this.setState({ show_alert: false })} dismissible>
+          {this.state.alert_text}
+        </Alert>
       );
     }
   }
 
   render() {
     return (
-    <Router>
-      <Navbar bg="dark" variant="dark" expand="lg">
+      <Router>
+        <Navbar bg="dark" variant="dark" expand="lg">
           <Navbar.Brand href="/">{config.websiteName}</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
@@ -215,29 +225,29 @@ class App extends React.Component<AppClassProps, AppClassState>{
             </Nav>
             {this.signInPrompt()}
           </Navbar.Collapse>
-      </Navbar>
-      {this.renderAlert()}
-      <Switch>
-        <Route path="/about">
-          <About />
-        </Route>
-        <Route path="/profile">
-          <Profile onAlert={this.alertCallback} onLogout={this.logoutCallback} user_details={this.state.user_details} />
-        </Route>
-        <Route path="/login">
-          <Login onAlert={this.alertCallback} onLogin={this.loginCallback}/>
-        </Route>
-        <Route path="/student/register">
-          <RegisterStudent onAlert={this.alertCallback}/>
-        </Route>
-        <Route path="/coach/register">
-          <RegisterCoach onAlert={this.alertCallback}/>
-        </Route>
-        <Route path="/">
-          <Home />
-        </Route>
-      </Switch>
-    </Router>
+        </Navbar>
+        {this.renderAlert()}
+        <Switch>
+          <Route path="/about">
+            <About />
+          </Route>
+          <Route path="/profile">
+            <Profile updateState={this.updateStateCallback} onAlert={this.alertCallback} onLogout={this.logoutCallback} user_details={this.state.user_details} />
+          </Route>
+          <Route path="/login">
+            <Login onAlert={this.alertCallback} onLogin={this.loginCallback} />
+          </Route>
+          <Route path="/student/register">
+            <RegisterStudent onAlert={this.alertCallback} />
+          </Route>
+          <Route path="/coach/register">
+            <RegisterCoach onAlert={this.alertCallback} />
+          </Route>
+          <Route path="/">
+            <Home />
+          </Route>
+        </Switch>
+      </Router>
     );
   }
 }
