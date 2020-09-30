@@ -14,11 +14,14 @@ import { AssignmentsStudent } from './AssignmentsStudent';
 import Api from '../../api/backend';
 import config from '../../config';
 
-type userDetailsType = {
+type userAuthenticationType = {
     id: number,
     user_type: string,
     email: string,
     created_at: string
+}
+
+type userProfileType = {
     fullname: string,
     country: string,
     state: string,
@@ -41,7 +44,8 @@ type userDetailsType = {
 type DashboardStudentProps = {
     onAlert: Function,
     onLogout: any,
-    user_details: userDetailsType,
+    user_authentication: userAuthenticationType,
+    user_profile: userProfileType,
     updateState: Function
 }
 
@@ -71,53 +75,53 @@ export class DashboardStudent extends React.Component<DashboardStudentProps, Das
     constructor(props: DashboardStudentProps) {
         super(props);
         const today: Date = new Date();
-        const parent_disabled_test = (Math.abs(today.valueOf() - this.props.user_details.dob.valueOf()) / (1000 * 60 * 60 * 24 * 365)) >= 18;
+        const parent_disabled_test = (Math.abs(today.valueOf() - this.props.user_profile.dob.valueOf()) / (1000 * 60 * 60 * 24 * 365)) >= 18;
         this.state = {
             profile_edit_mode: false,
-            fullname: this.props.user_details.fullname,
+            fullname: this.props.user_profile.fullname,
             fullname_is_invalid: false,
-            state: this.props.user_details.state,
-            description: this.props.user_details.description,
-            fide_id: this.props.user_details.fide_id,
-            lichess_id: this.props.user_details.lichess_id,
+            state: this.props.user_profile.state,
+            description: this.props.user_profile.description,
+            fide_id: this.props.user_profile.fide_id,
+            lichess_id: this.props.user_profile.lichess_id,
             password: '00000',
             password_is_invalid: false,
-            dob: this.props.user_details.dob,
+            dob: this.props.user_profile.dob,
             dob_is_invalid: false,
-            parent: this.props.user_details.parent,
-            parent_is_invalid: (this.props.user_details.parent) ? false : true,
+            parent: this.props.user_profile.parent,
+            parent_is_invalid: (this.props.user_profile.parent) ? false : true,
             parent_is_disabled: parent_disabled_test,
             photo_blob: new Blob(),
-            is_private_parent: this.props.user_details.is_private_parent,
-            is_private_contact: this.props.user_details.is_private_contact,
-            is_private_alt_contact: this.props.user_details.is_private_alt_contact,
-            is_private_dob: this.props.user_details.is_private_dob
+            is_private_parent: this.props.user_profile.is_private_parent,
+            is_private_contact: this.props.user_profile.is_private_contact,
+            is_private_alt_contact: this.props.user_profile.is_private_alt_contact,
+            is_private_dob: this.props.user_profile.is_private_dob
         };
     }
 
     resetState = () => {
         const today: Date = new Date();
-        const parent_disabled_test: boolean = (Math.abs(today.valueOf() - this.props.user_details.dob.valueOf()) / (1000 * 60 * 60 * 24 * 365)) >= 18;
+        const parent_disabled_test: boolean = (Math.abs(today.valueOf() - this.props.user_profile.dob.valueOf()) / (1000 * 60 * 60 * 24 * 365)) >= 18;
         this.setState({
             profile_edit_mode: false,
-            fullname: this.props.user_details.fullname,
+            fullname: this.props.user_profile.fullname,
             fullname_is_invalid: false,
-            state: this.props.user_details.state,
-            description: this.props.user_details.description,
-            fide_id: this.props.user_details.fide_id,
-            lichess_id: this.props.user_details.lichess_id,
+            state: this.props.user_profile.state,
+            description: this.props.user_profile.description,
+            fide_id: this.props.user_profile.fide_id,
+            lichess_id: this.props.user_profile.lichess_id,
             password: '00000',
             password_is_invalid: false,
-            dob: this.props.user_details.dob,
+            dob: this.props.user_profile.dob,
             dob_is_invalid: false,
-            parent: this.props.user_details.parent,
-            parent_is_invalid: (this.props.user_details.parent) ? false : true,
+            parent: this.props.user_profile.parent,
+            parent_is_invalid: (this.props.user_profile.parent) ? false : true,
             parent_is_disabled: parent_disabled_test,
             photo_blob: new Blob(),
-            is_private_parent: this.props.user_details.is_private_parent,
-            is_private_contact: this.props.user_details.is_private_contact,
-            is_private_alt_contact: this.props.user_details.is_private_alt_contact,
-            is_private_dob: this.props.user_details.is_private_dob
+            is_private_parent: this.props.user_profile.is_private_parent,
+            is_private_contact: this.props.user_profile.is_private_contact,
+            is_private_alt_contact: this.props.user_profile.is_private_alt_contact,
+            is_private_dob: this.props.user_profile.is_private_dob
         });
     }
 
@@ -203,8 +207,8 @@ export class DashboardStudent extends React.Component<DashboardStudentProps, Das
     editForm = () => {
         const dob_sql = this.state.dob.getFullYear() + "-" + (this.state.dob.getMonth() + 1) + "-" + this.state.dob.getDate();
         const parent = (this.state.parent_is_disabled) ? '' : this.state.parent;
-        Api.put('/user', {
-            email: this.props.user_details.email,
+        Api.put('/profile', {
+            email: this.props.user_authentication.email,
             updated_user_profile: {
                 fullname: this.state.fullname,
                 state: this.state.state,
@@ -223,7 +227,7 @@ export class DashboardStudent extends React.Component<DashboardStudentProps, Das
             console.log(response);
             this.props.onAlert({ alert_type: "success", alert_text: config.updateSuccesfulText });
             this.setState({ profile_edit_mode: false });
-            this.props.updateState();
+            this.props.updateState(response);
         }).catch((error) => {
             console.log(error);
             this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
@@ -238,8 +242,8 @@ export class DashboardStudent extends React.Component<DashboardStudentProps, Das
                     <Form.Row>
                         <Form.Group as={Col} controlId="formGridParent">
                             <InputGroup>
-                                <Form.Control readOnly value={this.props.user_details?.parent} />
-                                {this.renderPrivateButton(this.props.user_details.is_private_parent, null, !this.state.profile_edit_mode)}
+                                <Form.Control readOnly value={this.props.user_profile?.parent} />
+                                {this.renderPrivateButton(this.props.user_profile.is_private_parent, null, !this.state.profile_edit_mode)}
                             </InputGroup>
                         </Form.Group>
                     </Form.Row>
@@ -293,7 +297,7 @@ export class DashboardStudent extends React.Component<DashboardStudentProps, Das
                     <Form.Label>{config.emailAndPasswordLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group md={6} as={Col} controlId="formGridEmail">
-                            <Form.Control readOnly type="email" value={this.props.user_details?.email} />
+                            <Form.Control readOnly type="email" value={this.props.user_authentication?.email} />
                         </Form.Group>
                         <Form.Group md={6} as={Col} controlId="formGridPassword">
                             <Form.Control readOnly type="password" value={'******'} />
@@ -302,24 +306,24 @@ export class DashboardStudent extends React.Component<DashboardStudentProps, Das
                     <Form.Label>{config.fullNameLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group as={Col} controlId="formGridFullName">
-                            <Form.Control readOnly value={this.props.user_details?.fullname} />
+                            <Form.Control readOnly value={this.props.user_profile?.fullname} />
                         </Form.Group>
                     </Form.Row>
                     <Form.Label>{config.countryAndStateLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group md={6} as={Col} controlId="formGridCountry">
-                            <Form.Control readOnly value={this.props.user_details?.country} />
+                            <Form.Control readOnly value={this.props.user_profile?.country} />
                         </Form.Group>
                         <Form.Group md={6} as={Col} controlId="formGridState">
-                            <Form.Control readOnly value={this.props.user_details?.state} />
+                            <Form.Control readOnly value={this.props.user_profile?.state} />
                         </Form.Group>
                     </Form.Row>
                     <Form.Label>{config.dobLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group as={Col} controlId="formGridDate">
                             <InputGroup>
-                                <Form.Control readOnly value={this.props.user_details.dob.toDateString()} />
-                                {this.renderPrivateButton(this.props.user_details.is_private_dob, null, !this.state.profile_edit_mode)}
+                                <Form.Control readOnly value={this.props.user_profile.dob.toDateString()} />
+                                {this.renderPrivateButton(this.props.user_profile.is_private_dob, null, !this.state.profile_edit_mode)}
                             </InputGroup>
                         </Form.Group>
                     </Form.Row>
@@ -327,40 +331,40 @@ export class DashboardStudent extends React.Component<DashboardStudentProps, Das
                     <Form.Label>{config.contactLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group xs={3} as={Col} controlId="formGridContactCode">
-                            <Form.Control readOnly value={"+" + this.props.user_details?.contact_code} />
+                            <Form.Control readOnly value={"+" + this.props.user_profile?.contact_code} />
                         </Form.Group>
                         <Form.Group xs={9} as={Col} controlId="formGridContact">
                             <InputGroup>
-                                <Form.Control readOnly type="number" value={this.props.user_details?.contact} />
-                                {this.renderPrivateButton(this.props.user_details.is_private_contact, null, !this.state.profile_edit_mode)}
+                                <Form.Control readOnly type="number" value={this.props.user_profile?.contact} />
+                                {this.renderPrivateButton(this.props.user_profile.is_private_contact, null, !this.state.profile_edit_mode)}
                             </InputGroup>
                         </Form.Group>
                     </Form.Row>
                     <Form.Label>{config.altContactLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group xs={3} as={Col} controlId="formGridAltContactCode">
-                            <Form.Control readOnly value={"+" + this.props.user_details?.alt_contact_code} />
+                            <Form.Control readOnly value={"+" + this.props.user_profile?.alt_contact_code} />
                         </Form.Group>
                         <Form.Group xs={9} as={Col} controlId="formGridAltContact">
                             <InputGroup>
-                                <Form.Control readOnly type="number" value={this.props.user_details?.alt_contact} />
-                                {this.renderPrivateButton(this.props.user_details.is_private_alt_contact, null, !this.state.profile_edit_mode)}
+                                <Form.Control readOnly type="number" value={this.props.user_profile?.alt_contact} />
+                                {this.renderPrivateButton(this.props.user_profile.is_private_alt_contact, null, !this.state.profile_edit_mode)}
                             </InputGroup>
                         </Form.Group>
                     </Form.Row>
                     <Form.Label>{config.descriptionLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group as={Col} controlId="formGridDescription">
-                            <Form.Control readOnly as="textarea" value={this.props.user_details?.description} />
+                            <Form.Control readOnly as="textarea" value={this.props.user_profile?.description} />
                         </Form.Group>
                     </Form.Row>
                     <Form.Label>{config.fideLichessLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group md={6} as={Col} controlId="formGridFideID">
-                            <Form.Control readOnly value={this.props.user_details?.fide_id} />
+                            <Form.Control readOnly value={this.props.user_profile?.fide_id} />
                         </Form.Group>
                         <Form.Group md={6} as={Col} controlId="formGridLichessID">
-                            <Form.Control readOnly value={this.props.user_details?.lichess_id} />
+                            <Form.Control readOnly value={this.props.user_profile?.lichess_id} />
                         </Form.Group>
                     </Form.Row>
                     {/* <Form.Label>{config.imageLabel}</Form.Label>
@@ -384,7 +388,7 @@ export class DashboardStudent extends React.Component<DashboardStudentProps, Das
                     <Form.Label>{config.emailAndPasswordLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group md={6} as={Col} controlId="formGridEmail">
-                            <Form.Control readOnly type="email" value={this.props.user_details?.email} />
+                            <Form.Control readOnly type="email" value={this.props.user_authentication?.email} />
                         </Form.Group>
                         <Form.Group md={6} as={Col} controlId="formGridPassword">
                             <Form.Control readOnly type="password" value={'******'} />
@@ -402,10 +406,10 @@ export class DashboardStudent extends React.Component<DashboardStudentProps, Das
                     <Form.Label>{config.countryAndStateLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group md={6} as={Col} controlId="formGridCountry">
-                            <Form.Control readOnly value={this.props.user_details?.country} />
+                            <Form.Control readOnly value={this.props.user_profile?.country} />
                         </Form.Group>
                         <Form.Group md={6} as={Col} controlId="formGridState">
-                            <Form.Control custom as="select" onChange={this.onStateChange} defaultValue={this.props.user_details.state}>
+                            <Form.Control custom as="select" onChange={this.onStateChange} defaultValue={this.props.user_profile.state}>
                                 {config.stateSelectList.map((this.optionGenerator))}
                             </Form.Control>
                         </Form.Group>
@@ -429,11 +433,11 @@ export class DashboardStudent extends React.Component<DashboardStudentProps, Das
                     <Form.Label>{config.contactLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group xs={3} as={Col} controlId="formGridContactCode">
-                            <Form.Control readOnly value={"+" + this.props.user_details?.contact_code} />
+                            <Form.Control readOnly value={"+" + this.props.user_profile?.contact_code} />
                         </Form.Group>
                         <Form.Group xs={9} as={Col} controlId="formGridContact">
                             <InputGroup>
-                                <Form.Control readOnly type="number" value={this.props.user_details?.contact} />
+                                <Form.Control readOnly type="number" value={this.props.user_profile?.contact} />
                                 {this.renderPrivateButton(this.state.is_private_contact, this.togglePrivateContact, !this.state.profile_edit_mode)}
                             </InputGroup>
                         </Form.Group>
@@ -441,11 +445,11 @@ export class DashboardStudent extends React.Component<DashboardStudentProps, Das
                     <Form.Label>{config.altContactLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group xs={3} as={Col} controlId="formGridAltContactCode">
-                            <Form.Control readOnly value={"+" + this.props.user_details?.alt_contact_code} />
+                            <Form.Control readOnly value={"+" + this.props.user_profile?.alt_contact_code} />
                         </Form.Group>
                         <Form.Group xs={9} as={Col} controlId="formGridAltContact">
                             <InputGroup>
-                                <Form.Control readOnly type="number" value={this.props.user_details?.alt_contact} />
+                                <Form.Control readOnly type="number" value={this.props.user_profile?.alt_contact} />
                                 {this.renderPrivateButton(this.state.is_private_alt_contact, this.togglePrivateAltContact, !this.state.profile_edit_mode)}
                             </InputGroup>
                         </Form.Group>

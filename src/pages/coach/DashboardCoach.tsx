@@ -14,11 +14,13 @@ import { AssignmentsCoach } from './AssignmentsCoach';
 import Api from '../../api/backend';
 import config from '../../config';
 
-type userDetailsType = {
+type userAuthenticationType = {
     id: number,
     user_type: string,
     email: string,
     created_at: string
+}
+type userProfileType = {
     fullname: string,
     country: string,
     state: string,
@@ -31,15 +33,18 @@ type userDetailsType = {
     alt_contact: number,
     alt_contact_code: number,
     dob: Date,
+    parent: string,
     is_private_contact: boolean,
     is_private_alt_contact: boolean,
     is_private_dob: boolean,
+    is_private_parent: boolean
 }
 
 type DashboardCoachProps = {
     onAlert: Function,
     onLogout: any,
-    user_details: userDetailsType,
+    user_authentication: userAuthenticationType,
+    user_profile: userProfileType,
     updateState: Function
 }
 
@@ -66,40 +71,40 @@ export class DashboardCoach extends React.Component<DashboardCoachProps, Dashboa
         super(props);
         this.state = {
             profile_edit_mode: false,
-            fullname: this.props.user_details.fullname,
+            fullname: this.props.user_profile.fullname,
             fullname_is_invalid: false,
-            state: this.props.user_details.state,
-            description: this.props.user_details.description,
-            fide_id: this.props.user_details.fide_id,
-            lichess_id: this.props.user_details.lichess_id,
+            state: this.props.user_profile.state,
+            description: this.props.user_profile.description,
+            fide_id: this.props.user_profile.fide_id,
+            lichess_id: this.props.user_profile.lichess_id,
             password: '00000',
             password_is_invalid: false,
-            dob: this.props.user_details.dob,
+            dob: this.props.user_profile.dob,
             dob_is_invalid: false,
             photo_blob: new Blob(),
-            is_private_contact: this.props.user_details.is_private_contact,
-            is_private_alt_contact: this.props.user_details.is_private_alt_contact,
-            is_private_dob: this.props.user_details.is_private_dob
+            is_private_contact: this.props.user_profile.is_private_contact,
+            is_private_alt_contact: this.props.user_profile.is_private_alt_contact,
+            is_private_dob: this.props.user_profile.is_private_dob
         };
     }
 
     resetState = () => {
         this.setState({
             profile_edit_mode: false,
-            fullname: this.props.user_details.fullname,
+            fullname: this.props.user_profile.fullname,
             fullname_is_invalid: false,
-            state: this.props.user_details.state,
-            description: this.props.user_details.description,
-            fide_id: this.props.user_details.fide_id,
-            lichess_id: this.props.user_details.lichess_id,
+            state: this.props.user_profile.state,
+            description: this.props.user_profile.description,
+            fide_id: this.props.user_profile.fide_id,
+            lichess_id: this.props.user_profile.lichess_id,
             password: '00000',
             password_is_invalid: false,
-            dob: this.props.user_details.dob,
+            dob: this.props.user_profile.dob,
             dob_is_invalid: false,
             photo_blob: new Blob(),
-            is_private_contact: this.props.user_details.is_private_contact,
-            is_private_alt_contact: this.props.user_details.is_private_alt_contact,
-            is_private_dob: this.props.user_details.is_private_dob
+            is_private_contact: this.props.user_profile.is_private_contact,
+            is_private_alt_contact: this.props.user_profile.is_private_alt_contact,
+            is_private_dob: this.props.user_profile.is_private_dob
         });
     }
 
@@ -173,8 +178,8 @@ export class DashboardCoach extends React.Component<DashboardCoachProps, Dashboa
 
     editForm = () => {
         const dob_sql = this.state.dob.getFullYear() + "-" + (this.state.dob.getMonth() + 1) + "-" + this.state.dob.getDate();
-        Api.put('/user', {
-            email: this.props.user_details.email,
+        Api.put('/profile', {
+            email: this.props.user_authentication.email,
             updated_user_profile: {
                 fullname: this.state.fullname,
                 state: this.state.state,
@@ -193,7 +198,7 @@ export class DashboardCoach extends React.Component<DashboardCoachProps, Dashboa
             console.log(response);
             this.props.onAlert({ alert_type: "success", alert_text: config.updateSuccesfulText });
             this.setState({ profile_edit_mode: false });
-            this.props.updateState();
+            this.props.updateState(response);
         }).catch((error) => {
             console.log(error);
             this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
@@ -224,7 +229,7 @@ export class DashboardCoach extends React.Component<DashboardCoachProps, Dashboa
                     <Form.Label>{config.emailAndPasswordLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group md={6} as={Col} controlId="formGridEmail">
-                            <Form.Control readOnly type="email" value={this.props.user_details?.email} />
+                            <Form.Control readOnly type="email" value={this.props.user_authentication?.email} />
                         </Form.Group>
                         <Form.Group md={6} as={Col} controlId="formGridPassword">
                             <Form.Control readOnly type="password" value={'******'} />
@@ -233,64 +238,64 @@ export class DashboardCoach extends React.Component<DashboardCoachProps, Dashboa
                     <Form.Label>{config.fullNameLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group as={Col} controlId="formGridFullName">
-                            <Form.Control readOnly value={this.props.user_details?.fullname} />
+                            <Form.Control readOnly value={this.props.user_profile?.fullname} />
                         </Form.Group>
                     </Form.Row>
                     <Form.Label>{config.countryAndStateLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group md={6} as={Col} controlId="formGridCountry">
-                            <Form.Control readOnly value={this.props.user_details?.country} />
+                            <Form.Control readOnly value={this.props.user_profile?.country} />
                         </Form.Group>
                         <Form.Group md={6} as={Col} controlId="formGridState">
-                            <Form.Control readOnly value={this.props.user_details?.state} />
+                            <Form.Control readOnly value={this.props.user_profile?.state} />
                         </Form.Group>
                     </Form.Row>
                     <Form.Label>{config.dobLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group as={Col} controlId="formGridDate">
                             <InputGroup>
-                                <Form.Control readOnly value={this.props.user_details.dob.toDateString()} />
-                                {this.renderPrivateButton(this.props.user_details.is_private_dob, null, !this.state.profile_edit_mode)}
+                                <Form.Control readOnly value={this.props.user_profile.dob.toDateString()} />
+                                {this.renderPrivateButton(this.props.user_profile.is_private_dob, null, !this.state.profile_edit_mode)}
                             </InputGroup>
                         </Form.Group>
                     </Form.Row>
                     <Form.Label>{config.contactLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group xs={3} as={Col} controlId="formGridContactCode">
-                            <Form.Control readOnly value={"+" + this.props.user_details?.contact_code} />
+                            <Form.Control readOnly value={"+" + this.props.user_profile?.contact_code} />
                         </Form.Group>
                         <Form.Group xs={9} as={Col} controlId="formGridContact">
                             <InputGroup>
-                                <Form.Control readOnly type="number" value={this.props.user_details?.contact} />
-                                {this.renderPrivateButton(this.props.user_details.is_private_contact, null, !this.state.profile_edit_mode)}
+                                <Form.Control readOnly type="number" value={this.props.user_profile?.contact} />
+                                {this.renderPrivateButton(this.props.user_profile.is_private_contact, null, !this.state.profile_edit_mode)}
                             </InputGroup>
                         </Form.Group>
                     </Form.Row>
                     <Form.Label>{config.altContactLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group xs={3} as={Col} controlId="formGridAltContactCode">
-                            <Form.Control readOnly value={"+" + this.props.user_details?.alt_contact_code} />
+                            <Form.Control readOnly value={"+" + this.props.user_profile?.alt_contact_code} />
                         </Form.Group>
                         <Form.Group xs={9} as={Col} controlId="formGridAltContact">
                             <InputGroup>
-                                <Form.Control readOnly type="number" value={this.props.user_details?.alt_contact} />
-                                {this.renderPrivateButton(this.props.user_details.is_private_alt_contact, null, !this.state.profile_edit_mode)}
+                                <Form.Control readOnly type="number" value={this.props.user_profile?.alt_contact} />
+                                {this.renderPrivateButton(this.props.user_profile.is_private_alt_contact, null, !this.state.profile_edit_mode)}
                             </InputGroup>
                         </Form.Group>
                     </Form.Row>
                     <Form.Label>{config.descriptionLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group as={Col} controlId="formGridDescription">
-                            <Form.Control readOnly as="textarea" value={this.props.user_details?.description} />
+                            <Form.Control readOnly as="textarea" value={this.props.user_profile?.description} />
                         </Form.Group>
                     </Form.Row>
                     <Form.Label>{config.fideLichessLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group md={6} as={Col} controlId="formGridFideID">
-                            <Form.Control readOnly value={this.props.user_details?.fide_id} />
+                            <Form.Control readOnly value={this.props.user_profile?.fide_id} />
                         </Form.Group>
                         <Form.Group md={6} as={Col} controlId="formGridLichessID">
-                            <Form.Control readOnly value={this.props.user_details?.lichess_id} />
+                            <Form.Control readOnly value={this.props.user_profile?.lichess_id} />
                         </Form.Group>
                     </Form.Row>
                     {/* <Form.Label>{config.imageLabel}</Form.Label>
@@ -314,7 +319,7 @@ export class DashboardCoach extends React.Component<DashboardCoachProps, Dashboa
                     <Form.Label>{config.emailAndPasswordLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group md={6} as={Col} controlId="formGridEmail">
-                            <Form.Control readOnly type="email" value={this.props.user_details?.email} />
+                            <Form.Control readOnly type="email" value={this.props.user_authentication?.email} />
                         </Form.Group>
                         <Form.Group md={6} as={Col} controlId="formGridPassword">
                             <Form.Control readOnly type="password" value={'******'} />
@@ -332,10 +337,10 @@ export class DashboardCoach extends React.Component<DashboardCoachProps, Dashboa
                     <Form.Label>{config.countryAndStateLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group md={6} as={Col} controlId="formGridCountry">
-                            <Form.Control readOnly value={this.props.user_details?.country} />
+                            <Form.Control readOnly value={this.props.user_profile?.country} />
                         </Form.Group>
                         <Form.Group md={6} as={Col} controlId="formGridState">
-                            <Form.Control custom as="select" onChange={this.onStateChange} defaultValue={this.props.user_details.state}>
+                            <Form.Control custom as="select" onChange={this.onStateChange} defaultValue={this.props.user_profile.state}>
                                 {config.stateSelectList.map((this.optionGenerator))}
                             </Form.Control>
                         </Form.Group>
@@ -358,11 +363,11 @@ export class DashboardCoach extends React.Component<DashboardCoachProps, Dashboa
                     <Form.Label>{config.contactLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group xs={3} as={Col} controlId="formGridContactCode">
-                            <Form.Control readOnly value={"+" + this.props.user_details?.contact_code} />
+                            <Form.Control readOnly value={"+" + this.props.user_profile?.contact_code} />
                         </Form.Group>
                         <Form.Group xs={9} as={Col} controlId="formGridContact">
                             <InputGroup>
-                                <Form.Control readOnly type="number" value={this.props.user_details?.contact} />
+                                <Form.Control readOnly type="number" value={this.props.user_profile?.contact} />
                                 {this.renderPrivateButton(this.state.is_private_contact, this.togglePrivateContact, !this.state.profile_edit_mode)}
                             </InputGroup>
                         </Form.Group>
@@ -370,11 +375,11 @@ export class DashboardCoach extends React.Component<DashboardCoachProps, Dashboa
                     <Form.Label>{config.altContactLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group xs={3} as={Col} controlId="formGridAltContactCode">
-                            <Form.Control readOnly value={"+" + this.props.user_details?.alt_contact_code} />
+                            <Form.Control readOnly value={"+" + this.props.user_profile?.alt_contact_code} />
                         </Form.Group>
                         <Form.Group xs={9} as={Col} controlId="formGridAltContact">
                             <InputGroup>
-                                <Form.Control readOnly type="number" value={this.props.user_details?.alt_contact} />
+                                <Form.Control readOnly type="number" value={this.props.user_profile?.alt_contact} />
                                 {this.renderPrivateButton(this.state.is_private_alt_contact, this.togglePrivateAltContact, !this.state.profile_edit_mode)}
                             </InputGroup>
                         </Form.Group>

@@ -19,11 +19,13 @@ import Api from './api/backend';
 
 import { Navbar, Nav, Alert } from 'react-bootstrap';
 
-type userDetailsType = {
+type userAuthenticationType = {
   id: number,
   user_type: string,
   email: string,
   created_at: string
+}
+type userProfileType = {
   fullname: string,
   country: string,
   state: string,
@@ -43,11 +45,7 @@ type userDetailsType = {
   is_private_parent: boolean
 }
 
-type userDetailsTypeResponse = {
-  id: number,
-  user_type: string,
-  email: string,
-  created_at: string
+type userProfileResponseType = {
   fullname: string,
   country: string,
   state: string,
@@ -68,7 +66,7 @@ type userDetailsTypeResponse = {
 }
 
 type loginResponseType = {
-  user_details: userDetailsTypeResponse,
+  user_authentication: userAuthenticationType,
 }
 
 type AppClassProps = {
@@ -77,7 +75,8 @@ type AppClassProps = {
 
 type AppClassState = {
   signed_in: boolean,
-  user_details: userDetailsType | null,
+  user_authentication: userAuthenticationType | null,
+  user_profile: userProfileType | null,
   show_alert: boolean,
   alert_text: string,
   alert_type: string
@@ -93,7 +92,8 @@ class App extends React.Component<AppClassProps, AppClassState>{
     super(props);
     this.state = {
       signed_in: false,
-      user_details: null,
+      user_authentication: null,
+      user_profile: null,
       show_alert: false,
       alert_text: '',
       alert_type: ''
@@ -103,23 +103,79 @@ class App extends React.Component<AppClassProps, AppClassState>{
     this.renderAlert.bind(this.state);
   }
 
-  componentWillMount() {
-    Api.get('/profile').then((resp) => {
-      console.log(resp.data);
-      this.createLoginState(resp.data);
+  /**
+   * This function will set the global state from the http response data
+   * the http response data is available from the backend API response.
+   * @param loginResponseInfo HTTP response struct with login data
+   */
+
+  createAuthenticationState = (loginResponseData: loginResponseType) => {
+    this.setState({ signed_in: (!!loginResponseData.user_authentication), user_authentication: loginResponseData.user_authentication }, () => { console.log(this.state); });
+  }
+
+  createProfileState = (user_profile_response: userProfileResponseType) => {
+    const data: userProfileType = {
+      fullname: user_profile_response.fullname,
+      country: user_profile_response.country,
+      state: user_profile_response.state,
+      description: user_profile_response.description,
+      user_image: user_profile_response.user_image,
+      fide_id: user_profile_response.fide_id,
+      lichess_id: user_profile_response.lichess_id,
+      contact: user_profile_response.contact,
+      contact_code: user_profile_response.contact_code,
+      alt_contact: user_profile_response.alt_contact,
+      alt_contact_code: user_profile_response.alt_contact_code,
+      dob: new Date(user_profile_response.dob),
+      parent: user_profile_response.parent,
+      is_private_contact: user_profile_response.is_private_contact,
+      is_private_alt_contact: user_profile_response.is_private_alt_contact,
+      is_private_dob: user_profile_response.is_private_dob,
+      is_private_parent: user_profile_response.is_private_parent
+    }
+    this.setState({ user_profile: data });
+  }
+
+  getUserProfile() {
+    Api.get('/profile').then((response) => {
+      console.log(response);
+      this.createProfileState(response.data.user_profile);
     }).catch((error) => {
-      console.log("Session Reset\n", error);
-      this.setState({ user_details: null });
+      console.log("Session Reset-profile: ", error);
+      this.setState({ user_authentication: null, user_profile: null });
     });
+  }
+
+  componentWillMount() {
+    Api.get('/login').then((response) => {
+      console.log("Session Check Response:");
+      console.log(response);
+      this.createAuthenticationState(response.data);
+      console.log("Profile request call from Session\n");
+      this.getUserProfile();
+    }).catch((error) => {
+      console.log("Session Reset-authentication: ");
+      console.log(error);
+      this.setState({ user_authentication: null, user_profile: null });
+    });
+  }
+
+  loginCallback = (loginResponseData: loginResponseType) => {
+    this.createAuthenticationState(loginResponseData);
+    console.log("Profile request call from Login: ");
+    console.log(loginResponseData);
+    this.getUserProfile();
   }
 
   logoutCallback = () => {
     Api.delete('/login').then(
       (response) => {
+        console.log("session and login data deleted");
         console.log(response);
         this.setState({
           signed_in: false,
-          user_details: null
+          user_authentication: null,
+          user_profile: null
         });
         this.alertCallback({ alert_type: "success", alert_text: "Logged out successfully" });
       }
@@ -129,50 +185,10 @@ class App extends React.Component<AppClassProps, AppClassState>{
     });
   }
 
-  loginCallback = (loginInfo: loginResponseType) => {
-    this.createLoginState(loginInfo);
-  }
-
-  /**
-   * This function will set the global state from the http response data
-   * the http response data is available from the backend API response.
-   * @param loginResponseInfo HTTP response struct with login data
-   */
-  createLoginState = (loginResponseInfo: loginResponseType) => {
-    const data: userDetailsType = {
-      id: loginResponseInfo.user_details.id,
-      user_type: loginResponseInfo.user_details.user_type,
-      email: loginResponseInfo.user_details.email,
-      created_at: loginResponseInfo.user_details.created_at,
-      fullname: loginResponseInfo.user_details.fullname,
-      country: loginResponseInfo.user_details.country,
-      state: loginResponseInfo.user_details.state,
-      description: loginResponseInfo.user_details.description,
-      user_image: loginResponseInfo.user_details.user_image,
-      fide_id: loginResponseInfo.user_details.fide_id,
-      lichess_id: loginResponseInfo.user_details.lichess_id,
-      contact: loginResponseInfo.user_details.contact,
-      contact_code: loginResponseInfo.user_details.contact_code,
-      alt_contact: loginResponseInfo.user_details.alt_contact,
-      alt_contact_code: loginResponseInfo.user_details.alt_contact_code,
-      dob: new Date(loginResponseInfo.user_details.dob),
-      parent: loginResponseInfo.user_details.parent,
-      is_private_contact: loginResponseInfo.user_details.is_private_contact,
-      is_private_alt_contact: loginResponseInfo.user_details.is_private_alt_contact,
-      is_private_dob: loginResponseInfo.user_details.is_private_dob,
-      is_private_parent: loginResponseInfo.user_details.is_private_parent
-    }
-    this.setState({ signed_in: (!!loginResponseInfo.user_details), user_details: data }, () => { console.log(this.state); });
-  }
-
-  updateStateCallback = () => {
-    Api.get('/relogin').then((resp) => {
-      console.log(resp.data);
-      this.createLoginState(resp.data);
-    }).catch((error) => {
-      console.log("Session Reset\n", error);
-      this.setState({ user_details: null });
-    });
+  updateStateCallback = (response: any) => {
+    console.log("Profile State updated");
+    console.log(response);
+    this.createProfileState(response.data.user_profile);
   }
 
   studentRegister() {
@@ -185,7 +201,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
     if (this.state.signed_in) {
       return (
         <Navbar.Text>
-          {config.loginWelcomeText}, <Link style={{ textDecoration: 'none' }} to="/profile">{this.state.user_details?.fullname}</Link>
+          {config.loginWelcomeText}, <Link style={{ textDecoration: 'none' }} to="/profile">{this.state.user_profile?.fullname}</Link>
         </Navbar.Text>
       );
     }
@@ -232,7 +248,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
             <About />
           </Route>
           <Route path="/profile">
-            <Profile updateState={this.updateStateCallback} onAlert={this.alertCallback} onLogout={this.logoutCallback} user_details={this.state.user_details} />
+            <Profile updateState={this.updateStateCallback} onAlert={this.alertCallback} onLogout={this.logoutCallback} user_profile={this.state.user_profile} user_authentication={this.state.user_authentication} />
           </Route>
           <Route path="/login">
             <Login onAlert={this.alertCallback} onLogin={this.loginCallback} />
