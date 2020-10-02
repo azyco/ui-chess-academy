@@ -13,7 +13,6 @@ import { Login } from './pages/Login';
 import { Profile } from './pages/Profile';
 import { About } from './pages/About';
 import { RegisterStudent } from './pages/student/RegisterStudent';
-import { RegisterCoach } from './pages/coach/RegisterCoach';
 import config from './config';
 import Api from './api/backend';
 
@@ -264,9 +263,6 @@ class App extends React.Component<AppClassProps, AppClassState>{
 					</Route>
 					<Route path="/student/register">
 						<RegisterStudent onAlert={this.alertCallback} />
-					</Route>
-					<Route path="/coach/register">
-						<RegisterCoach onAlert={this.alertCallback} />
 					</Route>
 					<Route path="/">
 						<Home />

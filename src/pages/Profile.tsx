@@ -3,7 +3,7 @@ import { Redirect } from 'react-router-dom'
 
 import { DashboardStudent } from './student/DashboardStudent';
 import { DashboardCoach } from './coach/DashboardCoach';
-import { Admin } from './Admin';
+import { Admin } from './admin/Admin';
 
 //import config from '../config';
 

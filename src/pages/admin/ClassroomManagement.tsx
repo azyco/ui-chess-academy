@@ -10,14 +10,8 @@ import {
     Form
 } from 'react-bootstrap';
 
-import config from '../config';
-import Api from '../api/backend';
-
-type AdminProps = {
-    onAlert: Function,
-    onLogout: any,
-    user_authentication: userAuthenticationType
-}
+import config from '../../config';
+import Api from '../../api/backend';
 
 type classroom = {
     id: number,
@@ -36,7 +30,11 @@ type user = {
     fullname: string
 }
 
-type AdminState = {
+type ClassroomManagementProps ={
+    onAlert: Function
+}
+
+type ClassroomManagementState = {
     classroom_array: classroom[],
     student_array: (user | null)[],
     student_array_selected: (user | null)[],
@@ -50,15 +48,8 @@ type AdminState = {
     classroom_description: string,
 }
 
-type userAuthenticationType = {
-    id: number,
-    user_type: string,
-    email: string,
-    created_at: string
-}
-
-export class Admin extends React.Component<AdminProps, AdminState>{
-    constructor(props: AdminProps) {
+export class ClassroomManagement extends React.Component<ClassroomManagementProps, ClassroomManagementState>{
+    constructor(props: ClassroomManagementProps) {
         super(props);
         this.state = {
             classroom_array: [],
@@ -126,6 +117,7 @@ export class Admin extends React.Component<AdminProps, AdminState>{
             <td>{classrom_row.created_at}</td>
             <td>{classrom_row.coaches}</td>
             <td>{classrom_row.student_count}</td>
+            <td><Button>Edit</Button></td>
         </tr>
     );
 
@@ -273,7 +265,7 @@ export class Admin extends React.Component<AdminProps, AdminState>{
                             </Form.Control>
                         </Form.Group>
                         <Form.Group>
-                            <Button variant="dark" block onClick={this.addSelectedStudentID}>
+                            <Button variant="outline-dark" block onClick={this.addSelectedStudentID}>
                                 Add
                             </Button>
                         </Form.Group>
@@ -286,7 +278,7 @@ export class Admin extends React.Component<AdminProps, AdminState>{
                             </Form.Control>
                         </Form.Group>
                         <Form.Group>
-                            <Button variant="dark" block onClick={this.removeSelectedStudentID}>
+                            <Button variant="outline-dark" block onClick={this.removeSelectedStudentID}>
                                 Remove
                             </Button>
                         </Form.Group>
@@ -315,7 +307,7 @@ export class Admin extends React.Component<AdminProps, AdminState>{
                             </Form.Control>
                         </Form.Group>
                         <Form.Group>
-                            <Button variant="dark" block onClick={this.addSelectedCoachID}>
+                            <Button variant="outline-dark" block onClick={this.addSelectedCoachID}>
                                 Add
                             </Button>
                         </Form.Group>
@@ -328,7 +320,7 @@ export class Admin extends React.Component<AdminProps, AdminState>{
                             </Form.Control>
                         </Form.Group>
                         <Form.Group>
-                            <Button variant="dark" block onClick={this.removeSelectedCoachID}>
+                            <Button variant="outline-dark" block onClick={this.removeSelectedCoachID}>
                                 Remove
                             </Button>
                         </Form.Group>
@@ -388,7 +380,8 @@ export class Admin extends React.Component<AdminProps, AdminState>{
                             <th>Active</th>
                             <th>Creation Date</th>
                             <th>Coaches</th>
-                            <th>Student Count</th>
+                            <th>Students</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -406,9 +399,9 @@ export class Admin extends React.Component<AdminProps, AdminState>{
 
     }
     
-    renderClassroomTab() {
+    render() {
         return (
-            <Container fluid>
+            <div>
                 <Card bg="light" style={{ marginTop: '1em' }}>
                     <Card.Header as='h5'>Classrooms</Card.Header>
                     <Card.Body>
@@ -436,66 +429,12 @@ export class Admin extends React.Component<AdminProps, AdminState>{
                                 {this.renderCoachSelect()}
                             </Form>
                         </Container>
-                        <Button variant="outline-dark" block onClick={this.createClassroom}>
+                        <Button variant="dark" block onClick={this.createClassroom}>
                             Done
                         </Button>
                     </Card.Body>
                 </Card>
-            </Container>
+            </div>
         );
-    }
-
-    render() {
-        return (
-            <Container fluid >
-                <Tab.Container id="left-tabs-example" defaultActiveKey="classroom">
-                    <Row>
-                        <Col lg={2}>
-                            <Card bg="light" style={{ marginTop: '1em' }}>
-                                <Card.Body>
-                                    <Nav variant="pills" className="flex-column" >
-                                        <Nav.Item>
-                                            <Nav.Link eventKey="classroom">Classroom Management</Nav.Link>
-                                        </Nav.Item>
-                                        <Nav.Item>
-                                            <Nav.Link eventKey="coach">Coach Management</Nav.Link>
-                                        </Nav.Item>
-                                        <Nav.Item>
-                                            <Nav.Link eventKey="profile">Profile Management</Nav.Link>
-                                        </Nav.Item>
-                                        <Button variant={"warning"} onClick={this.props.onLogout} >
-                                            Logout
-                                        </Button>
-                                    </Nav>
-                                </Card.Body>
-                            </Card>
-                        </Col>
-                        <Col lg={10}>
-                            <Tab.Content>
-                                <Tab.Pane eventKey="classroom">
-                                    {this.renderClassroomTab()}
-                                </Tab.Pane>
-                                <Tab.Pane eventKey="coach">
-                                    <Card bg="light" style={{ marginTop: '1em' }}>
-                                        <Card.Header as='h5'>Coach Management</Card.Header>
-                                        <Card.Body>
-                                            Update Coaches
-                                        </Card.Body>
-                                    </Card>
-                                </Tab.Pane>
-                                <Tab.Pane eventKey="profile">
-                                    <Card bg="light" style={{ marginTop: '1em' }}>
-                                        <Card.Header as='h5'>Update Profile</Card.Header>
-                                        <Card.Body>
-                                            Update Profiles
-                                        </Card.Body>
-                                    </Card>
-                                </Tab.Pane>
-                            </Tab.Content>
-                        </Col>
-                    </Row>
-                </Tab.Container>
-            </Container>
-        )
     }
 }

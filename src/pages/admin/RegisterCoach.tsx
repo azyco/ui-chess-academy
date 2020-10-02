@@ -190,7 +190,7 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
 
     render() {
         return (
-            <Container>
+            <Container fluid>
                 <Card bg="light" style={{ marginTop: '1em' }}>
                     <Card.Header as="h5" >{config.coachRegistrationText}</Card.Header>
                     <Card.Body>
