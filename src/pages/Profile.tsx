@@ -22,10 +22,10 @@ type userProfileType = {
     user_image: Blob,
     fide_id: string,
     lichess_id: string,
-    contact: number,
-    contact_code: number,
-    alt_contact: number,
-    alt_contact_code: number,
+    contact: string,
+    contact_code: string,
+    alt_contact: string,
+    alt_contact_code: string,
     dob: Date,
     parent: string,
     is_private_contact: boolean,
@@ -50,36 +50,38 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
     constructor(props: ProfileProps) {
         super(props);
         this.state = {
-            signed_in: (!!this.props.user_authentication)
+            signed_in: (!this.props.user_authentication) ? false : true
         };
     }
 
-    componentWillReceiveProps(nextProps: ProfileProps) {
-        if (nextProps.user_authentication !== this.props.user_authentication) {
-            this.setState({
-                signed_in: (!!nextProps.user_authentication),
-            });
-        }
-    }
+    // componentWillReceiveProps(nextProps: ProfileProps) {
+    //     if (nextProps.user_authentication !== this.props.user_authentication) {
+    //         this.setState({
+    //             signed_in: (!!nextProps.user_authentication),
+    //         });
+    //     }
+    // }
 
     render() {
         if (this.state.signed_in &&
-            this.props.user_authentication &&
-            this.props.user_profile) {
-            if (this.props.user_authentication?.user_type === 'student') {
+            this.props.user_authentication) {
+                console.log(this.props.user_authentication);
+            if (this.props.user_authentication.user_type === 'student' && this.props.user_profile) {
                 return (<DashboardStudent updateState={this.props.updateState} user_profile={this.props.user_profile} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
             }
-            else if (this.props.user_authentication?.user_type === 'coach') {
+            else if (this.props.user_authentication.user_type === 'coach' && this.props.user_profile) {
                 return (<DashboardCoach updateState={this.props.updateState} user_profile={this.props.user_profile} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
             }
-            else if (this.props.user_authentication?.user_type === 'admin ') {
+            else if (this.props.user_authentication.user_type === 'admin') {
                 return (<Admin user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
             }
             else {
+                console.log("Bad user type");
                 return (<Redirect to='/' />);
             }
         }
         else {
+            console.log("User not logged in");
             return (<Redirect to='/' />);
         }
     }

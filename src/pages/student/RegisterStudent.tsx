@@ -78,7 +78,7 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
         const country_sql_length = this.state.country.length;
         const country_sql = this.state.country.substring(country_sql_length - 4, country_sql_length - 1);
         Api.post('/student', {
-            registration_details:{
+            registration_details: {
                 email: this.state.email,
                 password: encryptedPassword,
                 fullname: this.state.fullname,
@@ -95,13 +95,12 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
                 photo_blob: this.state.photo_blob,
                 dob: dob_sql
             }
-        }
-        ).then((response) => {
+        }).then((response) => {
             console.log(response);
             this.props.onAlert({ alert_type: "success", alert_text: config.registrationSuccessfulText });
         }).catch((error) => {
             console.log(error);
-            if(error.response){
+            if (error.response) {
                 if (error.response.data.error_code === 'ER_DUP_ENTRY') {
                     this.props.onAlert({ alert_type: "warning", alert_text: config.duplicateEntryText });
                 }
@@ -109,7 +108,7 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
                     this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
                 }
             }
-            else{
+            else {
                 this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
             }
         });
