@@ -24,7 +24,9 @@ type classroom = {
     name: string,
     description: string,
     is_active: boolean,
-    created_at: Date
+    created_at: Date,
+    student_count: number,
+    coaches: string[]
 }
 
 type user = {
@@ -122,36 +124,10 @@ export class Admin extends React.Component<AdminProps, AdminState>{
             <td>{classrom_row.description}</td>
             <td>{classrom_row.is_active}</td>
             <td>{classrom_row.created_at}</td>
+            <td>{classrom_row.coaches}</td>
+            <td>{classrom_row.student_count}</td>
         </tr>
     );
-
-    renderClassroomTable() {
-        if (this.state.classroom_array) {
-            return (
-                <Table striped bordered hover responsive="md" >
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Active</th>
-                            <th>Creation Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.state.classroom_array.map(this.classroomRowGenerator)}
-                    </tbody>
-                </Table>);
-        }
-        else {
-            return (
-                <div>
-                    No Classrooms present
-                </div>
-            )
-        }
-
-    }
 
     onClassroomNameChange = (ev: any) => {
         this.setState({
@@ -297,7 +273,7 @@ export class Admin extends React.Component<AdminProps, AdminState>{
                             </Form.Control>
                         </Form.Group>
                         <Form.Group>
-                            <Button block onClick={this.addSelectedStudentID}>
+                            <Button variant="dark" block onClick={this.addSelectedStudentID}>
                                 Add
                             </Button>
                         </Form.Group>
@@ -310,7 +286,7 @@ export class Admin extends React.Component<AdminProps, AdminState>{
                             </Form.Control>
                         </Form.Group>
                         <Form.Group>
-                            <Button block onClick={this.removeSelectedStudentID}>
+                            <Button variant="dark" block onClick={this.removeSelectedStudentID}>
                                 Remove
                             </Button>
                         </Form.Group>
@@ -339,7 +315,7 @@ export class Admin extends React.Component<AdminProps, AdminState>{
                             </Form.Control>
                         </Form.Group>
                         <Form.Group>
-                            <Button block onClick={this.addSelectedCoachID}>
+                            <Button variant="dark" block onClick={this.addSelectedCoachID}>
                                 Add
                             </Button>
                         </Form.Group>
@@ -352,7 +328,7 @@ export class Admin extends React.Component<AdminProps, AdminState>{
                             </Form.Control>
                         </Form.Group>
                         <Form.Group>
-                            <Button block onClick={this.removeSelectedCoachID}>
+                            <Button variant="dark" block onClick={this.removeSelectedCoachID}>
                                 Remove
                             </Button>
                         </Form.Group>
@@ -400,6 +376,36 @@ export class Admin extends React.Component<AdminProps, AdminState>{
         });
     }
 
+    renderClassroomTable() {
+        if (this.state.classroom_array) {
+            return (
+                <Table striped bordered hover responsive="lg" >
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Active</th>
+                            <th>Creation Date</th>
+                            <th>Coaches</th>
+                            <th>Student Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {this.state.classroom_array.map(this.classroomRowGenerator)}
+                    </tbody>
+                </Table>);
+        }
+        else {
+            return (
+                <div>
+                    No Classrooms present
+                </div>
+            )
+        }
+
+    }
+    
     renderClassroomTab() {
         return (
             <Container fluid>
@@ -430,7 +436,7 @@ export class Admin extends React.Component<AdminProps, AdminState>{
                                 {this.renderCoachSelect()}
                             </Form>
                         </Container>
-                        <Button block onClick={this.createClassroom}>
+                        <Button variant="outline-dark" block onClick={this.createClassroom}>
                             Done
                         </Button>
                     </Card.Body>
