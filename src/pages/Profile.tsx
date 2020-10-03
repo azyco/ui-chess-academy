@@ -65,7 +65,6 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
     render() {
         if (this.state.signed_in &&
             this.props.user_authentication) {
-                console.log(this.props.user_authentication);
             if (this.props.user_authentication.user_type === 'student' && this.props.user_profile) {
                 return (<DashboardStudent updateState={this.props.updateState} user_profile={this.props.user_profile} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
             }

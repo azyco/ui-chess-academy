@@ -138,7 +138,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
 
 	getUserProfile() {
 		Api.get('/profile').then((response) => {
-			console.log(response);
+			console.log("got user profile ",response);
 			this.createProfileState(response.data.user_profile);
 		}).catch((error) => {
 			if (this.state.user_authentication?.user_type !== 'admin') {
@@ -153,22 +153,19 @@ class App extends React.Component<AppClassProps, AppClassState>{
 
 	componentWillMount() {
 		Api.get('/login').then((response) => {
-			console.log("Authentication from Session:");
-			console.log(response);
+			console.log("Authentication from Session: ",response);
 			this.createAuthenticationState(response.data);
 			console.log("Profile request call from Session\n");
 			this.getUserProfile();
 		}).catch((error) => {
-			console.log("Session Reset: ");
-			console.log(error);
+			console.log("Session Reset: ",error);
 			this.setState({ user_authentication: null, user_profile: null });
 		});
 	}
 
 	loginCallback = (loginResponseData: loginResponseType) => {
 		this.createAuthenticationState(loginResponseData);
-		console.log("Authentication from Login: ");
-		console.log(loginResponseData);
+		console.log("Authentication from Login: ",loginResponseData);
 		console.log("Profile request call from Login\n");
 		this.getUserProfile();
 	}
@@ -176,8 +173,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
 	logoutCallback = () => {
 		Api.delete('/login').then(
 			(response) => {
-				console.log("session and login data deleted");
-				console.log(response);
+				console.log("session and login data deleted ",response);
 				this.setState({
 					signed_in: false,
 					user_authentication: null,
@@ -186,14 +182,13 @@ class App extends React.Component<AppClassProps, AppClassState>{
 				this.alertCallback({ alert_type: "success", alert_text: "Logged out successfully" });
 			}
 		).catch((error) => {
-			console.log(error)
+			console.log("error during logout ",error)
 			this.alertCallback({ alert_type: "warning", alert_text: config.serverDownAlertText });
 		});
 	}
 
 	updateStateCallback = (response: any) => {
-		console.log("Profile State updated");
-		console.log(response);
+		console.log("Profile State updated ",response);
 		this.createProfileState(response.data.user_profile);
 	}
 
@@ -205,7 +200,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
 
 	signInPrompt() {
 		if (this.state.signed_in) {
-			console.log(this.state.user_authentication?.user_type);
+			console.log("user signed in as: ",this.state.user_authentication?.user_type);
 			const username = (this.state.user_authentication?.user_type === 'admin') ? this.state.user_authentication.email : this.state.user_profile?.fullname;
 			return (
 				<Navbar.Text>

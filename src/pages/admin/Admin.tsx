@@ -20,35 +20,8 @@ type AdminProps = {
     user_authentication: userAuthenticationType
 }
 
-type classroom = {
-    id: number,
-    name: string,
-    description: string,
-    is_active: boolean,
-    created_at: Date,
-    student_count: number,
-    coaches: string[]
-}
-
-type user = {
-    id: number,
-    email: string,
-    user_type: string,
-    fullname: string
-}
-
 type AdminState = {
-    classroom_array: classroom[],
-    student_array: (user | null)[],
-    student_array_selected: (user | null)[],
-    coach_array: (user | null)[],
-    coach_array_selected: (user | null)[],
-    selected_source_student_array_index: number,
-    selected_destination_student_array_index: number,
-    selected_source_coach_array_index: number,
-    selected_destination_coach_array_index: number,
-    classroom_name: string,
-    classroom_description: string,
+    
 }
 
 type userAuthenticationType = {

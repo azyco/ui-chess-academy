@@ -2,9 +2,6 @@ import React from 'react';
 
 import {
     Container,
-    Button,
-    Row, Col,
-    Nav, Tab,
     Card,
     Table
 } from 'react-bootstrap';
@@ -40,12 +37,12 @@ export class CoachManagement extends React.Component<CoachManagementProps, Coach
 
     updateCoachArray() {
         Api.get('/coach').then((response) => {
-            console.log(response);
+            console.log("updated coach array in coach management ",response);
             this.setState({
                 coach_array: response.data.coach_array,
             });
         }).catch((error) => {
-            console.log("failed to update coach array");
+            console.log("failed to update coach array in coach management");
         });
     }
 
