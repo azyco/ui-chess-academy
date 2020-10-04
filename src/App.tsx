@@ -101,6 +101,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
 		this.signInPrompt.bind(this.state);
 		this.studentRegister.bind(this.state);
 		this.renderAlert.bind(this.state);
+		this.getUserProfile = this.getUserProfile.bind(this);
 	}
 
 	/**
@@ -109,8 +110,9 @@ class App extends React.Component<AppClassProps, AppClassState>{
 	 * @param loginResponseInfo HTTP response struct with login data
 	 */
 
-	createAuthenticationState = (loginResponseData: loginResponseType) => {
-		this.setState({ signed_in: (!!loginResponseData.user_authentication), user_authentication: loginResponseData.user_authentication });
+	createAuthenticationState = (loginResponseData: loginResponseType, callback: () => void) => {
+		this.setState({ signed_in: (!!loginResponseData.user_authentication), user_authentication: loginResponseData.user_authentication },
+			() => {callback()});
 	}
 
 	createProfileState = (user_profile_response: userProfileResponseType) => {
@@ -154,9 +156,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
 	componentWillMount() {
 		Api.get('/login').then((response) => {
 			console.log("Authentication from Session: ",response);
-			this.createAuthenticationState(response.data);
-			console.log("Profile request call from Session\n");
-			this.getUserProfile();
+			this.createAuthenticationState(response.data, this.getUserProfile);
 		}).catch((error) => {
 			console.log("Session Reset: ",error);
 			this.setState({ user_authentication: null, user_profile: null });
@@ -164,10 +164,8 @@ class App extends React.Component<AppClassProps, AppClassState>{
 	}
 
 	loginCallback = (loginResponseData: loginResponseType) => {
-		this.createAuthenticationState(loginResponseData);
+		this.createAuthenticationState(loginResponseData, this.getUserProfile);
 		console.log("Authentication from Login: ",loginResponseData);
-		console.log("Profile request call from Login\n");
-		this.getUserProfile();
 	}
 
 	logoutCallback = () => {
@@ -178,8 +176,9 @@ class App extends React.Component<AppClassProps, AppClassState>{
 					signed_in: false,
 					user_authentication: null,
 					user_profile: null
+				}, () => {
+					this.alertCallback({ alert_type: "success", alert_text: "Logged out successfully" })
 				});
-				this.alertCallback({ alert_type: "success", alert_text: "Logged out successfully" });
 			}
 		).catch((error) => {
 			console.log("error during logout ",error)

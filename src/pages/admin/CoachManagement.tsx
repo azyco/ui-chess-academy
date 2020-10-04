@@ -32,6 +32,9 @@ export class CoachManagement extends React.Component<CoachManagementProps, Coach
         this.state = {
             coach_array: []
         }
+    }
+
+    componentDidMount(){
         this.updateCoachArray();
     }
 

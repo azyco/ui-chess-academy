@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Form, Button, Card } from 'react-bootstrap';
+import { Container, Form, Button, Card, Spinner, Overlay } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom'
 import CryptoJS from 'crypto-js';
 
@@ -17,6 +17,7 @@ type LoginState = {
     redirect_to: string,
     email_is_invalid: boolean,
     password_is_invalid: boolean,
+    isLoading: boolean
 }
 
 export class Login extends React.Component<LoginProps, LoginState> {
@@ -27,9 +28,9 @@ export class Login extends React.Component<LoginProps, LoginState> {
             password: "",
             redirect_to: 'login',
             email_is_invalid: false,
-            password_is_invalid: false
+            password_is_invalid: false,
+            isLoading: false
         };
-        this.handleLoginClick.bind(this.state);
     }
 
     isLoginDisabled() {
@@ -37,31 +38,38 @@ export class Login extends React.Component<LoginProps, LoginState> {
     }
 
     handleLoginClick = () => {
-        const password_hash = CryptoJS.SHA1(this.state.password).toString(CryptoJS.enc.Hex);
-        Api.post('/login', { email: this.state.email, password_hash: password_hash }).then((response) => {
-            if (response.data) {
-                console.log("Logged In: ", response);
-                this.props.onLogin(response.data);
-                this.setState({ redirect_to: 'profile' });
-                this.props.onAlert({ alert_type: "success", alert_text: config.loginSuccessfulText });
-            }
-            else {
-                console.log("Bad data from server");
-                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
-            }
-        }).catch((error) => {
-            console.log(error);
-            if(error.response){                
-                if (error.response.data.error_type === 'login_credentials') {
-                    this.props.onAlert({ alert_type: "warning", alert_text: config.badLoginAlertText });
-                }
-                else if (error.response.data.error_type === 'database') {
-                    this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
-                }
-            }
-            else{
-                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
-            }
+        this.setState({ isLoading: true }, () => {
+            const password_hash = CryptoJS.SHA1(this.state.password).toString(CryptoJS.enc.Hex);
+            Api.post('/login', { email: this.state.email, password_hash: password_hash }).then((response) => {
+                this.setState({ isLoading: false }, () => {
+                    if (response.data) {
+                        console.log("Logged In: ", response);
+                        this.props.onLogin(response.data);
+                        this.setState({ redirect_to: 'profile' }, () => {
+                            this.props.onAlert({ alert_type: "success", alert_text: config.loginSuccessfulText })
+                        });
+                    }
+                    else {
+                        console.log("Bad data from server");
+                        this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+                    }
+                })
+            }).catch((error) => {
+                this.setState({ isLoading: false }, () => {
+                    console.log(error);
+                    if(error.response){                
+                        if (error.response.data.error_type === 'login_credentials') {
+                            this.props.onAlert({ alert_type: "warning", alert_text: config.badLoginAlertText });
+                        }
+                        else if (error.response.data.error_type === 'database') {
+                            this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+                        }
+                    }
+                    else{
+                        this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+                    }
+                })
+            })
         });
     }
 
@@ -82,8 +90,7 @@ export class Login extends React.Component<LoginProps, LoginState> {
 
     render() {
         return (
-            <Container >
-                {this.renderRedirect()}
+            <Container>
                 <Card bg="light" style={{ marginTop: '1em' }}>
                     <Card.Header as="h5">{config.loginText}</Card.Header>
                     <Card.Body>
@@ -92,14 +99,13 @@ export class Login extends React.Component<LoginProps, LoginState> {
                                 <Form.Control onChange={this.onEmailChange} value={this.state.email} type="email" placeholder={config.emailPlaceholderText} isInvalid={this.state.email_is_invalid} />
                                 <Form.Control.Feedback type="invalid">
                                     {config.emailInvalidFeedback}
-                        </Form.Control.Feedback>
+                                </Form.Control.Feedback>
                             </Form.Group>
-
                             <Form.Group controlId="formBasicPassword">
                                 <Form.Control onChange={this.onPasswordChange} value={this.state.password} type="password" placeholder={config.passwordPlaceholderText} isInvalid={this.state.password_is_invalid} />
                                 <Form.Control.Feedback type="invalid">
                                     {config.loginPasswordInvalidFeedback}
-                        </Form.Control.Feedback>
+                                </Form.Control.Feedback>
                             </Form.Group>
                             <Button onClick={this.handleLoginClick} className="float-right" variant="dark" disabled={this.isLoginDisabled()}>
                                 {config.loginText}

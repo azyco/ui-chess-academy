@@ -154,11 +154,6 @@ export class DashboardCoach extends React.Component<DashboardCoachProps, Dashboa
         this.setState({ profile_edit_mode: true });
     }
 
-    cancelEdit = () => {
-        this.setState({ profile_edit_mode: false });
-        this.resetState();
-    }
-
     togglePrivateDOB = () => {
         this.setState({ is_private_dob: !this.state.is_private_dob });
     }
@@ -197,8 +192,7 @@ export class DashboardCoach extends React.Component<DashboardCoachProps, Dashboa
         }).then((response) => {
             console.log(response);
             this.props.onAlert({ alert_type: "success", alert_text: config.updateSuccesfulText });
-            this.setState({ profile_edit_mode: false });
-            this.props.updateState(response);
+            this.setState({ profile_edit_mode: false },() => {this.props.updateState(response);});
         }).catch((error) => {
             console.log(error);
             this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
@@ -228,11 +222,8 @@ export class DashboardCoach extends React.Component<DashboardCoachProps, Dashboa
                 <Form >
                     <Form.Label>{config.emailAndPasswordLabel}</Form.Label>
                     <Form.Row>
-                        <Form.Group md={6} as={Col} controlId="formGridEmail">
+                        <Form.Group md={12} as={Col} controlId="formGridEmail">
                             <Form.Control readOnly type="email" value={this.props.user_authentication?.email} />
-                        </Form.Group>
-                        <Form.Group md={6} as={Col} controlId="formGridPassword">
-                            <Form.Control readOnly type="password" value={'******'} />
                         </Form.Group>
                     </Form.Row>
                     <Form.Label>{config.fullNameLabel}</Form.Label>
@@ -409,7 +400,7 @@ export class DashboardCoach extends React.Component<DashboardCoachProps, Dashboa
                 <Button className="float-right" onClick={this.editForm} disabled={this.isEditDisabled()} variant="dark" block>
                     Save
                 </Button>
-                <Button className="float-right" onClick={this.cancelEdit} variant="dark" block>
+                <Button className="float-right" onClick={this.resetState} variant="dark" block>
                     Cancel
                 </Button>
             </div>
