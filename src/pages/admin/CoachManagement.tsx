@@ -8,7 +8,7 @@ import {
 
 import { RegisterCoach } from './RegisterCoach';
 
-import config from '../../config';
+//import config from '../../config';
 import Api from '../../api/backend';
 
 type CoachManagementProps = {

@@ -190,117 +190,115 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
 
     render() {
         return (
-            <Container fluid>
-                <Card bg="light" style={{ marginTop: '1em' }}>
-                    <Card.Header as="h5" >{config.coachRegistrationText}</Card.Header>
-                    <Card.Body>
-                        <Form>
-                            <Form.Label>{config.emailAndPasswordLabel}</Form.Label>
-                            <Form.Row>
-                                <Form.Group md={6} as={Col} controlId="formGridEmail">
-                                    <Form.Control onChange={this.onEmailChange} type="email" placeholder={config.emailPlaceholderText} isInvalid={this.state.email_is_invalid} />
-                                    <Form.Control.Feedback type="invalid" >
-                                        {config.emailInvalidFeedback}
-                                    </Form.Control.Feedback>
-                                </Form.Group>
-                                <Form.Group md={6} as={Col} controlId="formGridPassword">
-                                    <Form.Control onChange={this.onPasswordChange} type="password" placeholder={config.passwordPlaceholderText} isInvalid={this.state.password_is_invalid} />
-                                    <Form.Control.Feedback type="invalid" >
-                                        {config.passwordInvalidFeedback}
-                                    </Form.Control.Feedback>
-                                </Form.Group>
-                            </Form.Row>
-                            <Form.Label>{config.fullNameLabel}</Form.Label>
-                            <Form.Row>
-                                <Form.Group as={Col} controlId="formGridFullName">
-                                    <Form.Control onChange={this.onFullNameChange} placeholder={config.fullNameLabel} isInvalid={this.state.fullname_is_invalid} />
-                                    <Form.Control.Feedback type="invalid" >
-                                        {config.fullNameInvalidFeedback}
-                                    </Form.Control.Feedback>
-                                </Form.Group>
-                            </Form.Row>
-                            <Form.Label>{config.countryAndStateLabel}</Form.Label>
-                            <Form.Row>
-                                <Form.Group md={6} as={Col} controlId="formGridCountry">
-                                    <Form.Control custom as="select" onChange={this.onCountryChange}>
-                                        {config.countrySelectList.map(this.optionGenerator)}
-                                    </Form.Control>
-                                </Form.Group>
+            <Card bg="light" style={{ marginTop: '1em' }}>
+                <Card.Header as="h5" >{config.coachRegistrationText}</Card.Header>
+                <Card.Body>
+                    <Form>
+                        <Form.Label>{config.emailAndPasswordLabel}</Form.Label>
+                        <Form.Row>
+                            <Form.Group md={6} as={Col} controlId="formGridEmail">
+                                <Form.Control onChange={this.onEmailChange} type="email" placeholder={config.emailPlaceholderText} isInvalid={this.state.email_is_invalid} />
+                                <Form.Control.Feedback type="invalid" >
+                                    {config.emailInvalidFeedback}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            <Form.Group md={6} as={Col} controlId="formGridPassword">
+                                <Form.Control onChange={this.onPasswordChange} type="password" placeholder={config.passwordPlaceholderText} isInvalid={this.state.password_is_invalid} />
+                                <Form.Control.Feedback type="invalid" >
+                                    {config.passwordInvalidFeedback}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                        </Form.Row>
+                        <Form.Label>{config.fullNameLabel}</Form.Label>
+                        <Form.Row>
+                            <Form.Group as={Col} controlId="formGridFullName">
+                                <Form.Control onChange={this.onFullNameChange} placeholder={config.fullNameLabel} isInvalid={this.state.fullname_is_invalid} />
+                                <Form.Control.Feedback type="invalid" >
+                                    {config.fullNameInvalidFeedback}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                        </Form.Row>
+                        <Form.Label>{config.countryAndStateLabel}</Form.Label>
+                        <Form.Row>
+                            <Form.Group md={6} as={Col} controlId="formGridCountry">
+                                <Form.Control custom as="select" onChange={this.onCountryChange}>
+                                    {config.countrySelectList.map(this.optionGenerator)}
+                                </Form.Control>
+                            </Form.Group>
 
-                                <Form.Group md={6} as={Col} controlId="formGridState">
-                                    <Form.Control custom as="select" onChange={this.onStateChange} defaultValue={config.countrySelectList[0]}>
-                                        {config.stateSelectList.map((this.optionGenerator))}
-                                    </Form.Control>
-                                </Form.Group>
-                            </Form.Row>
-                            <Form.Label>{config.dobLabel}</Form.Label>
-                            <Form.Row>
-                                <Form.Group sm={4} as={Col} controlId="formGridDOB">
-                                    <Form.Control onChange={this.onDateChange} isInvalid={this.state.dob_is_invalid} placeholder={config.dobLabel} />
-                                    <Form.Control.Feedback type="invalid" >
-                                        {config.dobInvalidFeedback}
-                                    </Form.Control.Feedback>
-                                </Form.Group>
-                                <Form.Group sm={8} as={Col} controlId="formGridDate">
-                                    <Form.Control readOnly value={this.state.dob.toDateString()} />
-                                </Form.Group>
-                            </Form.Row>
-                            <Form.Label>{config.contactLabel}</Form.Label>
-                            <Form.Row>
-                                <Form.Group xs={4} as={Col} controlId="formGridContactCode">
-                                    <Form.Control custom as="select" onChange={this.onContactCodeChange} >
-                                        {config.countryCodeSelectList.map((this.optionGenerator))}
-                                    </Form.Control>
-                                </Form.Group>
-                                <Form.Group xs={8} as={Col} controlId="formGridContact">
-                                    <Form.Control type="number" onChange={this.onContactChange} placeholder={config.contactLabel} isInvalid={this.state.contact_is_invalid} />
-                                    <Form.Control.Feedback type="invalid">
-                                        {config.contactInvalidFeedback}
-                                    </Form.Control.Feedback>
-                                </Form.Group>
-                            </Form.Row>
-                            <Form.Label>{config.altContactLabel}</Form.Label>
-                            <Form.Row>
-                                <Form.Group xs={4} as={Col} controlId="formGridAltContactCode">
-                                    <Form.Control custom as="select" onChange={this.onAltContactCodeChange} >
-                                        {config.countryCodeSelectList.map((this.optionGenerator))}
-                                    </Form.Control>
-                                </Form.Group>
-                                <Form.Group xs={8} as={Col} controlId="formGridAltContact">
-                                    <Form.Control type="number" onChange={this.onAltContactChange} placeholder={config.altContactLabel} isInvalid={this.state.alt_contact_is_invalid} />
-                                    <Form.Control.Feedback type="invalid">
-                                        {config.altContactInvalidFeedback}
-                                    </Form.Control.Feedback>
-                                </Form.Group>
-                            </Form.Row>
-                            <Form.Label>{config.descriptionLabel}</Form.Label>
-                            <Form.Row>
-                                <Form.Group as={Col} controlId="formGridDescription">
-                                    <Form.Control as="textarea" onChange={this.onDescriptionChange} placeholder={config.descriptionPlaceholder} />
-                                </Form.Group>
-                            </Form.Row>
-                            <Form.Label>{config.fideLichessLabel}</Form.Label>
-                            <Form.Row>
-                                <Form.Group md={6} as={Col} controlId="formGridFideID">
-                                    <Form.Control onChange={this.onFideIDChange} placeholder={config.fideLabel} />
-                                </Form.Group>
-                                <Form.Group md={6} as={Col} controlId="formGridLichessID">
-                                    <Form.Control onChange={this.onLichessIDChange} placeholder={config.lichessLabel} />
-                                </Form.Group>
-                            </Form.Row>
-                            {/* <Form.Label>{config.imageLabel}</Form.Label>
-                            <Form.Row>
-                                <Form.Group as={Col} >
-                                        <Form.File type="file" id="formGridphoto" onChange={this.onPhotoChange} label={config.imagePlaceholder} custom />
-                                </Form.Group>
-                            </Form.Row> */}
-                        </Form>
-                        <Button className="float-right" onClick={this.handleRegister} variant="dark" disabled={this.isRegistrationDisabled()}>
-                            {config.registerText}
-                        </Button>
-                    </Card.Body>
-                </Card>
-            </Container>
+                            <Form.Group md={6} as={Col} controlId="formGridState">
+                                <Form.Control custom as="select" onChange={this.onStateChange} defaultValue={config.countrySelectList[0]}>
+                                    {config.stateSelectList.map((this.optionGenerator))}
+                                </Form.Control>
+                            </Form.Group>
+                        </Form.Row>
+                        <Form.Label>{config.dobLabel}</Form.Label>
+                        <Form.Row>
+                            <Form.Group sm={4} as={Col} controlId="formGridDOB">
+                                <Form.Control onChange={this.onDateChange} isInvalid={this.state.dob_is_invalid} placeholder={config.dobLabel} />
+                                <Form.Control.Feedback type="invalid" >
+                                    {config.dobInvalidFeedback}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            <Form.Group sm={8} as={Col} controlId="formGridDate">
+                                <Form.Control readOnly value={this.state.dob.toDateString()} />
+                            </Form.Group>
+                        </Form.Row>
+                        <Form.Label>{config.contactLabel}</Form.Label>
+                        <Form.Row>
+                            <Form.Group xs={4} as={Col} controlId="formGridContactCode">
+                                <Form.Control custom as="select" onChange={this.onContactCodeChange} >
+                                    {config.countryCodeSelectList.map((this.optionGenerator))}
+                                </Form.Control>
+                            </Form.Group>
+                            <Form.Group xs={8} as={Col} controlId="formGridContact">
+                                <Form.Control type="number" onChange={this.onContactChange} placeholder={config.contactLabel} isInvalid={this.state.contact_is_invalid} />
+                                <Form.Control.Feedback type="invalid">
+                                    {config.contactInvalidFeedback}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                        </Form.Row>
+                        <Form.Label>{config.altContactLabel}</Form.Label>
+                        <Form.Row>
+                            <Form.Group xs={4} as={Col} controlId="formGridAltContactCode">
+                                <Form.Control custom as="select" onChange={this.onAltContactCodeChange} >
+                                    {config.countryCodeSelectList.map((this.optionGenerator))}
+                                </Form.Control>
+                            </Form.Group>
+                            <Form.Group xs={8} as={Col} controlId="formGridAltContact">
+                                <Form.Control type="number" onChange={this.onAltContactChange} placeholder={config.altContactLabel} isInvalid={this.state.alt_contact_is_invalid} />
+                                <Form.Control.Feedback type="invalid">
+                                    {config.altContactInvalidFeedback}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                        </Form.Row>
+                        <Form.Label>{config.descriptionLabel}</Form.Label>
+                        <Form.Row>
+                            <Form.Group as={Col} controlId="formGridDescription">
+                                <Form.Control as="textarea" onChange={this.onDescriptionChange} placeholder={config.descriptionPlaceholder} />
+                            </Form.Group>
+                        </Form.Row>
+                        <Form.Label>{config.fideLichessLabel}</Form.Label>
+                        <Form.Row>
+                            <Form.Group md={6} as={Col} controlId="formGridFideID">
+                                <Form.Control onChange={this.onFideIDChange} placeholder={config.fideLabel} />
+                            </Form.Group>
+                            <Form.Group md={6} as={Col} controlId="formGridLichessID">
+                                <Form.Control onChange={this.onLichessIDChange} placeholder={config.lichessLabel} />
+                            </Form.Group>
+                        </Form.Row>
+                        {/* <Form.Label>{config.imageLabel}</Form.Label>
+                        <Form.Row>
+                            <Form.Group as={Col} >
+                                    <Form.File type="file" id="formGridphoto" onChange={this.onPhotoChange} label={config.imagePlaceholder} custom />
+                            </Form.Group>
+                        </Form.Row> */}
+                    </Form>
+                    <Button className="float-right" onClick={this.handleRegister} variant="dark" disabled={this.isRegistrationDisabled()}>
+                        {config.registerText}
+                    </Button>
+                </Card.Body>
+            </Card>
         );
     }
 }

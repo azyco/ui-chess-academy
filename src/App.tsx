@@ -16,7 +16,7 @@ import { RegisterStudent } from './pages/student/RegisterStudent';
 import config from './config';
 import Api from './api/backend';
 
-import { Navbar, Nav, Alert } from 'react-bootstrap';
+import { Navbar, Nav, Modal, Button, Alert } from 'react-bootstrap';
 
 type userAuthenticationType = {
 	id: number,
@@ -153,7 +153,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
 		});
 	}
 
-	componentWillMount() {
+	componentDidMount() {
 		Api.get('/login').then((response) => {
 			console.log("Authentication from Session: ",response);
 			this.createAuthenticationState(response.data, this.getUserProfile);
@@ -222,11 +222,28 @@ class App extends React.Component<AppClassProps, AppClassState>{
 
 	renderAlert() {
 		if (this.state.show_alert) {
-			return (
-				<Alert style={{ marginBottom: 0 }} variant={this.state.alert_type} onClose={() => this.setState({ show_alert: false })} dismissible>
-					{this.state.alert_text}
-				</Alert>
-			);
+			if(this.state.alert_type==='warning'){
+				return (
+					
+					<Modal show={this.state.show_alert} onHide={() => this.setState({ show_alert: false })} size="sm" centered>
+						<Modal.Body>{this.state.alert_text}</Modal.Body>
+						<Modal.Footer>
+							<Button variant="secondary" onClick={() => this.setState({ show_alert: false })} block>
+								Close
+							</Button>
+						</Modal.Footer>
+					</Modal>
+	
+				);
+			}
+			else{
+				return(
+					<Alert style={{ marginBottom: 0 }} variant={this.state.alert_type} onClose={() => this.setState({ show_alert: false })} dismissible>
+						{this.state.alert_text}
+					</Alert>
+				);
+				
+			}
 		}
 	}
 
