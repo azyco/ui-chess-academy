@@ -34,13 +34,17 @@ export class CoachManagement extends React.Component<CoachManagementProps, Coach
         }
     }
 
-    componentDidMount(){
+    updateCoachArrayCallback = () => {
+        this.updateCoachArray();
+    }
+
+    componentDidMount() {
         this.updateCoachArray();
     }
 
     updateCoachArray() {
         Api.get('/coach').then((response) => {
-            console.log("updated coach array in coach management ",response);
+            console.log("updated coach array in coach management ", response);
             this.setState({
                 coach_array: response.data.coach_array,
             });
@@ -50,7 +54,7 @@ export class CoachManagement extends React.Component<CoachManagementProps, Coach
     }
 
     coachTableGenerator = (coach: user) => (
-        <tr key={coach.fullname} >
+        <tr key={coach.id} >
             <td>{coach.id}</td>
             <td>{coach.fullname}</td>
             <td>{coach.email}</td>
@@ -84,19 +88,19 @@ export class CoachManagement extends React.Component<CoachManagementProps, Coach
 
     }
 
-    render(){
-        return(
-        <div>
-            <Card bg="light" style={{ marginTop: '1em' }}>
-                <Card.Header as='h5'>Coaches</Card.Header>
-                <Card.Body>
-                    <Container fluid>
-                        {this.renderCoachTable()}
-                    </Container>
-                </Card.Body>
-            </Card>
-            <RegisterCoach onAlert={this.props.onAlert}/>
-        </div>
+    render() {
+        return (
+            <div>
+                <Card bg="light" style={{ marginTop: '1em' }}>
+                    <Card.Header as='h5'>Coaches</Card.Header>
+                    <Card.Body>
+                        <Container fluid>
+                            {this.renderCoachTable()}
+                        </Container>
+                    </Card.Body>
+                </Card>
+                <RegisterCoach updateCoachArray={this.updateCoachArrayCallback} onAlert={this.props.onAlert} />
+            </div>
         );
     }
 }

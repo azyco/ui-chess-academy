@@ -6,7 +6,7 @@ import {
     Table,
 } from 'react-bootstrap';
 
-//import config from '../../config';
+import config from '../../config';
 import Api from '../../api/backend';
 
 type classroom = {
@@ -31,26 +31,26 @@ type ClassCoachState = {
     classroom_array: classroom[]
 }
 
-export class ClassCoach extends React.Component<ClassCoachProps,ClassCoachState> {
+export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState> {
     constructor(props: ClassCoachProps) {
         super(props);
         this.state = {
             classroom_array: []
         };
     }
-    
+
     componentDidMount() {
         this.updateClassroomArray();
     }
 
     updateClassroomArray() {
-        Api.get('/classroom?coach_id='+this.props.user_authentication.id).then((response) => {
+        Api.get('/classroom?coach_id=' + this.props.user_authentication.id).then((response) => {
             console.log("classroom array updated ", response);
-            this.setState({ classroom_array: Array.from(response.data.classroom_array) },()=>{
+            this.setState({ classroom_array: Array.from(response.data.classroom_array) }, () => {
                 console.log("state after classroom update ", this.state);
             });
         }).catch((error) => {
-            console.log("failed to update classroom array ",error);
+            console.log("failed to update classroom array ", error);
         });
     }
 
@@ -65,15 +65,15 @@ export class ClassCoach extends React.Component<ClassCoachProps,ClassCoachState>
 
     renderClassroomTable() {
         console.log("rendering classroom table");
-        if (this.state.classroom_array) {
+        if (this.state.classroom_array && this.state.classroom_array.length > 0) {
             return (
                 <Table striped bordered hover responsive="lg" >
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Students</th>
+                            <th>{config.tableHeaderID}</th>
+                            <th>{config.tableHeaderName}</th>
+                            <th>{config.tableHeaderDescription}</th>
+                            <th>{config.tableHeaderStudents}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -84,7 +84,7 @@ export class ClassCoach extends React.Component<ClassCoachProps,ClassCoachState>
         else {
             return (
                 <div>
-                    You haven't enrolled in a class yet
+                    {config.noClassroomCoach}
                 </div>
             )
         }
@@ -95,7 +95,7 @@ export class ClassCoach extends React.Component<ClassCoachProps,ClassCoachState>
         return (
             <div>
                 <Card bg="light" style={{ marginTop: '1em' }}>
-                    <Card.Header as='h5'>Classrooms</Card.Header>
+                    <Card.Header as='h5'>{config.classroomsCardHeader}</Card.Header>
                     <Card.Body>
                         <Container fluid>
                             {this.renderClassroomTable()}

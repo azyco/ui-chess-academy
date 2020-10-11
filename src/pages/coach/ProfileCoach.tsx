@@ -187,7 +187,7 @@ export class ProfileCoach extends React.Component<ProfileCoachProps, ProfileCoac
         }).then((response) => {
             console.log(response);
             this.props.onAlert({ alert_type: "success", alert_text: config.updateSuccesfulText });
-            this.setState({ profile_edit_mode: false },() => {this.props.updateState(response);});
+            this.setState({ profile_edit_mode: false }, () => { this.props.updateState(response); });
         }).catch((error) => {
             console.log(error);
             this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });

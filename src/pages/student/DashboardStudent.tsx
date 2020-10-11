@@ -55,7 +55,7 @@ type DashboardStudentState = {
 export class DashboardStudent extends React.Component<DashboardStudentProps, DashboardStudentState>{
     constructor(props: DashboardStudentProps) {
         super(props);
-        };
+    };
 
     render() {
         return (
@@ -67,16 +67,16 @@ export class DashboardStudent extends React.Component<DashboardStudentProps, Das
                                 <Card.Body>
                                     <Nav variant="pills" className="flex-column" >
                                         <Nav.Item>
-                                            <Nav.Link  eventKey="profile">{config.profileTabText}</Nav.Link>
+                                            <Nav.Link eventKey="profile">{config.profileTabText}</Nav.Link>
                                         </Nav.Item>
                                         <Nav.Item>
-                                            <Nav.Link  eventKey="classes">{config.classesTabText}</Nav.Link>
+                                            <Nav.Link eventKey="classes">{config.classesTabText}</Nav.Link>
                                         </Nav.Item>
                                         <Nav.Item>
-                                            <Nav.Link  eventKey="assignments">{config.assignmentsTabText}</Nav.Link>
+                                            <Nav.Link eventKey="assignments">{config.assignmentsTabText}</Nav.Link>
                                         </Nav.Item>
                                         <Nav.Item>
-                                            <Nav.Link  eventKey="puzzles">{config.puzzlesTabText}</Nav.Link>
+                                            <Nav.Link eventKey="puzzles">{config.puzzlesTabText}</Nav.Link>
                                         </Nav.Item>
                                         <Button variant={"warning"} onClick={this.props.onLogout} >
                                             {config.logoutButtonText}

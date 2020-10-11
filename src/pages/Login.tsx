@@ -57,7 +57,7 @@ export class Login extends React.Component<LoginProps, LoginState> {
             }).catch((error) => {
                 this.setState({ isLoading: false }, () => {
                     console.log(error);
-                    if(error.response){                
+                    if (error.response) {
                         if (error.response.data.error_type === 'login_credentials') {
                             this.props.onAlert({ alert_type: "warning", alert_text: config.badLoginAlertText });
                         }
@@ -65,7 +65,7 @@ export class Login extends React.Component<LoginProps, LoginState> {
                             this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
                         }
                     }
-                    else{
+                    else {
                         this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
                     }
                 })
@@ -91,6 +91,7 @@ export class Login extends React.Component<LoginProps, LoginState> {
     render() {
         return (
             <Container>
+                {this.renderRedirect()}
                 <Card bg="light" style={{ marginTop: '1em' }}>
                     <Card.Header as="h5">{config.loginText}</Card.Header>
                     <Card.Body>

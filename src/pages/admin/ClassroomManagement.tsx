@@ -9,6 +9,7 @@ import {
     Form,
     Collapse
 } from 'react-bootstrap';
+
 import config from '../../config';
 import Api from '../../api/backend';
 
@@ -29,7 +30,7 @@ type user = {
     fullname: string
 }
 
-type ClassroomManagementProps ={
+type ClassroomManagementProps = {
     onAlert: Function
 }
 
@@ -90,24 +91,24 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
     updateClassroomArray() {
         Api.get('/classroom').then((response) => {
             console.log("classroom array updated ", response);
-            this.setState({ classroom_array: Array.from(response.data.classroom_array) },()=>{
+            this.setState({ classroom_array: Array.from(response.data.classroom_array) }, () => {
                 console.log("state after classroom update ", this.state);
             });
         }).catch((error) => {
-            console.log("failed to update classroom array ",error);
+            console.log("failed to update classroom array ", error);
         });
     }
 
     updateStudentAndCoachArray() {
         Api.get('/user').then((response) => {
-            console.log("student and coach arrays updated",response);
-            let student_array:user[] = [];
-            let coach_array:user[] = [];
-            response.data.forEach((user:user)=>{
-                if(user.user_type === 'student'){
+            console.log("student and coach arrays updated", response);
+            let student_array: user[] = [];
+            let coach_array: user[] = [];
+            response.data.forEach((user: user) => {
+                if (user.user_type === 'student') {
                     student_array.push(user);
                 }
-                else if(user.user_type === 'coach'){
+                else if (user.user_type === 'coach') {
                     coach_array.push(user);
                 }
             });
@@ -119,11 +120,11 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
                 coach_array: coach_array,
                 coach_array_available: Array.from(coach_array),
                 coach_array_selected: new Array(coach_array.length).fill(null)
-            },()=>{
+            }, () => {
                 console.log("state after student and coach array update ", this.state);
             });
         }).catch((error) => {
-            console.log("failed to update student and coach arrays",error);
+            console.log("failed to update student and coach arrays", error);
         });
     }
 
@@ -138,11 +139,11 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
             <td>{classrom_row.id}</td>
             <td>{classrom_row.name}</td>
             <td>{classrom_row.description}</td>
-            <td>{(classrom_row.is_active)?"Yes":"No"}</td>
+            <td>{(classrom_row.is_active) ? "Yes" : "No"}</td>
             <td>{classrom_row.created_at}</td>
             <td>{classrom_row.coaches}</td>
             <td>{classrom_row.student_count}</td>
-            <td><Button onClick={()=>{this.onClassroomEditStart(classrom_row)}} >Edit</Button></td>
+            <td><Button onClick={() => { this.onClassroomEditStart(classrom_row) }} >Edit</Button></td>
         </tr>
     );
 
@@ -289,27 +290,27 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
                 <Form.Row>
                     <Col md={6}>
                         <Form.Group controlId="student_select_source">
-                            <Form.Label>Available Students</Form.Label>
+                            <Form.Label>{config.availableStudentsAdmin}</Form.Label>
                             <Form.Control as="select" htmlSize={5} onChange={this.onSelectedSourceStudentChange}>
                                 {this.state.student_array_available.map((user_option, index) => { if (user_option) { return this.userOptionGenerator(user_option, index) } else { return <React.Fragment key={index} /> } })}
                             </Form.Control>
                         </Form.Group>
                         <Form.Group>
                             <Button variant="outline-dark" block onClick={this.addSelectedStudentID}>
-                                Add
+                                {config.addButtonText}
                             </Button>
                         </Form.Group>
                     </Col>
                     <Col md={6}>
                         <Form.Group controlId="student_select_sink">
-                            <Form.Label>Selected Students</Form.Label>
+                            <Form.Label>{config.selectedStudentsAdmin}</Form.Label>
                             <Form.Control as="select" htmlSize={5} onChange={this.onSelectedDestinationStudentChange}>
-                                {this.state.student_array_selected.map((user_option, index) => { if (user_option) { return this.userOptionGenerator(user_option, index) } else { return <React.Fragment key={index}/> } })}
+                                {this.state.student_array_selected.map((user_option, index) => { if (user_option) { return this.userOptionGenerator(user_option, index) } else { return <React.Fragment key={index} /> } })}
                             </Form.Control>
                         </Form.Group>
                         <Form.Group>
                             <Button variant="outline-dark" block onClick={this.removeSelectedStudentID}>
-                                Remove
+                                {config.removeButtonText}
                             </Button>
                         </Form.Group>
                     </Col>
@@ -319,7 +320,7 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
         else {
             return (
                 <Container>
-                    No Students added
+                    {config.noStudentsAdmin}
                 </Container>
             );
         }
@@ -331,27 +332,27 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
                 <Form.Row>
                     <Col md={6}>
                         <Form.Group controlId="coach_select_source">
-                            <Form.Label>Available Coaches</Form.Label>
+                            <Form.Label>{config.availableCoachesAdmin}</Form.Label>
                             <Form.Control as="select" htmlSize={5} onChange={this.onSelectedSourceCoachChange}>
                                 {this.state.coach_array_available.map((user_option, index) => { if (user_option) { return this.userOptionGenerator(user_option, index) } else { return <React.Fragment key={index} /> } })}
                             </Form.Control>
                         </Form.Group>
                         <Form.Group>
                             <Button variant="outline-dark" block onClick={this.addSelectedCoachID}>
-                                Add
+                                {config.addButtonText}
                             </Button>
                         </Form.Group>
                     </Col>
                     <Col md={6}>
                         <Form.Group controlId="coach_select_sink">
-                            <Form.Label>Selected Coaches</Form.Label>
+                            <Form.Label>{config.selectedCoachesAdmin}</Form.Label>
                             <Form.Control as="select" htmlSize={5} onChange={this.onSelectedDestinationCoachChange}>
-                                {this.state.coach_array_selected.map((user_option, index) => { if (user_option) { return this.userOptionGenerator(user_option, index) } else { return <React.Fragment key={index}/> } })}
+                                {this.state.coach_array_selected.map((user_option, index) => { if (user_option) { return this.userOptionGenerator(user_option, index) } else { return <React.Fragment key={index} /> } })}
                             </Form.Control>
                         </Form.Group>
                         <Form.Group>
                             <Button variant="outline-dark" block onClick={this.removeSelectedCoachID}>
-                                Remove
+                                {config.removeButtonText}
                             </Button>
                         </Form.Group>
                     </Col>
@@ -361,14 +362,14 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
         else {
             return (
                 <Container>
-                    No Coaches added
+                    {config.noCoachesAdmin}
                 </Container>
             );
         }
     }
 
     onClassroomCreateEnd = () => {
-        console.log("classroom created with state: ",this.state);
+        console.log("classroom created with state: ", this.state);
         const coach_array_selected_filtered = this.state.coach_array_selected.filter((value, index, array) => { if (value) { return value; } });
         const student_array_selected_filtered = this.state.student_array_selected.filter((value, index, array) => { if (value) { return value; } });
         Api.post('/classroom', {
@@ -385,7 +386,7 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
             this.resetState();
             this.props.onAlert({ alert_type: "success", alert_text: "Class added Successfully" });
         }).catch((error) => {
-            console.log("error while creating class",error);
+            console.log("error while creating class", error);
             if (error.response) {
                 if (error.response.data.error_code === 'ER_DUP_ENTRY') {
                     this.props.onAlert({ alert_type: "warning", alert_text: "Classroom name alreaady exists" });
@@ -402,18 +403,18 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
 
     renderClassroomTable() {
         console.log("rendering classroom table");
-        if (this.state.classroom_array) {
+        if (this.state.classroom_array && this.state.classroom_array.length > 0) {
             return (
                 <Table striped bordered hover responsive="lg" >
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Active</th>
-                            <th>Creation Date</th>
-                            <th>Coaches</th>
-                            <th>Students</th>
+                            <th>{config.tableHeaderID}</th>
+                            <th>{config.tableHeaderName}</th>
+                            <th>{config.tableHeaderDescription}</th>
+                            <th>{config.tableHeaderActive}</th>
+                            <th>{config.tableHeaderCreationDate}</th>
+                            <th>{config.tableHeaderCoaches}</th>
+                            <th>{config.tableHeaderStudents}</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -425,7 +426,7 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
         else {
             return (
                 <div>
-                    No Classrooms present
+                    {config.noClassroomsAdmin}
                 </div>
             )
         }
@@ -434,22 +435,22 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
 
     onClassroomEditStart(classrom_row: classroom) {
         this.updateStudentAndCoachArray();
-        this.setState({classroom_edit_id: classrom_row.id}, () => {
-            Api.get('/classroom_mappings?classroom_id='+classrom_row.id).then((response)=>{
-                console.log("got classroom mappings: ",response);
+        this.setState({ classroom_edit_id: classrom_row.id }, () => {
+            Api.get('/classroom_mappings?classroom_id=' + classrom_row.id).then((response) => {
+                console.log("got classroom mappings: ", response);
                 const student_id_arr_selected = response.data.students.split(',').map(Number);
                 const coach_id_arr_selected = response.data.coaches.split(',').map(Number);
                 const classroom_description = classrom_row.description;
                 const classroom_name = classrom_row.name;
-                let student_array_available: (user | null)[] = this.state.student_array_available; 
+                let student_array_available: (user | null)[] = this.state.student_array_available;
                 let student_array_selected: (user | null)[] = [];
                 let coach_array_available: (user | null)[] = this.state.coach_array_available;
                 let coach_array_selected: (user | null)[] = [];
 
-                student_id_arr_selected.forEach((student_id_arr_row:number)=>{
-                    this.state.student_array_available.forEach((student,student_swap_index)=>{
-                        console.log(student,student_id_arr_row)
-                        if(student_id_arr_row === student?.id){
+                student_id_arr_selected.forEach((student_id_arr_row: number) => {
+                    this.state.student_array_available.forEach((student, student_swap_index) => {
+                        console.log(student, student_id_arr_row)
+                        if (student_id_arr_row === student?.id) {
                             console.log("match!");
                             student_array_selected[student_swap_index] = this.state.student_array_available[student_swap_index];
                             student_array_available[student_swap_index] = null;
@@ -457,9 +458,9 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
                     });
                 });
 
-                coach_id_arr_selected.forEach((coach_id_arr_row:number)=>{
-                    this.state.coach_array_available.forEach((coach,coach_swap_index)=>{
-                        if(coach_id_arr_row === coach?.id){
+                coach_id_arr_selected.forEach((coach_id_arr_row: number) => {
+                    this.state.coach_array_available.forEach((coach, coach_swap_index) => {
+                        if (coach_id_arr_row === coach?.id) {
                             coach_array_selected[coach_swap_index] = this.state.coach_array_available[coach_swap_index];
                             coach_array_available[coach_swap_index] = null;
                         }
@@ -476,8 +477,8 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
                     show_form: true,
                     classroom_name_is_invalid: false
                 });
-            }).catch((error)=>{
-                console.log("failed to update mappings, reverting to add mode ",error);
+            }).catch((error) => {
+                console.log("failed to update mappings, reverting to add mode ", error);
                 this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
             });
         });
@@ -499,12 +500,12 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
                 student_array_selected_is_dirty: this.state.student_array_selected_is_dirty
             }
         }).then((response) => {
-            console.log("classroom edited succesfully ",response);
+            console.log("classroom edited succesfully ", response);
             this.props.onAlert({ alert_type: "success", alert_text: "Classroom edited Successfully" });
             this.updateClassroomArray();
             this.resetState();
         }).catch((error) => {
-            console.log("error while editing classroom ",error);
+            console.log("error while editing classroom ", error);
             if (error.response) {
                 if (error.response.data.error_code === 'ER_DUP_ENTRY') {
                     this.props.onAlert({ alert_type: "warning", alert_text: "Classroom name already exists" });
@@ -537,7 +538,7 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
             student_array_selected_is_dirty: false,
             coach_array_selected_is_dirty: false,
             show_form: false
-        },()=>{
+        }, () => {
             console.log("after state reset ", this.state);
         });
     }
@@ -547,27 +548,27 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
         this.setState({ show_form: true });
     }
 
-    submitClassroomButton(){
-        if(this.state.classroom_edit_id > -1){
-            return(
+    submitClassroomButton() {
+        if (this.state.classroom_edit_id > -1) {
+            return (
                 <div>
                     <Button variant="dark" block onClick={this.onClassroomEditEnd} disabled={this.state.classroom_name_is_invalid}>
-                        Done
+                        {config.doneButtonText}
                     </Button>
                     <Button variant="dark" block onClick={this.resetState}>
-                        Cancel
+                        {config.cancelButtonText}
                     </Button>
                 </div>
             );
         }
-        else{
-            return(
+        else {
+            return (
                 <div>
                     <Button variant="dark" block onClick={this.onClassroomCreateEnd} disabled={this.state.classroom_name_is_invalid}>
-                        Done
+                        {config.doneButtonText}
                     </Button>
                     <Button variant="dark" block onClick={this.resetState}>
-                        Cancel
+                        {config.cancelButtonText}
                     </Button>
                 </div>
             );
@@ -580,14 +581,14 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
                 <Form>
                     <Form.Row>
                         <Form.Group md={6} as={Col}>
-                            <Form.Label>Classroom Name</Form.Label>
-                            <Form.Control placeholder="Classroom Name" value={this.state.classroom_name} onChange={this.onClassroomNameChange} isInvalid={this.state.classroom_name_is_invalid}/>
+                            <Form.Label>{config.classroomNameLabel}</Form.Label>
+                            <Form.Control placeholder="Classroom Name" value={this.state.classroom_name} onChange={this.onClassroomNameChange} isInvalid={this.state.classroom_name_is_invalid} />
                             <Form.Control.Feedback type="invalid">
-                                    Classroom name can't be empty
-                                </Form.Control.Feedback>
+                                {config.classroomNameInvalidFeedback}
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group md={6} as={Col}>
-                            <Form.Label>Classroom Description</Form.Label>
+                            <Form.Label>{config.classroomDescriptionLabel}</Form.Label>
                             <Form.Control type="textarea" placeholder="Classroom Description" value={this.state.classroom_description} onChange={this.onClassroomDescriptionChange} />
                         </Form.Group>
                     </Form.Row>
@@ -603,7 +604,7 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
         return (
             <div>
                 <Card bg="light" style={{ marginTop: '1em' }}>
-                    <Card.Header as='h5'>Classrooms</Card.Header>
+                    <Card.Header as='h5'>{config.classroomsCardHeader}</Card.Header>
                     <Card.Body>
                         <Container fluid>
                             {this.renderClassroomTable()}
@@ -612,16 +613,16 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
                 </Card>
                 <Card bg="light" style={{ marginTop: '1em' }}>
                     <Card.Header as="h5" >
-                        {(this.state.classroom_edit_id === -1)?"Add Classroom":"Edit Classroom"}
+                        {(this.state.classroom_edit_id === -1) ? "Add Classroom" : "Edit Classroom"}
                     </Card.Header>
                     <Card.Body>
-                        <Collapse in={!this.state.show_form }>
+                        <Collapse in={!this.state.show_form}>
                             <Button variant='dark' onClick={this.onClassroomCreateStart} block>
-                                Add
+                                {config.addButtonText}
                             </Button>
                         </Collapse>
-                        <Collapse in={this.state.show_form }>
-                            { this.renderForm() }
+                        <Collapse in={this.state.show_form}>
+                            {this.renderForm()}
                         </Collapse>
                     </Card.Body>
                 </Card>
