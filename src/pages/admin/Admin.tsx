@@ -11,7 +11,7 @@ import {
 import { ClassroomManagement } from './ClassroomManagement';
 import { CoachManagement } from './CoachManagement';
 
-// import config from '../../config';
+import config from '../../config';
 // import Api from '../../api/backend';
 
 type AdminProps = {
@@ -21,7 +21,7 @@ type AdminProps = {
 }
 
 type AdminState = {
-    
+
 }
 
 type userAuthenticationType = {
@@ -46,13 +46,13 @@ export class Admin extends React.Component<AdminProps, AdminState>{
                                 <Card.Body>
                                     <Nav variant="pills" className="flex-column" >
                                         <Nav.Item>
-                                            <Nav.Link eventKey="classroom">Classroom Management </Nav.Link>
+                                            <Nav.Link eventKey="classroom">{config.classroomManagementTab} </Nav.Link>
                                         </Nav.Item>
                                         <Nav.Item>
-                                            <Nav.Link eventKey="coach">Coach Management </Nav.Link>
+                                            <Nav.Link eventKey="coach">{config.coachManagementTab} </Nav.Link>
                                         </Nav.Item>
                                         <Nav.Item>
-                                            <Nav.Link eventKey="profile">Profile Management </Nav.Link>
+                                            <Nav.Link eventKey="profile">{config.profileManagementTab} </Nav.Link>
                                         </Nav.Item>
                                         <Button variant={"warning"} onClick={this.props.onLogout} >
                                             Logout
@@ -64,10 +64,10 @@ export class Admin extends React.Component<AdminProps, AdminState>{
                         <Col lg={10}>
                             <Tab.Content>
                                 <Tab.Pane eventKey="classroom">
-                                    <ClassroomManagement onAlert={this.props.onAlert}/>
+                                    <ClassroomManagement onAlert={this.props.onAlert} />
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="coach">
-                                    <CoachManagement onAlert={this.props.onAlert}/>
+                                    <CoachManagement onAlert={this.props.onAlert} />
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="profile">
                                     <Card bg="light" style={{ marginTop: '1em' }}>

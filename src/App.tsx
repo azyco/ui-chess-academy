@@ -112,7 +112,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
 
 	createAuthenticationState = (loginResponseData: loginResponseType, callback: () => void) => {
 		this.setState({ signed_in: (!!loginResponseData.user_authentication), user_authentication: loginResponseData.user_authentication },
-			() => {callback()});
+			() => { callback() });
 	}
 
 	createProfileState = (user_profile_response: userProfileResponseType) => {
@@ -140,14 +140,14 @@ class App extends React.Component<AppClassProps, AppClassState>{
 
 	getUserProfile() {
 		Api.get('/profile').then((response) => {
-			console.log("got user profile ",response);
+			console.log("got user profile ", response);
 			this.createProfileState(response.data.user_profile);
 		}).catch((error) => {
 			if (this.state.user_authentication?.user_type !== 'admin') {
 				console.log("Profile failed to load, resetting login: ", error);
 				this.setState({ user_authentication: null, user_profile: null });
 			}
-			else{
+			else {
 				console.log("User is an Admin, no profile");
 			}
 		});
@@ -155,23 +155,23 @@ class App extends React.Component<AppClassProps, AppClassState>{
 
 	componentDidMount() {
 		Api.get('/login').then((response) => {
-			console.log("Authentication from Session: ",response);
+			console.log("Authentication from Session: ", response);
 			this.createAuthenticationState(response.data, this.getUserProfile);
 		}).catch((error) => {
-			console.log("Session Reset: ",error);
+			console.log("Session Reset: ", error);
 			this.setState({ user_authentication: null, user_profile: null });
 		});
 	}
 
 	loginCallback = (loginResponseData: loginResponseType) => {
 		this.createAuthenticationState(loginResponseData, this.getUserProfile);
-		console.log("Authentication from Login: ",loginResponseData);
+		console.log("Authentication from Login: ", loginResponseData);
 	}
 
 	logoutCallback = () => {
 		Api.delete('/login').then(
 			(response) => {
-				console.log("session and login data deleted ",response);
+				console.log("session and login data deleted ", response);
 				this.setState({
 					signed_in: false,
 					user_authentication: null,
@@ -181,13 +181,13 @@ class App extends React.Component<AppClassProps, AppClassState>{
 				});
 			}
 		).catch((error) => {
-			console.log("error during logout ",error)
+			console.log("error during logout ", error)
 			this.alertCallback({ alert_type: "warning", alert_text: config.serverDownAlertText });
 		});
 	}
 
 	updateStateCallback = (response: any) => {
-		console.log("Profile State updated ",response);
+		console.log("Profile State updated ", response);
 		this.createProfileState(response.data.user_profile);
 	}
 
@@ -199,7 +199,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
 
 	signInPrompt() {
 		if (this.state.signed_in) {
-			console.log("user signed in as: ",this.state.user_authentication?.user_type);
+			console.log("user signed in as: ", this.state.user_authentication?.user_type);
 			const username = (this.state.user_authentication?.user_type === 'admin') ? this.state.user_authentication.email : this.state.user_profile?.fullname;
 			return (
 				<Navbar.Text>
@@ -222,9 +222,9 @@ class App extends React.Component<AppClassProps, AppClassState>{
 
 	renderAlert() {
 		if (this.state.show_alert) {
-			if(this.state.alert_type==='warning'){
+			if (this.state.alert_type === 'warning') {
 				return (
-					
+
 					<Modal show={this.state.show_alert} onHide={() => this.setState({ show_alert: false })} size="sm" centered>
 						<Modal.Body>{this.state.alert_text}</Modal.Body>
 						<Modal.Footer>
@@ -233,16 +233,16 @@ class App extends React.Component<AppClassProps, AppClassState>{
 							</Button>
 						</Modal.Footer>
 					</Modal>
-	
+
 				);
 			}
-			else{
-				return(
+			else {
+				return (
 					<Alert style={{ marginBottom: 0 }} variant={this.state.alert_type} onClose={() => this.setState({ show_alert: false })} dismissible>
 						{this.state.alert_text}
 					</Alert>
 				);
-				
+
 			}
 		}
 	}
