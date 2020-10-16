@@ -221,7 +221,7 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
 
     renderForm() {
         return (
-            <div>
+            <Container>
                 <Form>
                     <Form.Label>{config.emailAndPasswordLabel}</Form.Label>
                     <Form.Row>
@@ -329,7 +329,7 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
                 <Button className="float-right" block onClick={this.resetState} variant="dark" >
                     Cancel
                 </Button>
-            </div>
+            </Container>
         );
     }
 

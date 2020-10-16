@@ -217,7 +217,7 @@ export class ProfileCoach extends React.Component<ProfileCoachProps, ProfileCoac
                 <Form >
                     <Form.Label>{config.emailAndPasswordLabel}</Form.Label>
                     <Form.Row>
-                        <Form.Group md={12} as={Col} controlId="formGridEmail">
+                        <Form.Group as={Col} controlId="formGridEmail">
                             <Form.Control readOnly type="email" value={this.props.user_authentication?.email} />
                         </Form.Group>
                     </Form.Row>
@@ -304,11 +304,8 @@ export class ProfileCoach extends React.Component<ProfileCoachProps, ProfileCoac
                 <Form>
                     <Form.Label>{config.emailAndPasswordLabel}</Form.Label>
                     <Form.Row>
-                        <Form.Group md={6} as={Col} controlId="formGridEmail">
+                        <Form.Group as={Col} controlId="formGridEmail">
                             <Form.Control readOnly type="email" value={this.props.user_authentication?.email} />
-                        </Form.Group>
-                        <Form.Group md={6} as={Col} controlId="formGridPassword">
-                            <Form.Control readOnly type="password" value={'******'} />
                         </Form.Group>
                     </Form.Row>
                     <Form.Label>{config.fullNameLabel}</Form.Label>

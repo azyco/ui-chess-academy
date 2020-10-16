@@ -64,25 +64,35 @@ export class CoachManagement extends React.Component<CoachManagementProps, Coach
     renderCoachTable() {
         if (this.state.coach_array) {
             return (
-                <Table striped bordered hover responsive="lg" >
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>E-Mail</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.state.coach_array.map(this.coachTableGenerator)}
-                    </tbody>
-                </Table>
+                <Card bg="light" style={{ marginTop: '1em' }}>
+                    <Card.Header as='h5'>Coaches</Card.Header>
+                    <Card.Body>
+                        <Container fluid>
+                            <Table striped bordered hover responsive="lg" >
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>E-Mail</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {this.state.coach_array.map(this.coachTableGenerator)}
+                                </tbody>
+                            </Table>
+                        </Container>
+                    </Card.Body>
+                </Card>
             );
         }
         else {
             return (
-                <div>
-                    No Coaches present
-                </div>
+                <Card bg="light" style={{ marginTop: '1em' }}>
+                    <Card.Header as='h5'>Coaches</Card.Header>
+                    <Card.Body>
+                        No Coaches present
+                    </Card.Body>
+                </Card>
             )
         }
 
@@ -91,14 +101,7 @@ export class CoachManagement extends React.Component<CoachManagementProps, Coach
     render() {
         return (
             <div>
-                <Card bg="light" style={{ marginTop: '1em' }}>
-                    <Card.Header as='h5'>Coaches</Card.Header>
-                    <Card.Body>
-                        <Container fluid>
-                            {this.renderCoachTable()}
-                        </Container>
-                    </Card.Body>
-                </Card>
+                {this.renderCoachTable()}
                 <RegisterCoach updateCoachArray={this.updateCoachArrayCallback} onAlert={this.props.onAlert} />
             </div>
         );
