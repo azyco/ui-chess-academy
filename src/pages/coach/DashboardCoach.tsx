@@ -104,7 +104,7 @@ export class DashboardCoach extends React.Component<DashboardCoachProps, Dashboa
                                     <ProfileCoach updateState={this.props.updateState} onAlert={this.props.onAlert} user_profile={this.props.user_profile} user_authentication={this.props.user_authentication} />
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="classes">
-                                    <ClassCoach user_authentication={this.props.user_authentication} />
+                                    <ClassCoach user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} />
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="assignments">
                                     <Container>

@@ -91,7 +91,7 @@ export class DashboardStudent extends React.Component<DashboardStudentProps, Das
                                     <ProfileStudent updateState={this.props.updateState} onAlert={this.props.onAlert} user_authentication={this.props.user_authentication} user_profile={this.props.user_profile} />
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="classes">
-                                    <ClassStudent user_authentication={this.props.user_authentication} />
+                                    <ClassStudent user_authentication={this.props.user_authentication} onAlert={this.props.onAlert}/>
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="assignments">
                                     <Container>

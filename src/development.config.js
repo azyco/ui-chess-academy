@@ -28,7 +28,7 @@ export default {
     countrySelectList: ['India (IND)'],
     stateSelectList: ['Andhra Pradesh', 'Assam', 'Arunachal Pradesh', 'Bihar', 'Goa', 'Gujarat', 'Jammu and Kashmir', 'Jharkhand', 'West Bengal', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Orissa', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Tripura', 'Uttaranchal', 'Uttar Pradesh', 'Haryana', 'Himachal Pradesh', 'Chhattisgarh', 'Andaman and Nicobar', 'Pondicherry', 'Dadra and Nagar Haveli', 'Daman and Diu', 'Delhi', 'Chandigarh', 'Lakshadweep'],
     countryCodeSelectList: ['+91'],
-    emailAndPasswordLabel: 'E-Mail and Password',
+    emailAndPasswordLabel: 'E-Mail',
     emailInvalidFeedback: 'Enter a valid Email',
     loginPasswordInvalidFeedback: 'Password can\'t be empty',
     passwordInvalidFeedback: 'Password must be atleast 6 characters long',
