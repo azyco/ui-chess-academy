@@ -339,9 +339,11 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
                 <Card.Header as="h5" >{config.coachRegistrationText}</Card.Header>
                 <Card.Body>
                     <Collapse in={!this.state.show_form} >
-                        <Button variant="dark" block onClick={() => { this.setState({ show_form: true }) }}>
-                            Add Coach
-                        </Button>
+                        <Container>
+                            <Button variant="dark" block onClick={() => { this.setState({ show_form: true }) }}>
+                                Add Coach
+                            </Button>
+                        </Container>
                     </Collapse>
                     <Collapse in={this.state.show_form}>
                         {this.renderForm()}

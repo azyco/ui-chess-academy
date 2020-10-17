@@ -21,7 +21,8 @@ type classroom_class = {
     classroom_id: number,
     start_time: Date,
     duration: number,
-    created_at: string
+    created_at: string,
+    uuid: string
 }
 
 type userAuthenticationType = {
@@ -189,6 +190,7 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
     classRowGenerator = (class_row: classroom_class) => (
         <tr key={class_row.id} >
             <td>{class_row.id}</td>
+            <td>{class_row.uuid}</td>
             <td>{class_row.classroom_id}</td>
             <td>{class_row.start_time}</td>
             <td>{class_row.duration}</td>
@@ -218,6 +220,7 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
                         <thead>
                             <tr>
                                 <th>Class ID</th>
+                                <th>UUID</th>
                                 <th>Classroom ID</th>
                                 <th>Start Time</th>
                                 <th>Duration</th>
@@ -293,7 +296,7 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
                                     <Form.Group sm={6} as={Col} >
                                         <Form.Control isInvalid={this.state.start_time_is_invalid} value={this.state.start_time_input} onChange={this.onStartTimeChange} placeholder="Date and Time" />
                                         <Form.Control.Feedback type="invalid" >
-                                            Date and Time must be valid
+                                            Date and Time (MM/DD/YYYY, HH:MM:SS) must be valid
                                         </Form.Control.Feedback>
                                     </Form.Group>
                                     <Form.Group sm={6} as={Col} >
@@ -304,7 +307,7 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
                                     <Form.Group sm={12} as={Col} >
                                         <Form.Control value={this.state.duration} onChange={this.onDurationChange} isInvalid={this.state.duration_is_invalid} placeholder="Duration" />
                                         <Form.Control.Feedback type="invalid" >
-                                            Duration must be valid
+                                            Duration (in minutes) must be valid
                                     </Form.Control.Feedback>
                                     </Form.Group>
                                 </Form.Row>

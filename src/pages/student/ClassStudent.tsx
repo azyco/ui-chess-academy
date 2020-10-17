@@ -22,7 +22,8 @@ type classroom_class = {
     classroom_id: number,
     start_time: Date,
     duration: number,
-    created_at: string
+    created_at: string,
+    uuid: string
 }
 
 type userAuthenticationType = {
@@ -135,6 +136,7 @@ export class ClassStudent extends React.Component<ClassStudentProps, ClassStuden
     classRowGenerator = (class_row: classroom_class) => (
         <tr key={class_row.id} >
             <td>{class_row.id}</td>
+            <td>{class_row.uuid}</td>
             <td>{class_row.classroom_id}</td>
             <td>{class_row.start_time}</td>
             <td>{class_row.duration}</td>
@@ -159,6 +161,7 @@ export class ClassStudent extends React.Component<ClassStudentProps, ClassStuden
                         <thead>
                             <tr>
                                 <th>Class ID</th>
+                                <th>UUID</th>
                                 <th>Classroom ID</th>
                                 <th>Start Time</th>
                                 <th>Duration</th>

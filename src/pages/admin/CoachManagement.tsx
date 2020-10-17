@@ -34,10 +34,6 @@ export class CoachManagement extends React.Component<CoachManagementProps, Coach
         }
     }
 
-    updateCoachArrayCallback = () => {
-        this.updateCoachArray();
-    }
-
     componentDidMount() {
         this.updateCoachArray();
     }
@@ -49,7 +45,7 @@ export class CoachManagement extends React.Component<CoachManagementProps, Coach
                 coach_array: response.data.coach_array,
             });
         }).catch((error) => {
-            console.log("failed to update coach array in coach management");
+            console.log("failed to update coach array in coach management ",error);
         });
     }
 
@@ -89,9 +85,9 @@ export class CoachManagement extends React.Component<CoachManagementProps, Coach
             return (
                 <Card bg="light" style={{ marginTop: '1em' }}>
                     <Card.Header as='h5'>Coaches</Card.Header>
-                    <Card.Body>
+                    <Card.Title>
                         No Coaches present
-                    </Card.Body>
+                    </Card.Title>
                 </Card>
             )
         }
@@ -102,7 +98,7 @@ export class CoachManagement extends React.Component<CoachManagementProps, Coach
         return (
             <div>
                 {this.renderCoachTable()}
-                <RegisterCoach updateCoachArray={this.updateCoachArrayCallback} onAlert={this.props.onAlert} />
+                <RegisterCoach updateCoachArray={()=>{this.updateCoachArray()}} onAlert={this.props.onAlert} />
             </div>
         );
     }
