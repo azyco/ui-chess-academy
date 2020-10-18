@@ -10,6 +10,7 @@ import {
 
 import { ClassroomManagement } from './ClassroomManagement';
 import { CoachManagement } from './CoachManagement';
+import { StudentManagement } from './StudentManagement';
 
 import config from '../../config';
 // import Api from '../../api/backend';
@@ -52,7 +53,7 @@ export class Admin extends React.Component<AdminProps, AdminState>{
                                             <Nav.Link eventKey="coach">{config.coachManagementTab} </Nav.Link>
                                         </Nav.Item>
                                         <Nav.Item>
-                                            <Nav.Link eventKey="profile">{config.profileManagementTab} </Nav.Link>
+                                            <Nav.Link eventKey="student">Student Management</Nav.Link>
                                         </Nav.Item>
                                         <Button variant={"warning"} onClick={this.props.onLogout} >
                                             Logout
@@ -69,13 +70,8 @@ export class Admin extends React.Component<AdminProps, AdminState>{
                                 <Tab.Pane eventKey="coach">
                                     <CoachManagement onAlert={this.props.onAlert} />
                                 </Tab.Pane>
-                                <Tab.Pane eventKey="profile">
-                                    <Card bg="light" style={{ marginTop: '1em' }}>
-                                        <Card.Header as='h5'>Update Profile</Card.Header>
-                                        <Card.Body>
-                                            Update Profiles
-                                        </Card.Body>
-                                    </Card>
+                                <Tab.Pane eventKey="student">
+                                    <StudentManagement onAlert={this.props.onAlert} />
                                 </Tab.Pane>
                             </Tab.Content>
                         </Col>

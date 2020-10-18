@@ -22,7 +22,7 @@ type classroom_class = {
     start_time: Date,
     duration: number,
     created_at: string,
-    uuid: string
+    class_hash: string
 }
 
 type userAuthenticationType = {
@@ -189,8 +189,7 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
 
     classRowGenerator = (class_row: classroom_class) => (
         <tr key={class_row.id} >
-            <td>{class_row.id}</td>
-            <td>{class_row.uuid}</td>
+            <td><a href={'/class/' + class_row.class_hash}>{class_row.id}</a></td>
             <td>{class_row.classroom_id}</td>
             <td>{class_row.start_time}</td>
             <td>{class_row.duration}</td>
@@ -219,8 +218,7 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
                     <Table striped bordered hover responsive="lg" >
                         <thead>
                             <tr>
-                                <th>Class ID</th>
-                                <th>UUID</th>
+                                <th>Class ID/Link</th>
                                 <th>Classroom ID</th>
                                 <th>Start Time</th>
                                 <th>Duration</th>

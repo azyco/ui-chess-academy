@@ -29,7 +29,7 @@ type classroom_class = {
     start_time: Date,
     duration: number,
     created_at: string,
-    uuid: string
+    class_hash: string
 }
 
 type user = {
@@ -199,8 +199,7 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
 
     classRowGenerator = (class_row: classroom_class) => (
         <tr key={class_row.id} >
-            <td>{class_row.id}</td>
-            <td>{class_row.uuid}</td>
+            <td><a href={'/class/' + class_row.class_hash}>{class_row.id}</a></td>
             <td>{class_row.classroom_id}</td>
             <td>{class_row.start_time}</td>
             <td>{class_row.duration}</td>
@@ -229,8 +228,7 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
                     <Table striped bordered hover responsive="lg" >
                         <thead>
                             <tr>
-                                <th>Class ID</th>
-                                <th>UUID</th>
+                                <th>Class ID/Link</th>
                                 <th>Classroom ID</th>
                                 <th>Start Time</th>
                                 <th>Duration</th>
@@ -602,33 +600,38 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
         console.log("classroom created with state: ", this.state);
         const coach_array_selected_filtered = this.state.coach_array_selected.filter((value, index, array) => { if (value) { return value; } });
         const student_array_selected_filtered = this.state.student_array_selected.filter((value, index, array) => { if (value) { return value; } });
-        Api.post('/classroom', {
-            classroom_data: {
-                classroom_name: this.state.classroom_name,
-                classroom_description: this.state.classroom_description,
-                student_array_selected: student_array_selected_filtered,
-                coach_array_selected: coach_array_selected_filtered,
-                is_active: true
-            }
-        }).then((response) => {
-            console.log("classroom created: ", response);
-            this.updateClassroomArray();
-            this.resetClassroomForm();
-            this.props.onAlert({ alert_type: "success", alert_text: "Class added Successfully" });
-        }).catch((error) => {
-            console.log("error while creating class", error);
-            if (error.response) {
-                if (error.response.data.error_code === 'ER_DUP_ENTRY') {
-                    this.props.onAlert({ alert_type: "warning", alert_text: "Classroom name alreaady exists" });
+        if (student_array_selected_filtered.length > 0 && coach_array_selected_filtered.length > 0) {
+            Api.post('/classroom', {
+                classroom_data: {
+                    classroom_name: this.state.classroom_name,
+                    classroom_description: this.state.classroom_description,
+                    student_array_selected: student_array_selected_filtered,
+                    coach_array_selected: coach_array_selected_filtered,
+                    is_active: true
+                }
+            }).then((response) => {
+                console.log("classroom created: ", response);
+                this.updateClassroomArray();
+                this.resetClassroomForm();
+                this.props.onAlert({ alert_type: "success", alert_text: "Class added Successfully" });
+            }).catch((error) => {
+                console.log("error while creating class", error);
+                if (error.response) {
+                    if (error.response.data.error_code === 'ER_DUP_ENTRY') {
+                        this.props.onAlert({ alert_type: "warning", alert_text: "Classroom name alreaady exists" });
+                    }
+                    else {
+                        this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+                    }
                 }
                 else {
                     this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
                 }
-            }
-            else {
-                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
-            }
-        });
+            });
+        }
+        else {
+            this.props.onAlert({ alert_type: "warning", alert_text: "You need to select atleast 1 coach and 1 student" });
+        }
     }
 
     renderClassroomTable() {
@@ -668,7 +671,9 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
                     <Card.Header as='h5'>{config.classroomsCardHeader}</Card.Header>
                     <Card.Body>
                         <Container fluid>
-                            {config.noClassroomsAdmin}
+                            <Card.Title>
+                                {config.noClassroomsAdmin}
+                            </Card.Title>
                         </Container>
                     </Card.Body>
                 </Card>
@@ -732,36 +737,41 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
         console.log("data before classroom edit submission ", this.state);
         const coach_array_selected_filtered = this.state.coach_array_selected.filter((value, index, array) => { if (value) { return value; } });
         const student_array_selected_filtered = this.state.student_array_selected.filter((value, index, array) => { if (value) { return value; } });
-        Api.put('/classroom', {
-            classroom_data: {
-                classroom_id: this.state.classroom_edit_id,
-                classroom_name: this.state.classroom_name,
-                classroom_description: this.state.classroom_description,
-                student_array_selected: student_array_selected_filtered,
-                coach_array_selected: coach_array_selected_filtered,
-                classroom_details_is_dirty: this.state.classroom_details_is_dirty,
-                coach_array_selected_is_dirty: this.state.coach_array_selected_is_dirty,
-                student_array_selected_is_dirty: this.state.student_array_selected_is_dirty
-            }
-        }).then((response) => {
-            console.log("classroom edited succesfully ", response);
-            this.props.onAlert({ alert_type: "success", alert_text: "Classroom edited Successfully" });
-            this.updateClassroomArray();
-            this.resetClassroomForm();
-        }).catch((error) => {
-            console.log("error while editing classroom ", error);
-            if (error.response) {
-                if (error.response.data.error_code === 'ER_DUP_ENTRY') {
-                    this.props.onAlert({ alert_type: "warning", alert_text: "Classroom name already exists" });
+        if (student_array_selected_filtered.length > 0 && coach_array_selected_filtered.length > 0) {
+            Api.put('/classroom', {
+                classroom_data: {
+                    classroom_id: this.state.classroom_edit_id,
+                    classroom_name: this.state.classroom_name,
+                    classroom_description: this.state.classroom_description,
+                    student_array_selected: student_array_selected_filtered,
+                    coach_array_selected: coach_array_selected_filtered,
+                    classroom_details_is_dirty: this.state.classroom_details_is_dirty,
+                    coach_array_selected_is_dirty: this.state.coach_array_selected_is_dirty,
+                    student_array_selected_is_dirty: this.state.student_array_selected_is_dirty
+                }
+            }).then((response) => {
+                console.log("classroom edited succesfully ", response);
+                this.props.onAlert({ alert_type: "success", alert_text: "Classroom edited Successfully" });
+                this.updateClassroomArray();
+                this.resetClassroomForm();
+            }).catch((error) => {
+                console.log("error while editing classroom ", error);
+                if (error.response) {
+                    if (error.response.data.error_code === 'ER_DUP_ENTRY') {
+                        this.props.onAlert({ alert_type: "warning", alert_text: "Classroom name already exists" });
+                    }
+                    else {
+                        this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+                    }
                 }
                 else {
                     this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
                 }
-            }
-            else {
-                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
-            }
-        });
+            });
+        }
+        else {
+            this.props.onAlert({ alert_type: "warning", alert_text: "You need to select atleast 1 coach and 1 student" });
+        }
     }
 
     resetClassroomForm = () => {
