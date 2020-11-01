@@ -53,9 +53,9 @@ type DashboardStudentState = {
 }
 
 export class DashboardStudent extends React.Component<DashboardStudentProps, DashboardStudentState>{
-    constructor(props: DashboardStudentProps) {
-        super(props);
-    };
+    // constructor(props: DashboardStudentProps) {
+    //     super(props);
+    // };
 
     render() {
         return (

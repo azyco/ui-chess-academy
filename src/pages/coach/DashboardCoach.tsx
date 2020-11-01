@@ -66,9 +66,9 @@ type DashboardCoachState = {
 }
 
 export class DashboardCoach extends React.Component<DashboardCoachProps, DashboardCoachState>{
-    constructor(props: DashboardCoachProps) {
-        super(props);
-    }
+    // constructor(props: DashboardCoachProps) {
+    //     super(props);
+    // }
 
     render() {
         return (

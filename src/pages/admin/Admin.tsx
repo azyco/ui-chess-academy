@@ -33,9 +33,9 @@ type userAuthenticationType = {
 }
 
 export class Admin extends React.Component<AdminProps, AdminState>{
-    constructor(props: AdminProps) {
-        super(props);
-    }
+    // constructor(props: AdminProps) {
+    //     super(props);
+    // }
 
     render() {
         return (

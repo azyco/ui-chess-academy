@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Form, Button, Card, Spinner, Overlay } from 'react-bootstrap';
+import { Container, Form, Button, Card } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom'
 import CryptoJS from 'crypto-js';
 

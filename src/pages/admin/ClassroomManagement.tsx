@@ -467,7 +467,8 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
     }
 
     countSelectedUsers(user_array: (user | null)[]) {
-        const new_arr = user_array.filter((value, index, array) => { if (value) { return value; } })
+        let new_arr = []
+        user_array.forEach((value) => { if (value) { new_arr.push(value) } })
         return new_arr.length;
     }
 
@@ -598,8 +599,12 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
 
     onClassroomCreateEnd = () => {
         console.log("classroom created with state: ", this.state);
-        const coach_array_selected_filtered = this.state.coach_array_selected.filter((value, index, array) => { if (value) { return value; } });
-        const student_array_selected_filtered = this.state.student_array_selected.filter((value, index, array) => { if (value) { return value; } });
+        let coach_array_selected_filtered: user[] = []
+        this.state.coach_array_selected.forEach((value) => { if (value) { coach_array_selected_filtered.push(value) } })
+
+        let student_array_selected_filtered: user[] = []
+        this.state.student_array_selected.forEach((value) => { if (value) { student_array_selected_filtered.push(value) } })
+
         if (student_array_selected_filtered.length > 0 && coach_array_selected_filtered.length > 0) {
             Api.post('/classroom', {
                 classroom_data: {
@@ -735,8 +740,10 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
 
     onClassroomEditEnd = () => {
         console.log("data before classroom edit submission ", this.state);
-        const coach_array_selected_filtered = this.state.coach_array_selected.filter((value, index, array) => { if (value) { return value; } });
-        const student_array_selected_filtered = this.state.student_array_selected.filter((value, index, array) => { if (value) { return value; } });
+        let coach_array_selected_filtered: user[] = []
+        this.state.coach_array_selected.forEach((value) => { if (value) { coach_array_selected_filtered.push(value) } })
+        let student_array_selected_filtered: user[] = []
+        this.state.student_array_selected.forEach((value) => { if (value) { student_array_selected_filtered.push(value) } })
         if (student_array_selected_filtered.length > 0 && coach_array_selected_filtered.length > 0) {
             Api.put('/classroom', {
                 classroom_data: {
