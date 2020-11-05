@@ -12,6 +12,7 @@ import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { Profile } from './pages/Profile';
 import { About } from './pages/About';
+import { ClassroomClass } from './pages/ClassroomClass';
 import { RegisterStudent } from './pages/student/RegisterStudent';
 import config from './config';
 import Api from './api/backend';
@@ -22,7 +23,7 @@ type userAuthenticationType = {
 	id: number,
 	user_type: string,
 	email: string,
-	created_at: string
+	created_at: number
 }
 
 type userProfileType = {
@@ -248,6 +249,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
 	}
 
 	render() {
+		const got_auth_and_profile = (!!this.state.user_authentication && !!this.state.user_profile) || this.state.user_authentication?.user_type === 'admin';
 		return (
 			<Router>
 				<Navbar bg="dark" variant="dark" expand="lg">
@@ -270,11 +272,12 @@ class App extends React.Component<AppClassProps, AppClassState>{
 						<Profile updateState={this.updateStateCallback} onAlert={this.alertCallback} onLogout={this.logoutCallback} user_profile={this.state.user_profile} user_authentication={this.state.user_authentication} />
 					</Route>
 					<Route path="/login">
-						<Login onAlert={this.alertCallback} onLogin={this.loginCallback} />
+						<Login got_auth_and_profile={got_auth_and_profile} onAlert={this.alertCallback} onLogin={this.loginCallback} />
 					</Route>
 					<Route path="/student/register">
 						<RegisterStudent onAlert={this.alertCallback} />
 					</Route>
+					<Route path="/class/:class_hash" render={(props) => (<ClassroomClass {...props} onAlert={this.alertCallback} user_authentication={this.state.user_authentication} />)} />
 					<Route path="/">
 						<Home />
 					</Route>

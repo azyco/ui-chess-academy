@@ -20,9 +20,9 @@ type classroom = {
 type classroom_class = {
     id: number,
     classroom_id: number,
-    start_time: Date,
+    start_time: number,
     duration: number,
-    created_at: string,
+    created_at: number,
     class_hash: string
 }
 
@@ -30,7 +30,7 @@ type userAuthenticationType = {
     id: number,
     user_type: string,
     email: string,
-    created_at: string
+    created_at: number
 }
 
 type ClassStudentProps = {
@@ -135,11 +135,11 @@ export class ClassStudent extends React.Component<ClassStudentProps, ClassStuden
 
     classRowGenerator = (class_row: classroom_class) => (
         <tr key={class_row.id} >
-            <td><a href={'/class/' + class_row.class_hash}>{class_row.id}</a></td>        
+            <td><a href={'/class/' + class_row.class_hash}>{class_row.id}</a></td>
             <td>{class_row.classroom_id}</td>
-            <td>{class_row.start_time}</td>
+            <td>{new Date(class_row.start_time).toLocaleString()}</td>
             <td>{class_row.duration}</td>
-            <td>{class_row.created_at}</td>
+            <td>{new Date(class_row.created_at).toLocaleString()}</td>
         </tr>
     );
 

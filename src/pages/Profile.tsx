@@ -11,7 +11,7 @@ type userAuthenticationType = {
     id: number,
     user_type: string,
     email: string,
-    created_at: string
+    created_at: number
 };
 
 type userProfileType = {
@@ -75,7 +75,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                 return (<Admin user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
             }
             else {
-                console.log("Bad user type");
+                console.log("Bad user type",this.props.user_authentication,this.props.user_profile);
                 return (<Redirect to='/' />);
             }
         }

@@ -8,7 +8,8 @@ import config from '../config';
 
 type LoginProps = {
     onLogin: any,//check type for callback functions
-    onAlert: Function
+    onAlert: Function,
+    got_auth_and_profile: boolean
 }
 
 type LoginState = {
@@ -83,8 +84,12 @@ export class Login extends React.Component<LoginProps, LoginState> {
     }
 
     renderRedirect = () => {
-        if (this.state.redirect_to === 'profile') {
+        console.log("user_authentication from login ",this.props.got_auth_and_profile)
+        if (this.state.redirect_to === 'profile' && this.props.got_auth_and_profile) {
             return <Redirect to='/profile' />
+        }
+        else{
+            return React.Fragment
         }
     }
 

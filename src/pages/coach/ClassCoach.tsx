@@ -19,9 +19,9 @@ type classroom = {
 type classroom_class = {
     id: number,
     classroom_id: number,
-    start_time: Date,
+    start_time: number,
     duration: number,
-    created_at: string,
+    created_at: number,
     class_hash: string
 }
 
@@ -29,7 +29,7 @@ type userAuthenticationType = {
     id: number,
     user_type: string,
     email: string,
-    created_at: string
+    created_at: number
 }
 
 type ClassCoachProps = {
@@ -108,13 +108,7 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
     }
 
     addClass() {
-        const start_time_db = this.state.start_time.getUTCFullYear() + '-' +
-            ('00' + (this.state.start_time.getUTCMonth() + 1)).slice(-2) + '-' +
-            ('00' + this.state.start_time.getUTCDate()).slice(-2) + ' ' +
-            ('00' + this.state.start_time.getUTCHours()).slice(-2) + ':' +
-            ('00' + this.state.start_time.getUTCMinutes()).slice(-2) + ':' +
-            ('00' + this.state.start_time.getUTCSeconds()).slice(-2);
-
+        const start_time_db = this.state.start_time.valueOf();
         Api.post('/class', {
             class_details: {
                 start_time: start_time_db,
@@ -191,9 +185,9 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
         <tr key={class_row.id} >
             <td><a href={'/class/' + class_row.class_hash}>{class_row.id}</a></td>
             <td>{class_row.classroom_id}</td>
-            <td>{class_row.start_time}</td>
+            <td>{new Date(class_row.start_time).toLocaleString()}</td>
             <td>{class_row.duration}</td>
-            <td>{class_row.created_at}</td>
+            <td>{new Date(class_row.created_at).toLocaleString()}</td>
             <td>
                 <Button variant="dark" onClick={() => { this.deleteClass(class_row.id, class_row.classroom_id) }}>
                     Delete

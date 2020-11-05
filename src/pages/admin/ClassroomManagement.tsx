@@ -18,7 +18,7 @@ type classroom = {
     name: string,
     description: string,
     is_active: boolean,
-    created_at: Date,
+    created_at: number,
     student_count: number,
     coaches: string[]
 }
@@ -26,9 +26,9 @@ type classroom = {
 type classroom_class = {
     id: number,
     classroom_id: number,
-    start_time: Date,
+    start_time: number,
     duration: number,
-    created_at: string,
+    created_at: number,
     class_hash: string
 }
 
@@ -181,7 +181,7 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
             <td>{classrom_row.name}</td>
             <td>{classrom_row.description}</td>
             <td>{(classrom_row.is_active) ? "Yes" : "No"}</td>
-            <td>{classrom_row.created_at}</td>
+            <td>{new Date(classrom_row.created_at).toLocaleString()}</td>
             <td>{classrom_row.coaches}</td>
             <td>{classrom_row.student_count}</td>
             <td>
@@ -201,9 +201,9 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
         <tr key={class_row.id} >
             <td><a href={'/class/' + class_row.class_hash}>{class_row.id}</a></td>
             <td>{class_row.classroom_id}</td>
-            <td>{class_row.start_time}</td>
+            <td>{new Date(class_row.start_time).toLocaleString()}</td>
             <td>{class_row.duration}</td>
-            <td>{class_row.created_at}</td>
+            <td>{new Date(class_row.created_at).toLocaleString()}</td>
             <td>
                 <Button variant="dark" onClick={() => { this.deleteClass(class_row.id) }}>
                     Delete
@@ -352,13 +352,7 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
     }
 
     addClass() {
-        const start_time_db = this.state.start_time.getUTCFullYear() + '-' +
-            ('00' + (this.state.start_time.getUTCMonth() + 1)).slice(-2) + '-' +
-            ('00' + this.state.start_time.getUTCDate()).slice(-2) + ' ' +
-            ('00' + this.state.start_time.getUTCHours()).slice(-2) + ':' +
-            ('00' + this.state.start_time.getUTCMinutes()).slice(-2) + ':' +
-            ('00' + this.state.start_time.getUTCSeconds()).slice(-2);
-
+        const start_time_db = this.state.start_time.valueOf();
         Api.post('/class', {
             class_details: {
                 start_time: start_time_db,

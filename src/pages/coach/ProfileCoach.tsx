@@ -14,7 +14,7 @@ type userAuthenticationType = {
     id: number,
     user_type: string,
     email: string,
-    created_at: string
+    created_at: number
 }
 type userProfileType = {
     fullname: string,
