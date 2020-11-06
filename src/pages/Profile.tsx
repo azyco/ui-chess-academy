@@ -4,6 +4,7 @@ import { Redirect } from 'react-router-dom'
 import { DashboardStudent } from './student/DashboardStudent';
 import { DashboardCoach } from './coach/DashboardCoach';
 import { Admin } from './admin/Admin';
+import { Container, Card } from 'react-bootstrap';
 
 //import config from '../config';
 
@@ -39,18 +40,17 @@ type ProfileProps = {
     user_profile: userProfileType | null,
     onLogout: Function,
     onAlert: Function,
-    updateState: Function
+    updateState: Function,
+    user_authorization_check_complete: boolean
 };
 
 type ProfileState = {
-    signed_in: boolean
 };
 
 export class Profile extends React.Component<ProfileProps, ProfileState> {
     constructor(props: ProfileProps) {
         super(props);
         this.state = {
-            signed_in: (!this.props.user_authentication) ? false : true
         };
     }
 
@@ -63,26 +63,38 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
     // }
 
     render() {
-        if (this.state.signed_in &&
-            this.props.user_authentication) {
-            if (this.props.user_authentication.user_type === 'student' && this.props.user_profile) {
-                return (<DashboardStudent updateState={this.props.updateState} user_profile={this.props.user_profile} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
-            }
-            else if (this.props.user_authentication.user_type === 'coach' && this.props.user_profile) {
-                return (<DashboardCoach updateState={this.props.updateState} user_profile={this.props.user_profile} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
-            }
-            else if (this.props.user_authentication.user_type === 'admin') {
-                return (<Admin user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
+        if (this.props.user_authorization_check_complete) {
+            if (this.props.user_authentication) {
+                if (this.props.user_authentication.user_type === 'student' && !!this.props.user_profile) {
+                    return (<DashboardStudent updateState={this.props.updateState} user_profile={this.props.user_profile} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
+                }
+                else if (this.props.user_authentication.user_type === 'coach' && !!this.props.user_profile) {
+                    return (<DashboardCoach updateState={this.props.updateState} user_profile={this.props.user_profile} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
+                }
+                else if (this.props.user_authentication.user_type === 'admin') {
+                    return (<Admin user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
+                }
+                else {
+                    console.log("Bad user type", this.props.user_authentication, this.props.user_profile);
+                    return (<Redirect to='/' />);
+                }
             }
             else {
-                console.log("Bad user type",this.props.user_authentication,this.props.user_profile);
+                console.log("User not logged in");
                 return (<Redirect to='/' />);
             }
         }
         else {
-            console.log("User not logged in");
-            return (<Redirect to='/' />);
+            return (
+                <Container>
+                    <Card bg="light" style={{ marginTop: '1em' }}>
+                        <Card.Header as="h5" >Loading</Card.Header>
+                        <Card.Body>
+                            Please Wait
+                        </Card.Body>
+                    </Card>
+                </Container>
+            )
         }
     }
-
 }
