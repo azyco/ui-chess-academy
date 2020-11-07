@@ -18,7 +18,8 @@ import config from '../../config';
 type AdminProps = {
     onAlert: Function,
     onLogout: any,
-    user_authentication: userAuthenticationType
+    user_authentication: userAuthenticationType,
+    unauthorizedLogout: Function
 }
 
 type AdminState = {
@@ -65,13 +66,13 @@ export class Admin extends React.Component<AdminProps, AdminState>{
                         <Col lg={10}>
                             <Tab.Content>
                                 <Tab.Pane eventKey="classroom">
-                                    <ClassroomManagement onAlert={this.props.onAlert} />
+                                    <ClassroomManagement unauthorizedLogout={this.props.unauthorizedLogout} onAlert={this.props.onAlert} />
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="coach">
-                                    <CoachManagement onAlert={this.props.onAlert} />
+                                    <CoachManagement unauthorizedLogout={this.props.unauthorizedLogout} onAlert={this.props.onAlert} />
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="student">
-                                    <StudentManagement onAlert={this.props.onAlert} />
+                                    <StudentManagement unauthorizedLogout={this.props.unauthorizedLogout} onAlert={this.props.onAlert} />
                                 </Tab.Pane>
                             </Tab.Content>
                         </Col>

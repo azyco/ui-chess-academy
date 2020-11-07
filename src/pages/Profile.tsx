@@ -41,7 +41,8 @@ type ProfileProps = {
     onLogout: Function,
     onAlert: Function,
     updateState: Function,
-    user_authorization_check_complete: boolean
+    user_authorization_check_complete: boolean,
+    unauthorizedLogout: Function
 };
 
 type ProfileState = {
@@ -66,13 +67,13 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
         if (this.props.user_authorization_check_complete) {
             if (this.props.user_authentication) {
                 if (this.props.user_authentication.user_type === 'student' && !!this.props.user_profile) {
-                    return (<DashboardStudent updateState={this.props.updateState} user_profile={this.props.user_profile} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
+                    return (<DashboardStudent unauthorizedLogout={this.props.unauthorizedLogout} updateState={this.props.updateState} user_profile={this.props.user_profile} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
                 }
                 else if (this.props.user_authentication.user_type === 'coach' && !!this.props.user_profile) {
-                    return (<DashboardCoach updateState={this.props.updateState} user_profile={this.props.user_profile} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
+                    return (<DashboardCoach unauthorizedLogout={this.props.unauthorizedLogout} updateState={this.props.updateState} user_profile={this.props.user_profile} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
                 }
                 else if (this.props.user_authentication.user_type === 'admin') {
-                    return (<Admin user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
+                    return (<Admin unauthorizedLogout={this.props.unauthorizedLogout} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
                 }
                 else {
                     console.log("Bad user type", this.props.user_authentication, this.props.user_profile);

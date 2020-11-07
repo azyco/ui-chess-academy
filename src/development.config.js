@@ -80,6 +80,7 @@ export default {
     noClassroomCoach: "You haven't enrolled in a class yet",
     noClassroomsAdmin: "No Classrooms Created",
     classroomsCardHeader: "Classrooms",
+    classesCardHeader: "Classes",
     noStudentsAdmin: "No students added",
     noCoachesAdmin: "No coaches added",
     availableStudentsAdmin: "Available Students",

@@ -10,7 +10,8 @@ import {
 import Api from '../../api/backend';
 
 type StudentManagementProps = {
-    onAlert: Function
+    onAlert: Function,
+    unauthorizedLogout: Function
 }
 
 type StudentManagementState = {
@@ -44,6 +45,9 @@ export class StudentManagement extends React.Component<StudentManagementProps, S
             });
         }).catch((error) => {
             console.log("failed to update student array in student management ", error);
+            if (error.response.status === 403) {
+                this.props.unauthorizedLogout();
+            }
         });
     }
 

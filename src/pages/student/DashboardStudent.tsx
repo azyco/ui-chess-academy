@@ -10,6 +10,7 @@ import {
 import { ClassStudent } from './ClassStudent';
 import { ProfileStudent } from './ProfileStudent';
 import { AssignmentsStudent } from './AssignmentsStudent';
+import { PuzzlesStudent } from './PuzzlesStudent';
 
 import config from '../../config';
 
@@ -45,7 +46,8 @@ type DashboardStudentProps = {
     onLogout: any,
     user_authentication: userAuthenticationType,
     user_profile: userProfileType,
-    updateState: Function
+    updateState: Function,
+    unauthorizedLogout: Function
 }
 
 type DashboardStudentState = {
@@ -88,30 +90,16 @@ export class DashboardStudent extends React.Component<DashboardStudentProps, Das
                         <Col lg={10}>
                             <Tab.Content>
                                 <Tab.Pane eventKey="profile">
-                                    <ProfileStudent updateState={this.props.updateState} onAlert={this.props.onAlert} user_authentication={this.props.user_authentication} user_profile={this.props.user_profile} />
+                                    <ProfileStudent unauthorizedLogout={this.props.unauthorizedLogout} updateState={this.props.updateState} onAlert={this.props.onAlert} user_authentication={this.props.user_authentication} user_profile={this.props.user_profile} />
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="classes">
-                                    <ClassStudent user_authentication={this.props.user_authentication} onAlert={this.props.onAlert}/>
+                                    <ClassStudent unauthorizedLogout={this.props.unauthorizedLogout} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} />
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="assignments">
-                                    <Container>
-                                        <Card bg="light" style={{ marginTop: '1em' }}>
-                                            <Card.Header as='h5'>Assignments</Card.Header>
-                                            <Card.Body>
-                                                <AssignmentsStudent />
-                                            </Card.Body>
-                                        </Card>
-                                    </Container>
+                                    <AssignmentsStudent unauthorizedLogout={this.props.unauthorizedLogout} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} />
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="puzzles">
-                                    <Container>
-                                        <Card bg="light" style={{ marginTop: '1em' }}>
-                                            <Card.Header as='h5'>Puzzles</Card.Header>
-                                            <Card.Body>
-                                                Puzzles
-                                            </Card.Body>
-                                        </Card>
-                                    </Container>
+                                    <PuzzlesStudent unauthorizedLogout={this.props.unauthorizedLogout} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} />
                                 </Tab.Pane>
                             </Tab.Content>
                         </Col>

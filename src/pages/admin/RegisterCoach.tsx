@@ -7,7 +7,8 @@ import CryptoJS from 'crypto-js';
 
 type RegisterCoachProps = {
     onAlert: Function,
-    updateCoachArray: Function
+    updateCoachArray: Function,
+    unauthorizedLogout: Function
 }
 
 type RegisterCoachState = {
@@ -122,11 +123,16 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
         }).catch((error) => {
             console.log(error);
             if (error.response) {
-                if (error.response.data.error_code === 'ER_DUP_ENTRY') {
-                    this.props.onAlert({ alert_type: "warning", alert_text: config.duplicateEntryText });
+                if (error.response.status === 403) {
+                    this.props.unauthorizedLogout();
                 }
-                else {
-                    this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+                else{
+                    if (error.response.data.error_code === 'ER_DUP_ENTRY') {
+                        this.props.onAlert({ alert_type: "warning", alert_text: config.duplicateEntryText });
+                    }
+                    else {
+                        this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+                    }
                 }
             }
             else {

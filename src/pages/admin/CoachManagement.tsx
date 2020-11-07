@@ -8,11 +8,12 @@ import {
 
 import { RegisterCoach } from './RegisterCoach';
 
-//import config from '../../config';
+import config from '../../config';
 import Api from '../../api/backend';
 
 type CoachManagementProps = {
-    onAlert: Function
+    onAlert: Function,
+    unauthorizedLogout: Function
 }
 
 type CoachManagementState = {
@@ -46,6 +47,12 @@ export class CoachManagement extends React.Component<CoachManagementProps, Coach
             });
         }).catch((error) => {
             console.log("failed to update coach array in coach management ", error);
+            if (error.response.status === 403) {
+                this.props.unauthorizedLogout();
+            }
+            else{
+                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            }
         });
     }
 
@@ -102,7 +109,7 @@ export class CoachManagement extends React.Component<CoachManagementProps, Coach
         return (
             <div>
                 {this.renderCoachTable()}
-                <RegisterCoach updateCoachArray={() => { this.updateCoachArray() }} onAlert={this.props.onAlert} />
+                <RegisterCoach unauthorizedLogout={this.props.unauthorizedLogout} updateCoachArray={() => { this.updateCoachArray() }} onAlert={this.props.onAlert} />
             </div>
         );
     }

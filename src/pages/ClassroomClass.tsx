@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Col, Container, Row, Card, Button, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Redirect } from 'react-router-dom'
 import Countdown from "react-countdown";
 
 //import config from '../config';
@@ -36,14 +37,14 @@ type ClassroomClassState = {
     class_hash: string,
     this_class: classroom_class | null,
     this_classroom: classroom | null,
-    waiting_for_authorization: boolean
+    waiting_for_class_authorization: boolean
 }
 
 type ClassroomClassProps = {
     onAlert: Function,
     match: any,
     user_authentication: userAuthenticationType | null,
-    user_authorization_check_complete: boolean
+    user_authorization_check_complete: boolean,
 }
 
 export class ClassroomClass extends React.Component<ClassroomClassProps, ClassroomClassState> {
@@ -53,13 +54,12 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
             class_hash: this.props.match.params.class_hash,
             this_class: null,
             this_classroom: null,
-            waiting_for_authorization: true
+            waiting_for_class_authorization: true,
         };
     }
 
     authorizeAndEnterClass() {
         Api.get('/enter_class?class_hash=' + this.state.class_hash).then((response) => {
-            console.log(response);
             if (response.data.class_id) {
                 this.setState({
                     this_class: {
@@ -79,27 +79,27 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
                         is_active: response.data.is_active,
                         created_at: response.data.classroom_created_at,
                     },
-                    waiting_for_authorization: false
+                    waiting_for_class_authorization: false,
                 }, () => {
                     console.log("got class", this.state.this_class, this.state.this_classroom)
                 })
             }
             else {
                 this.setState({
-                    waiting_for_authorization: false
+                    waiting_for_class_authorization: false
                 });
             }
         }).catch((error) => {
             console.log(error);
             this.setState({
-                waiting_for_authorization: false
+                waiting_for_class_authorization: false
             });
             this.props.onAlert({ alert_type: "warning", alert_text: "Class does not exist or you don't have access to this class" });
         });
     }
 
-    componentDidMount() {
-        if(this.props.user_authorization_check_complete){
+    fetchClass() {
+        if(this.props.user_authorization_check_complete && this.state.waiting_for_class_authorization){
             this.authorizeAndEnterClass();
         }
     }
@@ -343,7 +343,8 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
     }
 
     render() {
-        if (this.state.waiting_for_authorization && !this.props.user_authorization_check_complete) {
+        this.fetchClass();
+        if (this.state.waiting_for_class_authorization && !this.props.user_authorization_check_complete) {
             return (
                 <Container>
                     <Card bg="light" style={{ marginTop: '1em' }}>
@@ -358,6 +359,9 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
             );
         }
         else {
+            if(!this.props.user_authentication){
+                return (<Redirect to='/' />);
+            }
             if (this.state.this_class) {
                 if (this.state.this_class.start_time_actual && !this.state.this_class.end_time_actual) {
                     return this.renderDuringClass();

@@ -40,7 +40,8 @@ type user = {
 }
 
 type ClassroomManagementProps = {
-    onAlert: Function
+    onAlert: Function,
+    unauthorizedLogout: Function
 }
 
 type ClassroomManagementState = {
@@ -119,6 +120,9 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
             });
         }).catch((error) => {
             console.log("failed to update classroom array ", error);
+            if (error.response.status === 403) {
+                this.props.unauthorizedLogout();
+            }
         });
     }
 
@@ -148,6 +152,9 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
             });
         }).catch((error) => {
             console.log("failed to update student and coach arrays", error);
+            if (error.response.status === 403) {
+                this.props.unauthorizedLogout();
+            }
         });
     }
 
@@ -165,7 +172,12 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
             });
         }).catch((error) => {
             console.log(error);
-            this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            if (error.response.status === 403) {
+                this.props.unauthorizedLogout();
+            }
+            else {
+                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            }
         });
     }
 
@@ -200,7 +212,6 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
     classRowGenerator = (class_row: classroom_class) => (
         <tr key={class_row.id} >
             <td><a href={'/class/' + class_row.class_hash}>{class_row.id}</a></td>
-            <td>{class_row.classroom_id}</td>
             <td>{new Date(class_row.start_time).toLocaleString()}</td>
             <td>{class_row.duration}</td>
             <td>{new Date(class_row.created_at).toLocaleString()}</td>
@@ -229,7 +240,6 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
                         <thead>
                             <tr>
                                 <th>Class ID/Link</th>
-                                <th>Classroom ID</th>
                                 <th>Start Time</th>
                                 <th>Duration</th>
                                 <th>Created At</th>
@@ -244,21 +254,18 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
             );
         console.log("rendering class table");
         return (
-            <Card bg="light" style={{ marginTop: '1em' }}>
-                <Card.Header as='h5'>Classes</Card.Header>
-                <Card.Body>
-                    <Collapse in={!collapse_condition} >
-                        {table_element}
-                    </Collapse>
-                    <Collapse in={collapse_condition}>
-                        <Container>
-                            <Card.Title>
-                                Select a classroom
-                            </Card.Title>
-                        </Container>
-                    </Collapse>
-                </Card.Body>
-            </Card>
+            <Card.Body>
+                <Collapse in={!collapse_condition} >
+                    {table_element}
+                </Collapse>
+                <Collapse in={collapse_condition}>
+                    <Container>
+                        <Card.Title>
+                            Select a classroom
+                        </Card.Title>
+                    </Container>
+                </Collapse>
+            </Card.Body>
         );
     }
 
@@ -294,49 +301,39 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
 
     renderClassForm() {
         return (
-            <Card bg="light" style={{ marginTop: '1em' }}>
-                <Card.Header as='h5'>Add Class</Card.Header>
+            <Collapse in={this.state.selected_classroom_id !== -1}>
                 <Card.Body>
-                    <Collapse in={this.state.selected_classroom_id !== -1}>
-                        <Container>
-                            <Form>
-                                <Form.Row>
-                                    <Form.Group sm={6} as={Col} >
-                                        <Form.Control isInvalid={this.state.start_time_is_invalid} value={this.state.start_time_input} onChange={this.onStartTimeChange} placeholder="Date and Time" />
-                                        <Form.Control.Feedback type="invalid" >
-                                            Date and Time (MM/DD/YYYY, HH:MM:SS) must be valid
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                    <Form.Group sm={6} as={Col} >
-                                        <Form.Control readOnly value={this.state.start_time.toLocaleString()} />
-                                    </Form.Group>
-                                </Form.Row>
-                                <Form.Row>
-                                    <Form.Group sm={12} as={Col} >
-                                        <Form.Control value={this.state.duration} onChange={this.onDurationChange} isInvalid={this.state.duration_is_invalid} placeholder="Duration" />
-                                        <Form.Control.Feedback type="invalid" >
-                                            Duration (in minutes) must be valid
+                    <Container>
+                        <Form>
+                            <Form.Row>
+                                <Form.Group sm={6} as={Col} >
+                                    <Form.Control isInvalid={this.state.start_time_is_invalid} value={this.state.start_time_input} onChange={this.onStartTimeChange} placeholder="Date and Time" />
+                                    <Form.Control.Feedback type="invalid" >
+                                        Date and Time (MM/DD/YYYY, HH:MM:SS) must be valid
                                     </Form.Control.Feedback>
-                                    </Form.Group>
-                                </Form.Row>
-                            </Form>
-                            <Button variant="dark" disabled={this.state.duration_is_invalid || this.state.start_time_is_invalid} onClick={() => { this.addClass() }} block>
-                                Add
-                            </Button>
-                            <Button variant="dark" onClick={this.resetFormAndSelectedClassroom} block>
-                                Cancel
-                            </Button>
-                        </Container>
-                    </Collapse>
-                    <Collapse in={this.state.selected_classroom_id === -1}>
-                        <Container>
-                            <Card.Title>
-                                Select a classroom
-                            </Card.Title>
-                        </Container>
-                    </Collapse>
+                                </Form.Group>
+                                <Form.Group sm={6} as={Col} >
+                                    <Form.Control readOnly value={this.state.start_time.toLocaleString()} />
+                                </Form.Group>
+                            </Form.Row>
+                            <Form.Row>
+                                <Form.Group sm={12} as={Col} >
+                                    <Form.Control value={this.state.duration} onChange={this.onDurationChange} isInvalid={this.state.duration_is_invalid} placeholder="Duration" />
+                                    <Form.Control.Feedback type="invalid" >
+                                        Duration (in minutes) must be valid
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                            </Form.Row>
+                        </Form>
+                        <Button variant="dark" disabled={this.state.duration_is_invalid || this.state.start_time_is_invalid} onClick={() => { this.addClass() }} block>
+                            Add
+                        </Button>
+                        <Button variant="dark" onClick={this.resetFormAndSelectedClassroom} block>
+                            Cancel
+                        </Button>
+                    </Container>
                 </Card.Body>
-            </Card>
+            </Collapse>
         );
     }
 
@@ -347,7 +344,12 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
             this.getClassArrayAndResetForm(this.state.selected_classroom_id);
         }).catch((error) => {
             console.log(error);
-            this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            if (error.response.status === 403) {
+                this.props.unauthorizedLogout();
+            }
+            else {
+                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            }
         });
     }
 
@@ -365,7 +367,12 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
             this.getClassArrayAndResetForm();
         }).catch((error) => {
             console.log(error);
-            this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            if (error.response.status === 403) {
+                this.props.unauthorizedLogout();
+            }
+            else {
+                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            }
         });
     }
 
@@ -616,11 +623,16 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
             }).catch((error) => {
                 console.log("error while creating class", error);
                 if (error.response) {
-                    if (error.response.data.error_code === 'ER_DUP_ENTRY') {
-                        this.props.onAlert({ alert_type: "warning", alert_text: "Classroom name alreaady exists" });
+                    if (error.response.status === 403) {
+                        this.props.unauthorizedLogout();
                     }
                     else {
-                        this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+                        if (error.response.data.error_code === 'ER_DUP_ENTRY') {
+                            this.props.onAlert({ alert_type: "warning", alert_text: "Classroom name alreaady exists" });
+                        }
+                        else {
+                            this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+                        }
                     }
                 }
                 else {
@@ -637,45 +649,39 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
         console.log("rendering classroom table");
         if (this.state.classroom_array && this.state.classroom_array.length > 0) {
             return (
-                <Card bg="light" style={{ marginTop: '1em' }}>
-                    <Card.Header as='h5'>{config.classroomsCardHeader}</Card.Header>
-                    <Card.Body>
-                        <Container fluid>
-                            <Table striped bordered hover responsive="lg" >
-                                <thead>
-                                    <tr>
-                                        <th>{config.tableHeaderID}</th>
-                                        <th>{config.tableHeaderName}</th>
-                                        <th>{config.tableHeaderDescription}</th>
-                                        <th>{config.tableHeaderActive}</th>
-                                        <th>{config.tableHeaderCreatedAt}</th>
-                                        <th>{config.tableHeaderCoaches}</th>
-                                        <th>{config.tableHeaderStudents}</th>
-                                        <th></th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {this.state.classroom_array.map(this.classroomRowGenerator)}
-                                </tbody>
-                            </Table>
-                        </Container>
-                    </Card.Body>
-                </Card>
+                <Card.Body>
+                    <Container fluid>
+                        <Table striped bordered hover responsive="lg" >
+                            <thead>
+                                <tr>
+                                    <th>{config.tableHeaderID}</th>
+                                    <th>{config.tableHeaderName}</th>
+                                    <th>{config.tableHeaderDescription}</th>
+                                    <th>{config.tableHeaderActive}</th>
+                                    <th>{config.tableHeaderCreatedAt}</th>
+                                    <th>{config.tableHeaderCoaches}</th>
+                                    <th>{config.tableHeaderStudents}</th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {this.state.classroom_array.map(this.classroomRowGenerator)}
+                            </tbody>
+                        </Table>
+                    </Container>
+                </Card.Body>
             );
         }
         else {
             return (
-                <Card bg="light" style={{ marginTop: '1em' }}>
-                    <Card.Header as='h5'>{config.classroomsCardHeader}</Card.Header>
-                    <Card.Body>
-                        <Container fluid>
-                            <Card.Title>
-                                {config.noClassroomsAdmin}
-                            </Card.Title>
-                        </Container>
-                    </Card.Body>
-                </Card>
+                <Card.Body>
+                    <Container fluid>
+                        <Card.Title>
+                            {config.noClassroomsAdmin}
+                        </Card.Title>
+                    </Container>
+                </Card.Body>
             )
         }
 
@@ -727,7 +733,12 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
                 });
             }).catch((error) => {
                 console.log("failed to update mappings, reverting to add mode ", error);
-                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+                if (error.response.status === 403) {
+                    this.props.unauthorizedLogout();
+                }
+                else {
+                    this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+                }
             });
         });
     }
@@ -758,11 +769,16 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
             }).catch((error) => {
                 console.log("error while editing classroom ", error);
                 if (error.response) {
-                    if (error.response.data.error_code === 'ER_DUP_ENTRY') {
-                        this.props.onAlert({ alert_type: "warning", alert_text: "Classroom name already exists" });
+                    if (error.response.status === 403) {
+                        this.props.unauthorizedLogout();
                     }
                     else {
-                        this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+                        if (error.response.data.error_code === 'ER_DUP_ENTRY') {
+                            this.props.onAlert({ alert_type: "warning", alert_text: "Classroom name already exists" });
+                        }
+                        else {
+                            this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+                        }
                     }
                 }
                 else {
@@ -831,53 +847,55 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
     }
 
     renderClassroomForm() {
-        return (
-            <Card bg="light" style={{ marginTop: '1em' }}>
-                <Card.Header as="h5" >
-                    {(this.state.classroom_edit_id === -1) ? "Add Classroom" : "Edit Classroom"}
-                </Card.Header>
-                <Card.Body>
-                    <Collapse in={!this.state.show_form}>
-                        <Container>
-                            <Button variant='dark' onClick={this.onClassroomCreateStart} block>
-                                {config.addButtonText}
-                            </Button>
-                        </Container>
-                    </Collapse>
-                    <Collapse in={this.state.show_form}>
-                        <Container>
-                            <Form>
-                                <Form.Row>
-                                    <Form.Group md={6} as={Col}>
-                                        <Form.Label>{config.classroomNameLabel}</Form.Label>
-                                        <Form.Control placeholder="Classroom Name" value={this.state.classroom_name} onChange={this.onClassroomNameChange} isInvalid={this.state.classroom_name_is_invalid} />
-                                        <Form.Control.Feedback type="invalid">
-                                            {config.classroomNameInvalidFeedback}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                    <Form.Group md={6} as={Col}>
-                                        <Form.Label>{config.classroomDescriptionLabel}</Form.Label>
-                                        <Form.Control type="textarea" placeholder="Classroom Description" value={this.state.classroom_description} onChange={this.onClassroomDescriptionChange} />
-                                    </Form.Group>
-                                </Form.Row>
-                                {this.renderStudentSelect()}
-                                {this.renderCoachSelect()}
-                                {this.submitClassroomButton()}
-                            </Form>
-                        </Container>
-                    </Collapse>
-                </Card.Body>
-            </Card>
+        return (                
+            <Card.Body>
+                <Collapse in={!this.state.show_form}>
+                    <Container>
+                        <Button variant='dark' onClick={this.onClassroomCreateStart} block>
+                            {config.addButtonText}
+                        </Button>
+                    </Container>
+                </Collapse>
+                <Collapse in={this.state.show_form}>
+                    <Container>
+                        <Card.Title>{(this.state.classroom_edit_id === -1) ? "Add Classroom" : "Edit Classroom"}</Card.Title>
+                        <Form>
+                            <Form.Row>
+                                <Form.Group md={6} as={Col}>
+                                    <Form.Label>{config.classroomNameLabel}</Form.Label>
+                                    <Form.Control placeholder="Classroom Name" value={this.state.classroom_name} onChange={this.onClassroomNameChange} isInvalid={this.state.classroom_name_is_invalid} />
+                                    <Form.Control.Feedback type="invalid">
+                                        {config.classroomNameInvalidFeedback}
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                                <Form.Group md={6} as={Col}>
+                                    <Form.Label>{config.classroomDescriptionLabel}</Form.Label>
+                                    <Form.Control type="textarea" placeholder="Classroom Description" value={this.state.classroom_description} onChange={this.onClassroomDescriptionChange} />
+                                </Form.Group>
+                            </Form.Row>
+                            {this.renderStudentSelect()}
+                            {this.renderCoachSelect()}
+                            {this.submitClassroomButton()}
+                        </Form>
+                    </Container>
+                </Collapse>
+            </Card.Body>
         );
     }
 
     render() {
         return (
             <div>
-                {this.renderClassroomTable()}
-                {this.renderClassroomForm()}
-                {this.renderClassTable()}
-                {this.renderClassForm()}
+                <Card bg="light" style={{ marginTop: '1em' }}>
+                    <Card.Header as='h5'>{config.classroomsCardHeader}</Card.Header>
+                    {this.renderClassroomTable()}
+                    {this.renderClassroomForm()}
+                </Card>
+                <Card bg="light" style={{ marginTop: '1em' }}>
+                    <Card.Header as='h5'>{config.classesCardHeader}</Card.Header>
+                    {this.renderClassTable()}
+                    {this.renderClassForm()}
+                </Card>                
             </div >
         );
     }

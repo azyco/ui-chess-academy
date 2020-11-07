@@ -40,7 +40,8 @@ type ProfileCoachProps = {
     onAlert: Function,
     user_authentication: userAuthenticationType,
     user_profile: userProfileType,
-    updateState: Function
+    updateState: Function,
+    unauthorizedLogout: Function
 }
 
 type ProfileCoachState = {
@@ -190,7 +191,12 @@ export class ProfileCoach extends React.Component<ProfileCoachProps, ProfileCoac
             this.setState({ profile_edit_mode: false }, () => { this.props.updateState(response); });
         }).catch((error) => {
             console.log(error);
-            this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            if(error.response.status === 403){
+                this.props.unauthorizedLogout();
+            }
+            else{
+                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            }
         });
     }
 

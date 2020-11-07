@@ -75,7 +75,6 @@ type AppClassProps = {
 };
 
 type AppClassState = {
-	signed_in: boolean,
 	user_authentication: userAuthenticationType | null,
 	user_profile: userProfileType | null,
 	show_alert: boolean,
@@ -93,7 +92,6 @@ class App extends React.Component<AppClassProps, AppClassState>{
 	constructor(props: AppClassProps) {
 		super(props);
 		this.state = {
-			signed_in: false,
 			user_authentication: null,
 			user_profile: null,
 			show_alert: false,
@@ -119,7 +117,6 @@ class App extends React.Component<AppClassProps, AppClassState>{
 		this.setState({
 			user_profile: data,
 			user_authorization_check_complete: true,
-			signed_in: (!!loginResponseData.user_authentication),
 			user_authentication: loginResponseData.user_authentication
 		});
 	}
@@ -128,7 +125,6 @@ class App extends React.Component<AppClassProps, AppClassState>{
 		console.log("set authentication data")
 		this.setState({
 			user_authorization_check_complete: true,
-			signed_in: (!!loginResponseData.user_authentication),
 			user_authentication: loginResponseData.user_authentication
 		});
 	}
@@ -178,7 +174,6 @@ class App extends React.Component<AppClassProps, AppClassState>{
 			(response) => {
 				console.log("session and login data deleted ", response);
 				this.setState({
-					signed_in: false,
 					user_authentication: null,
 					user_profile: null
 				}, () => {
@@ -191,6 +186,15 @@ class App extends React.Component<AppClassProps, AppClassState>{
 		});
 	}
 
+	unauthorizedLogout = () => {
+		this.setState({
+			user_authentication: null,
+			user_profile: null
+		}, () => {
+			this.alertCallback({ alert_type: "warning", alert_text: "Please log in." })
+		});
+	}
+
 	updateProfileStateCallback = (response: any) => {
 		console.log("Profile State updated ", response);
 		const data: userProfileType = { ...response.data.user_profile, dob: new Date(response.data.user_profile.dob) }
@@ -200,13 +204,13 @@ class App extends React.Component<AppClassProps, AppClassState>{
 	}
 
 	studentRegister() {
-		if (!this.state.signed_in) {
+		if (!this.state.user_authentication) {
 			return (<Nav.Link href="/student/register">{config.registerText}</Nav.Link>);
 		}
 	}
 
 	signInPrompt() {
-		if (this.state.signed_in) {
+		if (this.state.user_authentication) {
 			console.log("user signed in as: ", this.state.user_authentication?.user_type);
 			const username = (this.state.user_authentication?.user_type === 'admin') ? this.state.user_authentication.email : this.state.user_profile?.fullname;
 			return (
@@ -276,7 +280,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
 						<About />
 					</Route>
 					<Route path="/profile">
-						<Profile user_authorization_check_complete={this.state.user_authorization_check_complete} updateState={this.updateProfileStateCallback} onAlert={this.alertCallback} onLogout={this.logoutCallback} user_profile={this.state.user_profile} user_authentication={this.state.user_authentication} />
+						<Profile unauthorizedLogout={this.unauthorizedLogout} user_authorization_check_complete={this.state.user_authorization_check_complete} updateState={this.updateProfileStateCallback} onAlert={this.alertCallback} onLogout={this.logoutCallback} user_profile={this.state.user_profile} user_authentication={this.state.user_authentication} />
 					</Route>
 					<Route path="/login">
 						<Login got_auth_and_profile={got_auth_and_profile} user_authorization_check_complete={this.state.user_authorization_check_complete} is_logged_in={!!this.state.user_authentication} onAlert={this.alertCallback} onLogin={this.loginCallback} />

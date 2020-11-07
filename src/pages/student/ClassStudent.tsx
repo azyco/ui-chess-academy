@@ -35,7 +35,8 @@ type userAuthenticationType = {
 
 type ClassStudentProps = {
     user_authentication: userAuthenticationType,
-    onAlert: Function
+    onAlert: Function,
+    unauthorizedLogout: Function
 }
 
 type ClassStudentState = {
@@ -66,6 +67,12 @@ export class ClassStudent extends React.Component<ClassStudentProps, ClassStuden
             });
         }).catch((error) => {
             console.log("failed to update classroom array ", error);
+            if(error.response.status === 403){
+                this.props.unauthorizedLogout()
+            }
+            else{
+                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            }
         });
     }
 
@@ -78,7 +85,12 @@ export class ClassStudent extends React.Component<ClassStudentProps, ClassStuden
             });
         }).catch((error) => {
             console.log(error);
-            this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            if(error.response.status === 403){
+                this.props.unauthorizedLogout()
+            }
+            else{
+                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            }
         });
     }
 
@@ -136,7 +148,6 @@ export class ClassStudent extends React.Component<ClassStudentProps, ClassStuden
     classRowGenerator = (class_row: classroom_class) => (
         <tr key={class_row.id} >
             <td><a href={'/class/' + class_row.class_hash}>{class_row.id}</a></td>
-            <td>{class_row.classroom_id}</td>
             <td>{new Date(class_row.start_time).toLocaleString()}</td>
             <td>{class_row.duration}</td>
             <td>{new Date(class_row.created_at).toLocaleString()}</td>
@@ -160,7 +171,6 @@ export class ClassStudent extends React.Component<ClassStudentProps, ClassStuden
                         <thead>
                             <tr>
                                 <th>Class ID/Link</th>
-                                <th>Classroom ID</th>
                                 <th>Start Time</th>
                                 <th>Duration</th>
                                 <th>Created At</th>
