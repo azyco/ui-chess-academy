@@ -160,9 +160,7 @@ export class ClassStudent extends React.Component<ClassStudentProps, ClassStuden
         const table_element = (!no_class_condition) ?
             (
                 <Container>
-                    <Card.Title>
-                        No Classes Scheduled
-                    </Card.Title>
+                    No Classes Scheduled
                 </Container>
             ) :
             (
@@ -192,9 +190,7 @@ export class ClassStudent extends React.Component<ClassStudentProps, ClassStuden
                     </Collapse>
                     <Collapse in={collapse_condition}>
                         <Container>
-                            <Card.Title>
-                                Select a classroom
-                            </Card.Title>
+                            Select a classroom
                         </Container>
                     </Collapse>
                 </Card.Body>

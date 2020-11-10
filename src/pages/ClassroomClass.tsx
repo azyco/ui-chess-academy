@@ -1,5 +1,6 @@
 import React from 'react';
-
+// @ts-ignore
+import { Jutsu } from 'react-jutsu'
 import { Col, Container, Row, Card, Button, ListGroup, ListGroupItem } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom'
 import Countdown from "react-countdown";
@@ -12,6 +13,26 @@ type userAuthenticationType = {
     user_type: string,
     email: string,
     created_at: number
+}
+
+type userProfileType = {
+    fullname: string,
+    country: string,
+    state: string,
+    description: string,
+    user_image: Blob,
+    fide_id: string,
+    lichess_id: string,
+    contact: string,
+    contact_code: string,
+    alt_contact: string,
+    alt_contact_code: string,
+    dob: Date,
+    parent: string,
+    is_private_contact: boolean,
+    is_private_alt_contact: boolean,
+    is_private_dob: boolean,
+    is_private_parent: boolean
 }
 
 type classroom = {
@@ -37,7 +58,7 @@ type ClassroomClassState = {
     class_hash: string,
     this_class: classroom_class | null,
     this_classroom: classroom | null,
-    waiting_for_class_authorization: boolean
+    class_authorization_complete: boolean,
 }
 
 type ClassroomClassProps = {
@@ -45,6 +66,7 @@ type ClassroomClassProps = {
     match: any,
     user_authentication: userAuthenticationType | null,
     user_authorization_check_complete: boolean,
+    user_profile: userProfileType | null
 }
 
 export class ClassroomClass extends React.Component<ClassroomClassProps, ClassroomClassState> {
@@ -54,8 +76,14 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
             class_hash: this.props.match.params.class_hash,
             this_class: null,
             this_classroom: null,
-            waiting_for_class_authorization: true,
+            class_authorization_complete: false,
         };
+    }
+
+    componentDidMount() {
+        const script = document.createElement("script");
+        script.src = 'https://meet.jit.si/external_api.js';
+        document.body.appendChild(script);
     }
 
     authorizeAndEnterClass() {
@@ -79,27 +107,22 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
                         is_active: response.data.is_active,
                         created_at: response.data.classroom_created_at,
                     },
-                    waiting_for_class_authorization: false,
+                    class_authorization_complete: true,
                 }, () => {
                     console.log("got class", this.state.this_class, this.state.this_classroom)
                 })
             }
-            else {
-                this.setState({
-                    waiting_for_class_authorization: false
-                });
-            }
         }).catch((error) => {
             console.log(error);
             this.setState({
-                waiting_for_class_authorization: false
+                class_authorization_complete: true
             });
             this.props.onAlert({ alert_type: "warning", alert_text: "Class does not exist or you don't have access to this class" });
         });
     }
 
     fetchClass() {
-        if(this.props.user_authorization_check_complete && this.state.waiting_for_class_authorization){
+        if (this.props.user_authorization_check_complete && !this.state.class_authorization_complete) {
             this.authorizeAndEnterClass();
         }
     }
@@ -130,20 +153,11 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
         }
     }
 
-    renderDuringClass() {
-        console.log("DuringClass")
-        return (
-            <Container fluid>
+    renderClassControlsAndChat() {
+        if (this.props.user_authentication?.user_type === 'coach') {
+            return (
                 <Row>
-                    <Col xs="8">
-                        <Row className="justify-content-md-center">
-                            <Card bg="light" style={{ marginTop: '1em' }}>
-                                <Card.Header as="h5" >Chessboard Area</Card.Header>
-                                <Card.Body>
-                                    chessboard placeholder
-                                </Card.Body>
-                            </Card>
-                        </Row>
+                    <Col md={6}>
                         <Row className="justify-content-md-center">
                             <Card bg="light" style={{ marginTop: '1em' }}>
                                 <Card.Header as="h5" >Class Controls</Card.Header>
@@ -155,26 +169,89 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
                             </Card>
                         </Row>
                     </Col>
-                    <Col xs="4">
-                        <Row className="justify-content-md-center">
-                            <Card bg="light" style={{ marginTop: '1em' }}>
-                                <Card.Header as="h5" >Video Area</Card.Header>
-                                <Card.Body>
-                                    Video placeholder
-                                </Card.Body>
-                            </Card>
-                        </Row>
-                        <Row className="justify-content-md-center">
-                            <Card bg="light" style={{ marginTop: '1em' }}>
-                                <Card.Header as="h5" >Chat Area</Card.Header>
-                                <Card.Body>
-                                    Chat placeholder
-                                </Card.Body>
-                            </Card>
-                        </Row>
+                    <Col md={6}>
+                        <Card bg="light" style={{ marginTop: '1em' }}>
+                            <Card.Header as="h5" >Chat Area</Card.Header>
+                            <Card.Body>
+                                Chat placeholder
+                            </Card.Body>
+                        </Card>
                     </Col>
                 </Row>
+            )
+        }
+        else{
+            return(
+                <Row>
+                    <Col >
+                        <Card bg="light" style={{ marginTop: '1em' }}>
+                            <Card.Header as="h5" >Chat Area</Card.Header>
+                            <Card.Body>
+                                Chat placeholder
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            );
+        }
+    }
+
+    // jitsiApp(){
+    //     const roomName = this.state.this_classroom?.name
+    //     const parentNode = 'jitsi-container'
+    //     const jitsi = useJitsi({ roomName, parentNode })
+
+    //     useEffect(() => {
+    //         if (jitsi) {
+    //             jitsi.addEventListener('videoConferenceJoined', () => {
+    //                 jitsi.executeCommand('displayName', 'Naruto Uzumaki')
+    //                 jitsi.executeCommand('password', 'dattebayo')
+    //                 jitsi.executeCommand('subject', 'fan')
+    //             })
+    //         }
+    //         return () => jitsi && jitsi.dispose()
+    //     }, [jitsi])
+
+    //     return <div id={parentNode} />
+    // }
+
+    jitsiApp() {
+        return (
+            <Jutsu
+                roomName={this.state.this_classroom?.name}
+                displayName={this.props.user_profile?.fullname}
+                password={this.state.class_hash}
+                onMeetingEnd={() => console.log('Meeting has ended')}
+                containerStyles={{ width: '100%' }}
+            />
+        );
+    }
+
+    renderDuringClass() {
+        console.log("DuringClass")
+        return (
+            <Container fluid>
+                <Row>
+                    <Col md={6}>
+                        <Card bg="light" style={{ marginTop: '1em' }}>
+                            <Card.Header as="h5" >Chessboard Area</Card.Header>
+                            <Card.Body>
+                                chessboard placeholder
+                                </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col md={6}>
+                        <Card bg="light" style={{ marginTop: '1em' }}>
+                            <Card.Header as="h5" >Video Area</Card.Header>
+                            <Card.Body>
+                                {this.jitsiApp()}
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+                {this.renderClassControlsAndChat()}
             </Container>
+
         );
     }
 
@@ -306,14 +383,15 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
 
     renderPostClass() {
         console.log("PostClass")
-        let start_time = new Date()
+        let start_time = new Date();
         let end_time = new Date();
+        let duration: number = 0;
         if (this.state.this_class) {
             start_time = new Date(this.state.this_class?.start_time_actual);
             end_time = new Date(this.state.this_class?.end_time_actual);
+            duration = (this.state.this_class?.end_time_actual - this.state.this_class?.start_time_actual) / (1000 * 60)
         }
         return (
-
             <Container>
                 <Card bg="light" style={{ marginTop: '1em' }}>
                     <Card.Header as="h5">Class Over</Card.Header>
@@ -331,7 +409,7 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
                             End: {end_time.toLocaleString()}
                         </ListGroupItem>
                         <ListGroupItem >
-                            Duration: {this.state.this_class?.duration} {"minutes"}
+                            Duration: {duration} {"minutes"}
                         </ListGroupItem>
                     </ListGroup>
                     <Card.Footer className="text-muted">
@@ -344,22 +422,8 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
 
     render() {
         this.fetchClass();
-        if (this.state.waiting_for_class_authorization && !this.props.user_authorization_check_complete) {
-            return (
-                <Container>
-                    <Card bg="light" style={{ marginTop: '1em' }}>
-                        <Card.Header as="h5">Loading</Card.Header>
-                        <Card.Body>
-                            <Card.Text>
-                                Class loading
-                            </Card.Text>
-                        </Card.Body>
-                    </Card>
-                </Container>
-            );
-        }
-        else {
-            if(!this.props.user_authentication){
+        if (this.state.class_authorization_complete && this.props.user_authorization_check_complete) {
+            if (!this.props.user_authentication) {
                 return (<Redirect to='/' />);
             }
             if (this.state.this_class) {
@@ -396,6 +460,20 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
                     </Container>
                 );
             }
+        }
+        else {
+            return (
+                <Container>
+                    <Card bg="light" style={{ marginTop: '1em' }}>
+                        <Card.Header as="h5">Loading</Card.Header>
+                        <Card.Body>
+                            <Card.Text>
+                                Class loading
+                            </Card.Text>
+                        </Card.Body>
+                    </Card>
+                </Container>
+            );
         }
     }
 }
