@@ -10,6 +10,7 @@ import {
 
 import { ClassroomManagement } from './ClassroomManagement';
 import { CoachManagement } from './CoachManagement';
+import { StudentManagement } from './StudentManagement';
 
 import config from '../../config';
 // import Api from '../../api/backend';
@@ -17,7 +18,8 @@ import config from '../../config';
 type AdminProps = {
     onAlert: Function,
     onLogout: any,
-    user_authentication: userAuthenticationType
+    user_authentication: userAuthenticationType,
+    unauthorizedLogout: Function
 }
 
 type AdminState = {
@@ -28,13 +30,13 @@ type userAuthenticationType = {
     id: number,
     user_type: string,
     email: string,
-    created_at: string
+    created_at: number
 }
 
 export class Admin extends React.Component<AdminProps, AdminState>{
-    constructor(props: AdminProps) {
-        super(props);
-    }
+    // constructor(props: AdminProps) {
+    //     super(props);
+    // }
 
     render() {
         return (
@@ -52,7 +54,7 @@ export class Admin extends React.Component<AdminProps, AdminState>{
                                             <Nav.Link eventKey="coach">{config.coachManagementTab} </Nav.Link>
                                         </Nav.Item>
                                         <Nav.Item>
-                                            <Nav.Link eventKey="profile">{config.profileManagementTab} </Nav.Link>
+                                            <Nav.Link eventKey="student">Student Management</Nav.Link>
                                         </Nav.Item>
                                         <Button variant={"warning"} onClick={this.props.onLogout} >
                                             Logout
@@ -64,18 +66,13 @@ export class Admin extends React.Component<AdminProps, AdminState>{
                         <Col lg={10}>
                             <Tab.Content>
                                 <Tab.Pane eventKey="classroom">
-                                    <ClassroomManagement onAlert={this.props.onAlert} />
+                                    <ClassroomManagement unauthorizedLogout={this.props.unauthorizedLogout} onAlert={this.props.onAlert} />
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="coach">
-                                    <CoachManagement onAlert={this.props.onAlert} />
+                                    <CoachManagement unauthorizedLogout={this.props.unauthorizedLogout} onAlert={this.props.onAlert} />
                                 </Tab.Pane>
-                                <Tab.Pane eventKey="profile">
-                                    <Card bg="light" style={{ marginTop: '1em' }}>
-                                        <Card.Header as='h5'>Update Profile</Card.Header>
-                                        <Card.Body>
-                                            Update Profiles
-                                        </Card.Body>
-                                    </Card>
+                                <Tab.Pane eventKey="student">
+                                    <StudentManagement unauthorizedLogout={this.props.unauthorizedLogout} onAlert={this.props.onAlert} />
                                 </Tab.Pane>
                             </Tab.Content>
                         </Col>

@@ -12,27 +12,27 @@ type userAuthenticationType = {
     created_at: number
 }
 
-type AssignmentsCoachProps = {
+type PuzzlesStudentProps = {
     user_authentication: userAuthenticationType,
     onAlert: Function,
     unauthorizedLogout: Function
 }
 
-type AssignmentsCoachState = {
+type PuzzlesStudentState = {
     
 }
 
-export class AssignmentsCoach extends React.Component<AssignmentsCoachProps, AssignmentsCoachState>{
-    // constructor(props: DashboardCoachProps) {
+export class PuzzlesStudent extends React.Component<PuzzlesStudentProps, PuzzlesStudentState>{
+    // constructor(props: DashboardStudentProps) {
     //     super(props);
     // }
     render() {
         return (
             <Container>
                 <Card bg="light" style={{ marginTop: '1em' }}>
-                    <Card.Header as='h5'>Assignments</Card.Header>
+                    <Card.Header as='h5'>Puzzles</Card.Header>
                     <Card.Body>
-                        Create assignments
+                        Create puzzles
                     </Card.Body>
                 </Card>
             </Container>

@@ -9,6 +9,8 @@ import {
 
 import { ClassCoach } from './ClassCoach';
 import { AssignmentsCoach } from './AssignmentsCoach';
+import { PuzzlesCoach } from './PuzzlesCoach';
+
 import { ProfileCoach } from './ProfileCoach';
 
 import config from '../../config';
@@ -17,7 +19,7 @@ type userAuthenticationType = {
     id: number,
     user_type: string,
     email: string,
-    created_at: string
+    created_at: number
 }
 type userProfileType = {
     fullname: string,
@@ -44,7 +46,8 @@ type DashboardCoachProps = {
     onLogout: any,
     user_authentication: userAuthenticationType,
     user_profile: userProfileType,
-    updateState: Function
+    updateState: Function,
+    unauthorizedLogout: Function
 }
 
 type DashboardCoachState = {
@@ -66,9 +69,9 @@ type DashboardCoachState = {
 }
 
 export class DashboardCoach extends React.Component<DashboardCoachProps, DashboardCoachState>{
-    constructor(props: DashboardCoachProps) {
-        super(props);
-    }
+    // constructor(props: DashboardCoachProps) {
+    //     super(props);
+    // }
 
     render() {
         return (
@@ -101,30 +104,16 @@ export class DashboardCoach extends React.Component<DashboardCoachProps, Dashboa
                         <Col lg={10}>
                             <Tab.Content>
                                 <Tab.Pane eventKey="profile">
-                                    <ProfileCoach updateState={this.props.updateState} onAlert={this.props.onAlert} user_profile={this.props.user_profile} user_authentication={this.props.user_authentication} />
+                                    <ProfileCoach unauthorizedLogout={this.props.unauthorizedLogout} updateState={this.props.updateState} onAlert={this.props.onAlert} user_profile={this.props.user_profile} user_authentication={this.props.user_authentication} />
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="classes">
-                                    <ClassCoach user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} />
+                                    <ClassCoach unauthorizedLogout={this.props.unauthorizedLogout} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} />
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="assignments">
-                                    <Container>
-                                        <Card bg="light" style={{ marginTop: '1em' }}>
-                                            <Card.Header as='h5'>Assignments</Card.Header>
-                                            <Card.Body>
-                                                <AssignmentsCoach />
-                                            </Card.Body>
-                                        </Card>
-                                    </Container>
+                                    <AssignmentsCoach unauthorizedLogout={this.props.unauthorizedLogout} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} />
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="puzzles">
-                                    <Container>
-                                        <Card bg="light" style={{ marginTop: '1em' }}>
-                                            <Card.Header as='h5'>Puzzles</Card.Header>
-                                            <Card.Body>
-                                                Puzzles
-                                            </Card.Body>
-                                        </Card>
-                                    </Container>
+                                    <PuzzlesCoach unauthorizedLogout={this.props.unauthorizedLogout} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} />
                                 </Tab.Pane>
                             </Tab.Content>
                         </Col>

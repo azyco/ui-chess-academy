@@ -19,21 +19,23 @@ type classroom = {
 type classroom_class = {
     id: number,
     classroom_id: number,
-    start_time: Date,
+    start_time: number,
     duration: number,
-    created_at: string
+    created_at: number,
+    class_hash: string
 }
 
 type userAuthenticationType = {
     id: number,
     user_type: string,
     email: string,
-    created_at: string
+    created_at: number
 }
 
 type ClassCoachProps = {
     onAlert: Function,
-    user_authentication: userAuthenticationType
+    user_authentication: userAuthenticationType,
+    unauthorizedLogout: Function
 }
 
 type ClassCoachState = {
@@ -74,6 +76,12 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
             });
         }).catch((error) => {
             console.log("failed to update classroom array ", error);
+            if (error.response.status === 403) {
+                this.props.unauthorizedLogout();
+            }
+            else {
+                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            }
         });
     }
 
@@ -91,7 +99,12 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
             });
         }).catch((error) => {
             console.log(error);
-            this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            if (error.response.status === 403) {
+                this.props.unauthorizedLogout();
+            }
+            else {
+                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            }
         });
     }
 
@@ -102,18 +115,17 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
             this.getClassArrayAndResetForm(this.state.selected_classroom_id);
         }).catch((error) => {
             console.log(error);
-            this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            if (error.response.status === 403) {
+                this.props.unauthorizedLogout();
+            }
+            else {
+                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            }
         });
     }
 
     addClass() {
-        const start_time_db = this.state.start_time.getUTCFullYear() + '-' +
-            ('00' + (this.state.start_time.getUTCMonth() + 1)).slice(-2) + '-' +
-            ('00' + this.state.start_time.getUTCDate()).slice(-2) + ' ' +
-            ('00' + this.state.start_time.getUTCHours()).slice(-2) + ':' +
-            ('00' + this.state.start_time.getUTCMinutes()).slice(-2) + ':' +
-            ('00' + this.state.start_time.getUTCSeconds()).slice(-2);
-
+        const start_time_db = this.state.start_time.valueOf();
         Api.post('/class', {
             class_details: {
                 start_time: start_time_db,
@@ -126,7 +138,12 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
             this.getClassArrayAndResetForm();
         }).catch((error) => {
             console.log(error);
-            this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            if (error.response.status === 403) {
+                this.props.unauthorizedLogout();
+            }
+            else {
+                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            }
         });
     }
 
@@ -188,11 +205,10 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
 
     classRowGenerator = (class_row: classroom_class) => (
         <tr key={class_row.id} >
-            <td>{class_row.id}</td>
-            <td>{class_row.classroom_id}</td>
-            <td>{class_row.start_time}</td>
+            <td><a href={'/class/' + class_row.class_hash}>{class_row.id}</a></td>
+            <td>{new Date(class_row.start_time).toLocaleString()}</td>
             <td>{class_row.duration}</td>
-            <td>{class_row.created_at}</td>
+            <td>{new Date(class_row.created_at).toLocaleString()}</td>
             <td>
                 <Button variant="dark" onClick={() => { this.deleteClass(class_row.id, class_row.classroom_id) }}>
                     Delete
@@ -217,8 +233,7 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
                     <Table striped bordered hover responsive="lg" >
                         <thead>
                             <tr>
-                                <th>Class ID</th>
-                                <th>Classroom ID</th>
+                                <th>Class ID/Link</th>
                                 <th>Start Time</th>
                                 <th>Duration</th>
                                 <th>Created At</th>
@@ -233,21 +248,18 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
             );
         console.log("rendering class table");
         return (
-            <Card bg="light" style={{ marginTop: '1em' }}>
-                <Card.Header as='h5'>Classes</Card.Header>
-                <Card.Body>
-                    <Collapse in={!collapse_condition} >
-                        {table_element}
-                    </Collapse>
-                    <Collapse in={collapse_condition}>
-                        <Container>
-                            <Card.Title>
-                                Select a classroom
-                            </Card.Title>
-                        </Container>
-                    </Collapse>
-                </Card.Body>
-            </Card>
+            <Card.Body>
+                <Collapse in={!collapse_condition} >
+                    {table_element}
+                </Collapse>
+                <Collapse in={collapse_condition}>
+                    <Container>
+                        <Card.Title>
+                            Select a classroom
+                        </Card.Title>
+                    </Container>
+                </Collapse>
+            </Card.Body>
         );
     }
 
@@ -283,49 +295,39 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
 
     renderClassForm() {
         return (
-            <Card bg="light" style={{ marginTop: '1em' }}>
-                <Card.Header as='h5'>Add Class</Card.Header>
+            <Collapse in={this.state.selected_classroom_id !== -1}>
                 <Card.Body>
-                    <Collapse in={this.state.selected_classroom_id !== -1}>
-                        <Container>
-                            <Form>
-                                <Form.Row>
-                                    <Form.Group sm={6} as={Col} >
-                                        <Form.Control isInvalid={this.state.start_time_is_invalid} value={this.state.start_time_input} onChange={this.onStartTimeChange} placeholder="Date and Time" />
-                                        <Form.Control.Feedback type="invalid" >
-                                            Date and Time must be valid
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                    <Form.Group sm={6} as={Col} >
-                                        <Form.Control readOnly value={this.state.start_time.toLocaleString()} />
-                                    </Form.Group>
-                                </Form.Row>
-                                <Form.Row>
-                                    <Form.Group sm={12} as={Col} >
-                                        <Form.Control value={this.state.duration} onChange={this.onDurationChange} isInvalid={this.state.duration_is_invalid} placeholder="Duration" />
-                                        <Form.Control.Feedback type="invalid" >
-                                            Duration must be valid
+                    <Container>
+                        <Form>
+                            <Form.Row>
+                                <Form.Group sm={6} as={Col} >
+                                    <Form.Control isInvalid={this.state.start_time_is_invalid} value={this.state.start_time_input} onChange={this.onStartTimeChange} placeholder="Date and Time" />
+                                    <Form.Control.Feedback type="invalid" >
+                                        Date and Time (MM/DD/YYYY, HH:MM:SS) must be valid
                                     </Form.Control.Feedback>
-                                    </Form.Group>
-                                </Form.Row>
-                            </Form>
-                            <Button variant="dark" disabled={this.state.duration_is_invalid || this.state.start_time_is_invalid} onClick={() => { this.addClass() }} block>
-                                Add
-                            </Button>
-                            <Button variant="dark" onClick={this.resetFormAndSelectedClassroom} block>
-                                Cancel
-                            </Button>
-                        </Container>
-                    </Collapse>
-                    <Collapse in={this.state.selected_classroom_id === -1}>
-                        <Container>
-                            <Card.Title>
-                                Select a classroom
-                            </Card.Title>
-                        </Container>
-                    </Collapse>
+                                </Form.Group>
+                                <Form.Group sm={6} as={Col} >
+                                    <Form.Control readOnly value={this.state.start_time.toLocaleString()} />
+                                </Form.Group>
+                            </Form.Row>
+                            <Form.Row>
+                                <Form.Group sm={12} as={Col} >
+                                    <Form.Control value={this.state.duration} onChange={this.onDurationChange} isInvalid={this.state.duration_is_invalid} placeholder="Duration" />
+                                    <Form.Control.Feedback type="invalid" >
+                                        Duration (in minutes) must be valid
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                            </Form.Row>
+                        </Form>
+                        <Button variant="dark" disabled={this.state.duration_is_invalid || this.state.start_time_is_invalid} onClick={() => { this.addClass() }} block>
+                            Add
+                        </Button>
+                        <Button variant="dark" onClick={this.resetFormAndSelectedClassroom} block>
+                            Cancel
+                        </Button>
+                    </Container>
                 </Card.Body>
-            </Card>
+            </Collapse>
         );
     }
 
@@ -333,8 +335,11 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
         return (
             <div>
                 {this.renderClassroomTable()}
-                {this.renderClassTable()}
-                {this.renderClassForm()}
+                <Card bg="light" style={{ marginTop: '1em' }}>
+                    <Card.Header as='h5'>Class</Card.Header>
+                    {this.renderClassTable()}
+                    {this.renderClassForm()}
+                </Card>
             </div>
         )
     }

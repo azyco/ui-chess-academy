@@ -14,7 +14,7 @@ type userAuthenticationType = {
     id: number,
     user_type: string,
     email: string,
-    created_at: string
+    created_at: number
 }
 
 type userProfileType = {
@@ -41,7 +41,8 @@ type ProfileStudentProps = {
     onAlert: Function,
     updateState: Function,
     user_profile: userProfileType,
-    user_authentication: userAuthenticationType
+    user_authentication: userAuthenticationType,
+    unauthorizedLogout: Function
 }
 
 type ProfileStudentState = {
@@ -219,7 +220,12 @@ export class ProfileStudent extends React.Component<ProfileStudentProps, Profile
             this.setState({ profile_edit_mode: false }, () => { this.props.updateState(response) });
         }).catch((error) => {
             console.log(error);
-            this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            if(error.response.status === 403){
+                this.props.unauthorizedLogout()
+            }
+            else{
+                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+            }
         });
     }
 

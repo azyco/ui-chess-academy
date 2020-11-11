@@ -6,18 +6,16 @@ import {
     Table
 } from 'react-bootstrap';
 
-import { RegisterCoach } from './RegisterCoach';
-
-import config from '../../config';
+//import config from '../../config';
 import Api from '../../api/backend';
 
-type CoachManagementProps = {
+type StudentManagementProps = {
     onAlert: Function,
     unauthorizedLogout: Function
 }
 
-type CoachManagementState = {
-    coach_array: user[]
+type StudentManagementState = {
+    student_array: user[]
 }
 
 type user = {
@@ -27,48 +25,45 @@ type user = {
     fullname: string
 }
 
-export class CoachManagement extends React.Component<CoachManagementProps, CoachManagementState>{
-    constructor(props: CoachManagementProps) {
+export class StudentManagement extends React.Component<StudentManagementProps, StudentManagementState>{
+    constructor(props: StudentManagementProps) {
         super(props);
         this.state = {
-            coach_array: []
+            student_array: []
         }
     }
 
     componentDidMount() {
-        this.updateCoachArray();
+        this.updateStudentArray();
     }
 
-    updateCoachArray() {
-        Api.get('/coach').then((response) => {
-            console.log("updated coach array in coach management ", response);
+    updateStudentArray() {
+        Api.get('/student').then((response) => {
+            console.log("updated student array in student management ", response);
             this.setState({
-                coach_array: response.data.coach_array,
+                student_array: response.data.student_array,
             });
         }).catch((error) => {
-            console.log("failed to update coach array in coach management ", error);
+            console.log("failed to update student array in student management ", error);
             if (error.response.status === 403) {
                 this.props.unauthorizedLogout();
-            }
-            else{
-                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
             }
         });
     }
 
-    coachTableGenerator = (coach: user) => (
-        <tr key={coach.id} >
-            <td>{coach.id}</td>
-            <td>{coach.fullname}</td>
-            <td>{coach.email}</td>
+    studentTableGenerator = (student: user) => (
+        <tr key={student.id} >
+            <td>{student.id}</td>
+            <td>{student.fullname}</td>
+            <td>{student.email}</td>
         </tr>
     );
 
-    renderCoachTable() {
-        if (this.state.coach_array && this.state.coach_array.length > 0) {
+    renderStudentTable() {
+        if (this.state.student_array && this.state.student_array.length > 0) {
             return (
                 <Card bg="light" style={{ marginTop: '1em' }}>
-                    <Card.Header as='h5'>Coaches</Card.Header>
+                    <Card.Header as='h5'>Students</Card.Header>
                     <Card.Body>
                         <Container fluid>
                             <Table striped bordered hover responsive="lg" >
@@ -80,7 +75,7 @@ export class CoachManagement extends React.Component<CoachManagementProps, Coach
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {this.state.coach_array.map(this.coachTableGenerator)}
+                                    {this.state.student_array.map(this.studentTableGenerator)}
                                 </tbody>
                             </Table>
                         </Container>
@@ -91,11 +86,11 @@ export class CoachManagement extends React.Component<CoachManagementProps, Coach
         else {
             return (
                 <Card bg="light" style={{ marginTop: '1em' }}>
-                    <Card.Header as='h5'>Coaches</Card.Header>
+                    <Card.Header as='h5'>Students</Card.Header>
                     <Card.Body>
                         <Container fluid>
                             <Card.Title>
-                                No Coaches present
+                                No Students present
                             </Card.Title>
                         </Container>
                     </Card.Body>
@@ -108,8 +103,7 @@ export class CoachManagement extends React.Component<CoachManagementProps, Coach
     render() {
         return (
             <div>
-                {this.renderCoachTable()}
-                <RegisterCoach unauthorizedLogout={this.props.unauthorizedLogout} updateCoachArray={() => { this.updateCoachArray() }} onAlert={this.props.onAlert} />
+                {this.renderStudentTable()}
             </div>
         );
     }

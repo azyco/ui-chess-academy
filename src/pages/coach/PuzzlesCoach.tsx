@@ -12,17 +12,17 @@ type userAuthenticationType = {
     created_at: number
 }
 
-type AssignmentsCoachProps = {
+type PuzzlesCoachProps = {
     user_authentication: userAuthenticationType,
     onAlert: Function,
     unauthorizedLogout: Function
 }
 
-type AssignmentsCoachState = {
+type PuzzlesCoachState = {
     
 }
 
-export class AssignmentsCoach extends React.Component<AssignmentsCoachProps, AssignmentsCoachState>{
+export class PuzzlesCoach extends React.Component<PuzzlesCoachProps, PuzzlesCoachState>{
     // constructor(props: DashboardCoachProps) {
     //     super(props);
     // }
@@ -30,9 +30,9 @@ export class AssignmentsCoach extends React.Component<AssignmentsCoachProps, Ass
         return (
             <Container>
                 <Card bg="light" style={{ marginTop: '1em' }}>
-                    <Card.Header as='h5'>Assignments</Card.Header>
+                    <Card.Header as='h5'>Puzzles</Card.Header>
                     <Card.Body>
-                        Create assignments
+                        Create puzzles
                     </Card.Body>
                 </Card>
             </Container>

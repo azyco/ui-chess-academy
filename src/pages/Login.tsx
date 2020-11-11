@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Form, Button, Card, Spinner, Overlay } from 'react-bootstrap';
+import { Container, Form, Button, Card } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom'
 import CryptoJS from 'crypto-js';
 
@@ -8,7 +8,10 @@ import config from '../config';
 
 type LoginProps = {
     onLogin: any,//check type for callback functions
-    onAlert: Function
+    onAlert: Function,
+    is_logged_in: boolean,
+    user_authorization_check_complete: boolean,
+    got_auth_and_profile: boolean
 }
 
 type LoginState = {
@@ -17,7 +20,8 @@ type LoginState = {
     redirect_to: string,
     email_is_invalid: boolean,
     password_is_invalid: boolean,
-    isLoading: boolean
+    isLoading: boolean,
+    got_auth: boolean
 }
 
 export class Login extends React.Component<LoginProps, LoginState> {
@@ -29,12 +33,13 @@ export class Login extends React.Component<LoginProps, LoginState> {
             redirect_to: 'login',
             email_is_invalid: false,
             password_is_invalid: false,
-            isLoading: false
+            isLoading: false,
+            got_auth: false
         };
     }
 
     isLoginDisabled() {
-        return this.state.email.length === 0 || this.state.email_is_invalid || this.state.password.length === 0 || this.state.password_is_invalid;
+        return this.state.email.length === 0 || this.state.email_is_invalid || this.state.password.length === 0 || this.state.password_is_invalid || this.state.got_auth;
     }
 
     handleLoginClick = () => {
@@ -45,7 +50,10 @@ export class Login extends React.Component<LoginProps, LoginState> {
                     if (response.data) {
                         console.log("Logged In: ", response);
                         this.props.onLogin(response.data);
-                        this.setState({ redirect_to: 'profile' }, () => {
+                        this.setState({
+                            redirect_to: 'profile',
+                            got_auth: true
+                        }, () => {
                             this.props.onAlert({ alert_type: "success", alert_text: config.loginSuccessfulText })
                         });
                     }
@@ -83,38 +91,53 @@ export class Login extends React.Component<LoginProps, LoginState> {
     }
 
     renderRedirect = () => {
-        if (this.state.redirect_to === 'profile') {
+        if ((this.state.redirect_to === 'profile' && this.props.got_auth_and_profile) || this.props.is_logged_in) {
+            console.log("redirecting to profile ")
             return <Redirect to='/profile' />
         }
     }
 
     render() {
-        return (
-            <Container>
-                {this.renderRedirect()}
-                <Card bg="light" style={{ marginTop: '1em' }}>
-                    <Card.Header as="h5">{config.loginText}</Card.Header>
-                    <Card.Body>
-                        <Form>
-                            <Form.Group controlId="formBasicEmail">
-                                <Form.Control onChange={this.onEmailChange} value={this.state.email} type="email" placeholder={config.emailPlaceholderText} isInvalid={this.state.email_is_invalid} />
-                                <Form.Control.Feedback type="invalid">
-                                    {config.emailInvalidFeedback}
-                                </Form.Control.Feedback>
-                            </Form.Group>
-                            <Form.Group controlId="formBasicPassword">
-                                <Form.Control onChange={this.onPasswordChange} value={this.state.password} type="password" placeholder={config.passwordPlaceholderText} isInvalid={this.state.password_is_invalid} />
-                                <Form.Control.Feedback type="invalid">
-                                    {config.loginPasswordInvalidFeedback}
-                                </Form.Control.Feedback>
-                            </Form.Group>
-                            <Button onClick={this.handleLoginClick} className="float-right" variant="dark" disabled={this.isLoginDisabled()}>
-                                {config.loginText}
-                            </Button>
-                        </Form>
+        if (!this.props.user_authorization_check_complete) {
+            return (
+                <Container>
+                    <Card bg="light" style={{ marginTop: '1em' }}>
+                        <Card.Header as="h5" >Loading</Card.Header>
+                        <Card.Body>
+                            Please Wait
                     </Card.Body>
-                </Card>
-            </Container>
-        );
+                    </Card>
+                </Container>
+            )
+        }
+        else {
+            return (
+                <Container>
+                    {this.renderRedirect()}
+                    <Card bg="light" style={{ marginTop: '1em' }}>
+                        <Card.Header as="h5">{config.loginText}</Card.Header>
+                        <Card.Body>
+                            <Form>
+                                <Form.Group controlId="formBasicEmail">
+                                    <Form.Control onChange={this.onEmailChange} value={this.state.email} type="email" placeholder={config.emailPlaceholderText} isInvalid={this.state.email_is_invalid} />
+                                    <Form.Control.Feedback type="invalid">
+                                        {config.emailInvalidFeedback}
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                                <Form.Group controlId="formBasicPassword">
+                                    <Form.Control onChange={this.onPasswordChange} value={this.state.password} type="password" placeholder={config.passwordPlaceholderText} isInvalid={this.state.password_is_invalid} />
+                                    <Form.Control.Feedback type="invalid">
+                                        {config.loginPasswordInvalidFeedback}
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                                <Button onClick={this.handleLoginClick} className="float-right" variant="dark" disabled={this.isLoginDisabled()}>
+                                    {config.loginText}
+                                </Button>
+                            </Form>
+                        </Card.Body>
+                    </Card>
+                </Container>
+            );
+        }
     }
 }
