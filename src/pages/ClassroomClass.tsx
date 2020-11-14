@@ -5,6 +5,8 @@ import { Col, Container, Row, Card, Button, ListGroup, ListGroupItem } from 'rea
 import { Redirect } from 'react-router-dom'
 import Countdown from "react-countdown";
 
+import WithMoveValidation from './chessBoardWithMoveValidation';
+
 import Api from '../api/backend';
 import config from '../config';
 
@@ -111,12 +113,6 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
                 SHOW_WATERMARK_FOR_GUESTS: false,
             },
         };
-    }
-
-    componentDidMount() {
-        const script = document.createElement("script");
-        script.src = 'https://meet.jit.si/external_api.js';
-        document.body.appendChild(script);
     }
 
     authorizeAndEnterClass() {
@@ -279,9 +275,9 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
                     <Col md={6}>
                         <Card bg="light" style={{ marginTop: '1em' }}>
                             <Card.Header as="h5" >Chessboard Area</Card.Header>
-                            <Card.Body>
-                                chessboard placeholder
-                                </Card.Body>
+                            <Card.Body className="chessBoardArea">
+                                <WithMoveValidation />
+                            </Card.Body>
                         </Card>
                     </Col>
                     <Col md={6}>
