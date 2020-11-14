@@ -229,9 +229,7 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
         const table_element = (!no_class_condition) ?
             (
                 <Container>
-                    <Card.Title>
-                        No Classes Scheduled
-                    </Card.Title>
+                    No Classes Scheduled
                 </Container>
             ) :
             (
@@ -260,9 +258,7 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
                 </Collapse>
                 <Collapse in={collapse_condition}>
                     <Container>
-                        <Card.Title>
-                            Select a classroom
-                        </Card.Title>
+                        Select a classroom
                     </Container>
                 </Collapse>
             </Card.Body>
@@ -304,6 +300,7 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
             <Collapse in={this.state.selected_classroom_id !== -1}>
                 <Card.Body>
                     <Container>
+                        <Card.Title>Add Class</Card.Title>
                         <Form>
                             <Form.Row>
                                 <Form.Group sm={6} as={Col} >
@@ -326,7 +323,7 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
                             </Form.Row>
                         </Form>
                         <Button variant="dark" disabled={this.state.duration_is_invalid || this.state.start_time_is_invalid} onClick={() => { this.addClass() }} block>
-                            Add
+                            Done
                         </Button>
                         <Button variant="dark" onClick={this.resetFormAndSelectedClassroom} block>
                             Cancel
@@ -847,7 +844,7 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
     }
 
     renderClassroomForm() {
-        return (                
+        return (
             <Card.Body>
                 <Collapse in={!this.state.show_form}>
                     <Container>
@@ -895,7 +892,7 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
                     <Card.Header as='h5'>{config.classesCardHeader}</Card.Header>
                     {this.renderClassTable()}
                     {this.renderClassForm()}
-                </Card>                
+                </Card>
             </div >
         );
     }

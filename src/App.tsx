@@ -191,6 +191,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
 			user_authentication: null,
 			user_profile: null
 		}, () => {
+			console.log('forced logout')
 			this.alertCallback({ alert_type: "warning", alert_text: "Please log in." })
 		});
 	}
@@ -288,7 +289,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
 					<Route path="/student/register">
 						<RegisterStudent onAlert={this.alertCallback} />
 					</Route>
-					<Route path="/class/:class_hash" render={(props) => (<ClassroomClass {...props} onAlert={this.alertCallback} user_authentication={this.state.user_authentication} user_authorization_check_complete={this.state.user_authorization_check_complete} />)} />
+					<Route path="/class/:class_hash" render={(props) => (<ClassroomClass {...props} onAlert={this.alertCallback} user_profile={this.state.user_profile} user_authentication={this.state.user_authentication} user_authorization_check_complete={this.state.user_authorization_check_complete} />)} />
 					<Route path="/">
 						<Home />
 					</Route>

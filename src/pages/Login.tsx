@@ -105,10 +105,22 @@ export class Login extends React.Component<LoginProps, LoginState> {
                         <Card.Header as="h5" >Loading</Card.Header>
                         <Card.Body>
                             Please Wait
-                    </Card.Body>
+                        </Card.Body>
                     </Card>
                 </Container>
             )
+        }
+        else if (this.state.got_auth && !this.props.got_auth_and_profile) {
+            return (
+                <Container>
+                    <Card bg="light" style={{ marginTop: '1em' }}>
+                        <Card.Header as="h5" >Loading</Card.Header>
+                        <Card.Body>
+                            Please Wait
+                        </Card.Body>
+                    </Card>
+                </Container>
+            );
         }
         else {
             return (

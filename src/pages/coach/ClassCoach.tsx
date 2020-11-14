@@ -223,9 +223,7 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
         const table_element = (!no_class_condition) ?
             (
                 <Container>
-                    <Card.Title>
-                        No Classes Scheduled
-                    </Card.Title>
+                    No Classes Scheduled
                 </Container>
             ) :
             (
@@ -254,9 +252,7 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
                 </Collapse>
                 <Collapse in={collapse_condition}>
                     <Container>
-                        <Card.Title>
-                            Select a classroom
-                        </Card.Title>
+                        Select a classroom
                     </Container>
                 </Collapse>
             </Card.Body>
@@ -320,7 +316,7 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
                             </Form.Row>
                         </Form>
                         <Button variant="dark" disabled={this.state.duration_is_invalid || this.state.start_time_is_invalid} onClick={() => { this.addClass() }} block>
-                            Add
+                            Done
                         </Button>
                         <Button variant="dark" onClick={this.resetFormAndSelectedClassroom} block>
                             Cancel
