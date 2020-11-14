@@ -5,8 +5,8 @@ import { Col, Container, Row, Card, Button, ListGroup, ListGroupItem } from 'rea
 import { Redirect } from 'react-router-dom'
 import Countdown from "react-countdown";
 
-//import config from '../config';
 import Api from '../api/backend';
+import config from '../config';
 
 type userAuthenticationType = {
     id: number,
@@ -59,6 +59,8 @@ type ClassroomClassState = {
     this_class: classroom_class | null,
     this_classroom: classroom | null,
     class_authorization_complete: boolean,
+    configOverwrite: any,
+    interfaceConfigOverwrite: any,
 }
 
 type ClassroomClassProps = {
@@ -77,6 +79,37 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
             this_class: null,
             this_classroom: null,
             class_authorization_complete: false,
+            configOverwrite: { enableWelcomePage: false, disableProfile: true },
+            interfaceConfigOverwrite: {
+                APP_NAME: config.websiteName,
+                CONNECTION_INDICATOR_DISABLED: true,
+                DEFAULT_LOGO_URL: '/passedpawn.png',
+                DEFAULT_WELCOME_PAGE_LOGO_URL: '/passedpawn.png',
+                DISABLE_DOMINANT_SPEAKER_INDICATOR: true,
+                DISABLE_FOCUS_INDICATOR: true,
+                DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+                DISABLE_PRESENCE_STATUS: true,
+                DISPLAY_WELCOME_PAGE_ADDITIONAL_CARD: true,
+                DISPLAY_WELCOME_PAGE_CONTENT: true,
+                DISPLAY_WELCOME_PAGE_TOOLBAR_ADDITIONAL_CONTENT: true,
+                HIDE_DEEP_LINKING_LOGO: true,
+                HIDE_INVITE_MORE_HEADER: true,
+                JITSI_WATERMARK_LINK: config.currentWebsite,
+                LIVE_STREAMING_HELP_LINK: config.currentWebsite,
+                MOBILE_APP_PROMO: false,
+                MOBILE_DOWNLOAD_LINK_ANDROID: config.currentWebsite,
+                MOBILE_DOWNLOAD_LINK_F_DROID: config.currentWebsite,
+                MOBILE_DOWNLOAD_LINK_IOS: config.currentWebsite,
+                NATIVE_APP_NAME: config.websiteName,
+                PROVIDER_NAME: config.websiteName,
+                RECENT_LIST_ENABLED: false,
+                SETTINGS_SECTIONS: [ 'devices' ],
+                SHOW_JITSI_WATERMARK: false,
+                SUPPORT_URL: config.currentWebsite,
+                TOOLBAR_BUTTONS: [ 'microphone', 'camera' ],
+                VERTICAL_FILMSTRIP: false,
+                SHOW_WATERMARK_FOR_GUESTS: false,
+            },
         };
     }
 
@@ -222,7 +255,10 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
                 displayName={this.props.user_profile?.fullname}
                 password={this.state.class_hash}
                 onMeetingEnd={() => console.log('Meeting has ended')}
+                loadingComponent={<p>Loading...</p>}
                 containerStyles={{ width: '100%' }}
+                configOverwrite={this.state.configOverwrite}
+                interfaceConfigOverwrite={this.state.interfaceConfigOverwrite}
             />
         );
     }

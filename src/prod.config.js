@@ -1,5 +1,6 @@
 export default {
-    apiUrl: "https://8ekqi8q0rk.execute-api.ap-southeast-1.amazonaws.com",
+    apiUrl: "https://api.chessmagic.in",
+    currentWebsite: 'https://chessmagic.in/',
     websiteName: "Chaturanga Chess Academy",
     websiteDescription: "We are the biggest chess academy in Bengal. Register as a student to take a glimpse of the different courses we have.",
     aboutDescription: "Chess coaching classes online",
