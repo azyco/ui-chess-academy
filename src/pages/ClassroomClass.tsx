@@ -251,6 +251,14 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
     jitsiApp() {
         return (
             <Jutsu
+                onJitsi={() => {
+                    // @ts-ignore
+                    console.log('jitsi is being loaded');
+                    // // @ts-ignore
+                    // document.querySelector('.leftwatermark').style.display = 'none';
+                    // // @ts-ignore
+                    // document.querySelector('#videoResolutionLabel').style.display = 'none';
+                }}
                 roomName={this.state.this_classroom?.name}
                 displayName={this.props.user_profile?.fullname}
                 password={this.state.class_hash}
