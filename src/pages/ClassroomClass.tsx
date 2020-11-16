@@ -1,4 +1,5 @@
 import React from 'react';
+import Measure from 'react-measure'
 // @ts-ignore
 import { Jutsu } from 'react-jutsu'
 import { Col, Container, Row, Card, Button, ListGroup, ListGroupItem } from 'react-bootstrap';
@@ -105,10 +106,10 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
                 NATIVE_APP_NAME: config.websiteName,
                 PROVIDER_NAME: config.websiteName,
                 RECENT_LIST_ENABLED: false,
-                SETTINGS_SECTIONS: [ 'devices' ],
+                SETTINGS_SECTIONS: ['devices'],
                 SHOW_JITSI_WATERMARK: false,
                 SUPPORT_URL: config.currentWebsite,
-                TOOLBAR_BUTTONS: [ 'microphone', 'camera' ],
+                TOOLBAR_BUTTONS: ['microphone', 'camera'],
                 VERTICAL_FILMSTRIP: false,
                 SHOW_WATERMARK_FOR_GUESTS: false,
             },
@@ -221,8 +222,8 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
                 </Row>
             )
         }
-        else{
-            return(
+        else {
+            return (
                 <Row>
                     <Col >
                         <Card bg="light" style={{ marginTop: '1em' }}>
@@ -268,9 +269,7 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
                     <Col md={6}>
                         <Card bg="light" style={{ marginTop: '1em' }}>
                             <Card.Header as="h5" >Chessboard Area</Card.Header>
-                            <Card.Body className="chessBoardArea">
-                                <WithMoveValidation />
-                            </Card.Body>
+                            <ResizableChessBoard/>
                         </Card>
                     </Col>
                     <Col md={6}>
@@ -507,3 +506,32 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
         }
     }
 }
+
+class ResizableChessBoard extends React.Component {
+    state = {
+      dimensions: {
+        width: -1,
+        height: -1,
+      },
+    }
+   
+    render() {
+      const { width, height } = this.state.dimensions
+      return (
+        <Measure
+          bounds
+          onResize={contentRect => {
+            this.setState({ dimensions: contentRect.bounds },()=>{console.log("width,height ",width,height)})
+          }}
+        >
+          {({ measureRef }) => (
+              <Card.Body >
+                  <div ref={measureRef}>
+                    <WithMoveValidation width={width}/>
+                  </div>
+              </Card.Body>
+          )}
+        </Measure>
+      )
+    }
+  }

@@ -190,9 +190,8 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
   }
 }
 
-export default function WithMoveValidation() {
+export default function WithMoveValidation(props:any) {
   return (
-    <div>
       <HumanVsHuman>
         {({
           position,
@@ -207,7 +206,7 @@ export default function WithMoveValidation() {
         }: any) => (
           <Chessboard
             id="humanVsHuman"
-            // width={320}
+            width={props.width}
             position={position}
             onDrop={onDrop}
             onMouseOverSquare={onMouseOverSquare}
@@ -224,7 +223,6 @@ export default function WithMoveValidation() {
           />
         )}
       </HumanVsHuman>
-    </div>
   );
 }
 
