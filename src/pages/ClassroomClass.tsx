@@ -237,25 +237,6 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
         }
     }
 
-    // jitsiApp(){
-    //     const roomName = this.state.this_classroom?.name
-    //     const parentNode = 'jitsi-container'
-    //     const jitsi = useJitsi({ roomName, parentNode })
-
-    //     useEffect(() => {
-    //         if (jitsi) {
-    //             jitsi.addEventListener('videoConferenceJoined', () => {
-    //                 jitsi.executeCommand('displayName', 'Naruto Uzumaki')
-    //                 jitsi.executeCommand('password', 'dattebayo')
-    //                 jitsi.executeCommand('subject', 'fan')
-    //             })
-    //         }
-    //         return () => jitsi && jitsi.dispose()
-    //     }, [jitsi])
-
-    //     return <div id={parentNode} />
-    // }
-
     jitsiApp() {
         return (
             <Jutsu

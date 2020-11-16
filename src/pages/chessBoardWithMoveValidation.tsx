@@ -42,15 +42,15 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
             history: [],
         };
         this.ws = io(config.webSocketApi);
+        this.ws.on('board', (fenData: string) => {
+            console.log('-=-=-=-=-= GET BOARD DATA -=-=-=-=-', fenData);
+            this.setState({fen: fenData}, () => {this.game = new Chess(fenData)});
+        });
+
     }
 
     componentDidMount() {
         this.game = new Chess();
-        // console.log('rrrrrrrrrrrrrrrrrrrrrrrr');
-        this.ws.on('board', (fenData: string) => {
-            console.log('-=-=-=-=-= GET BOARD DATA -=-=-=-=-', fenData);
-            this.setState({fen: fenData});
-        });
     }
 
     componentWillUnmount() {
