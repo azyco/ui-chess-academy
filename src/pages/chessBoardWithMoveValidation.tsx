@@ -1,6 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Chessboard from "chessboardjsx";
+import config from '../config';
+
+import { io } from 'socket.io-client';
 
 const Chess = require("chess.js");
 
@@ -21,6 +24,7 @@ type HumanVsHumanState = {
 class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState> {
     static propTypes = { children: PropTypes.func };
     game: any;
+    ws  : any | null;
 
     constructor(props: HumanVsHumanProps) {
         super(props);
@@ -35,15 +39,31 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
             // currently clicked square
             square: "",
             // array of past game moves
-            history: []
+            history: [],
         };
+        this.ws = io(config.webSocketApi);
     }
 
-    
+    componentDidMount() {
+        this.game = new Chess();
+        // console.log('rrrrrrrrrrrrrrrrrrrrrrrr');
+        this.ws.on('board', (fenData: string) => {
+            console.log('-=-=-=-=-= GET BOARD DATA -=-=-=-=-', fenData);
+            this.setState({fen: fenData});
+        });
+    }
 
-  componentDidMount() {
-    this.game = new Chess();
-  }
+    componentWillUnmount() {
+        try {
+            this.ws !== null && this.ws.disconnect();
+        } catch(e) {
+            console.log('no socket created - hence cannot disconnect')
+        }
+    }
+
+    handleWsCallback = () => {
+        this.ws.emit('chat', `${this.game.fen()}`);
+    }
 
   // keep clicked square style and remove hint squares
   removeHighlightSquare = (square: string) => {
@@ -93,7 +113,7 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
       fen: this.game.fen(),
       history: this.game.history({ verbose: true }),
       squareStyles: squareStyling({ pieceSquare, history })
-    }));
+    }), this.handleWsCallback);
   };
 
   onMouseOverSquare = (square: string) => {
@@ -145,7 +165,7 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
       fen: this.game.fen(),
       history: this.game.history({ verbose: true }),
       pieceSquare: ""
-    });
+    }, this.handleWsCallback);
   };
 
   onSquareRightClick = (square: string) =>

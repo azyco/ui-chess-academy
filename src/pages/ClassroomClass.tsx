@@ -80,7 +80,7 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
             class_hash: this.props.match.params.class_hash,
             this_class: null,
             this_classroom: null,
-            class_authorization_complete: false,
+            class_authorization_complete: props.user_authorization_check_complete || false,
             configOverwrite: { enableWelcomePage: false, disableProfile: true },
             interfaceConfigOverwrite: {
                 APP_NAME: config.websiteName,
@@ -113,6 +113,18 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
                 SHOW_WATERMARK_FOR_GUESTS: false,
             },
         };
+    }
+
+    componentDidMount() {
+        if(this.state.class_authorization_complete) {
+            this.authorizeAndEnterClass();
+        }
+    }
+
+    componentDidUpdate(prevProps: any) {
+        if( this.props.user_authorization_check_complete !== prevProps.user_authorization_check_complete ) {
+            this.fetchClass();
+        }
     }
 
     authorizeAndEnterClass() {
@@ -422,7 +434,6 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
     }
 
     renderPostClass() {
-        console.log("PostClass")
         let start_time = new Date();
         let end_time = new Date();
         let duration: number = 0;
@@ -461,11 +472,10 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
     }
 
     render() {
-        this.fetchClass();
+        if (this.props.user_authorization_check_complete && !this.props.user_authentication) {
+            return (<Redirect to={`/login?redirect=/class/${this.state.class_hash}`} />);
+        }
         if (this.state.class_authorization_complete && this.props.user_authorization_check_complete) {
-            if (!this.props.user_authentication) {
-                return (<Redirect to='/' />);
-            }
             if (this.state.this_class) {
                 if (this.state.this_class.start_time_actual && !this.state.this_class.end_time_actual) {
                     return this.renderDuringClass();
@@ -486,7 +496,6 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
                 }
             }
             else {
-                console.log("unauthorized")
                 return (
                     <Container>
                         <Card bg="light" style={{ marginTop: '1em' }}>
@@ -508,7 +517,7 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
                         <Card.Header as="h5">Loading</Card.Header>
                         <Card.Body>
                             <Card.Text>
-                                Class loading
+                                Class loading {this.props.user_authorization_check_complete ? 'yes' : 'no'}
                             </Card.Text>
                         </Card.Body>
                     </Card>

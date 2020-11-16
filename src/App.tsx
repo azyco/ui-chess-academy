@@ -237,7 +237,6 @@ class App extends React.Component<AppClassProps, AppClassState>{
 		if (this.state.show_alert) {
 			if (this.state.alert_type === 'warning') {
 				return (
-
 					<Modal show={this.state.show_alert} onHide={() => this.setState({ show_alert: false })} size="sm" centered>
 						<Modal.Body>{this.state.alert_text}</Modal.Body>
 						<Modal.Footer>
@@ -246,7 +245,6 @@ class App extends React.Component<AppClassProps, AppClassState>{
 							</Button>
 						</Modal.Footer>
 					</Modal>
-
 				);
 			}
 			else {
@@ -281,15 +279,31 @@ class App extends React.Component<AppClassProps, AppClassState>{
 						<About />
 					</Route>
 					<Route path="/profile">
-						<Profile unauthorizedLogout={this.unauthorizedLogout} user_authorization_check_complete={this.state.user_authorization_check_complete} updateState={this.updateProfileStateCallback} onAlert={this.alertCallback} onLogout={this.logoutCallback} user_profile={this.state.user_profile} user_authentication={this.state.user_authentication} />
+						<Profile
+							unauthorizedLogout={this.unauthorizedLogout}
+							user_authorization_check_complete={this.state.user_authorization_check_complete}
+							updateState={this.updateProfileStateCallback}
+							onAlert={this.alertCallback}
+							onLogout={this.logoutCallback}
+							user_profile={this.state.user_profile}
+							user_authentication={this.state.user_authentication} />
 					</Route>
-					<Route path="/login">
-						<Login got_auth_and_profile={got_auth_and_profile} user_authorization_check_complete={this.state.user_authorization_check_complete} is_logged_in={!!this.state.user_authentication} onAlert={this.alertCallback} onLogin={this.loginCallback} />
+					<Route path="/login" render={(props) =>
+						<Login {...props}
+							got_auth_and_profile={got_auth_and_profile}
+							user_authorization_check_complete={this.state.user_authorization_check_complete}
+							is_logged_in={this.state.user_authentication ? true : false}
+							onAlert={this.alertCallback} onLogin={this.loginCallback} />}>
 					</Route>
 					<Route path="/student/register">
 						<RegisterStudent onAlert={this.alertCallback} />
 					</Route>
-					<Route path="/class/:class_hash" render={(props) => (<ClassroomClass {...props} onAlert={this.alertCallback} user_profile={this.state.user_profile} user_authentication={this.state.user_authentication} user_authorization_check_complete={this.state.user_authorization_check_complete} />)} />
+					<Route path="/class/:class_hash" render={(props) => 
+						<ClassroomClass {...props}
+							onAlert={this.alertCallback}
+							user_profile={this.state.user_profile}
+							user_authentication={this.state.user_authentication}
+							user_authorization_check_complete={this.state.user_authorization_check_complete} />} />
 					<Route path="/">
 						<Home />
 					</Route>
