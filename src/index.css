@@ -13,8 +13,26 @@ code {
 }
 
 
-.chessBoardArea {
+/* .chessBoardArea {
   display: flex;
   justify-content: center;
   text-align: center;
+} */
+
+.ui-header {
+  text-align: center;
+}
+
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.table-responsive{
+  overflow-y: auto;
+  max-height: 33.3vh;
 }
