@@ -42,6 +42,7 @@ type ClassCoachState = {
     classroom_array: classroom[],
     selected_classroom_id: number,
     selected_classroom_class_array: classroom_class[] | null,
+    show_class_form: boolean,
     start_time_input: string,
     start_time: Date,
     start_time_is_invalid: boolean,
@@ -56,6 +57,7 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
             classroom_array: [],
             selected_classroom_id: -1,
             selected_classroom_class_array: null,
+            show_class_form: false,
             start_time_input: '',
             start_time: new Date(),
             start_time_is_invalid: true,
@@ -95,7 +97,8 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
                 start_time: new Date(),
                 start_time_is_invalid: true,
                 duration: 0,
-                duration_is_invalid: true
+                duration_is_invalid: true,
+                show_class_form: false,
             });
         }).catch((error) => {
             console.log(error);
@@ -193,9 +196,9 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
                 <Card bg="light" style={{ marginTop: '1em' }}>
                     <Card.Header as='h5'>{config.classroomsCardHeader}</Card.Header>
                     <Card.Body>
-                        <Card.Title>
+                        <Container>
                             {config.noClassroomCoach}
-                        </Card.Title>
+                        </Container>
                     </Card.Body>
                 </Card>
             );
@@ -277,54 +280,65 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
         });
     }
 
-    resetFormAndSelectedClassroom = () => {
+    resetClassForm = () => {
         this.setState({
-            selected_classroom_id: -1,
-            selected_classroom_class_array: null,
             start_time_input: '',
             start_time: new Date(),
             start_time_is_invalid: true,
             duration: 0,
             duration_is_invalid: true,
+            show_class_form: false,
         });
     }
 
     renderClassForm() {
-        return (
-            <Collapse in={this.state.selected_classroom_id !== -1}>
+        if (this.state.selected_classroom_id !== -1) {
+            return (
                 <Card.Body>
-                    <Container>
-                        <Form>
-                            <Form.Row>
-                                <Form.Group sm={6} as={Col} >
-                                    <Form.Control isInvalid={this.state.start_time_is_invalid} value={this.state.start_time_input} onChange={this.onStartTimeChange} placeholder="Date and Time" />
-                                    <Form.Control.Feedback type="invalid" >
-                                        Date and Time (MM/DD/YYYY, HH:MM:SS) must be valid
-                                    </Form.Control.Feedback>
-                                </Form.Group>
-                                <Form.Group sm={6} as={Col} >
-                                    <Form.Control readOnly value={this.state.start_time.toLocaleString()} />
-                                </Form.Group>
-                            </Form.Row>
-                            <Form.Row>
-                                <Form.Group sm={12} as={Col} >
-                                    <Form.Control value={this.state.duration} onChange={this.onDurationChange} isInvalid={this.state.duration_is_invalid} placeholder="Duration" />
-                                    <Form.Control.Feedback type="invalid" >
-                                        Duration (in minutes) must be valid
-                                    </Form.Control.Feedback>
-                                </Form.Group>
-                            </Form.Row>
-                        </Form>
-                        <Button variant="dark" disabled={this.state.duration_is_invalid || this.state.start_time_is_invalid} onClick={() => { this.addClass() }} block>
-                            Done
-                        </Button>
-                        <Button variant="dark" onClick={this.resetFormAndSelectedClassroom} block>
-                            Cancel
-                        </Button>
-                    </Container>
+                    <Collapse in={!this.state.show_class_form}>
+                        <Container>
+                            <Button variant="dark" onClick={() => { this.setState({ show_class_form: true }) }} block>
+                                Add
+                            </Button>
+                        </Container>
+                    </Collapse>
+                    <Collapse in={this.state.show_class_form}>
+                        <Container>
+                            <Form>
+                                <Form.Row>
+                                    <Form.Group sm={6} as={Col} >
+                                        <Form.Control isInvalid={this.state.start_time_is_invalid} value={this.state.start_time_input} onChange={this.onStartTimeChange} placeholder="Date and Time" />
+                                        <Form.Control.Feedback type="invalid" >
+                                            Date and Time (MM/DD/YYYY, HH:MM:SS) must be valid
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                    <Form.Group sm={6} as={Col} >
+                                        <Form.Control readOnly value={this.state.start_time.toLocaleString()} />
+                                    </Form.Group>
+                                </Form.Row>
+                                <Form.Row>
+                                    <Form.Group sm={12} as={Col} >
+                                        <Form.Control value={this.state.duration} onChange={this.onDurationChange} isInvalid={this.state.duration_is_invalid} placeholder="Duration" />
+                                        <Form.Control.Feedback type="invalid" >
+                                            Duration (in minutes) must be valid
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                </Form.Row>
+                            </Form>
+                            <Button variant="dark" disabled={this.state.duration_is_invalid || this.state.start_time_is_invalid} onClick={() => { this.addClass() }} block>
+                                Done
+                            </Button>
+                            <Button variant="dark" onClick={this.resetClassForm} block>
+                                Cancel
+                            </Button>
+                        </Container>
+                    </Collapse>
                 </Card.Body>
-            </Collapse>
-        );
+            );
+        }
+        else {
+            return React.Fragment
+        }
     }
 
     render() {
