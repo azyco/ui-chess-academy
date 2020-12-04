@@ -51,21 +51,6 @@ type DashboardCoachProps = {
 }
 
 type DashboardCoachState = {
-    profile_edit_mode: boolean,
-    fullname: string,
-    fullname_is_invalid: boolean,
-    state: string,
-    description: string,
-    fide_id: string,
-    lichess_id: string,
-    password: string,
-    password_is_invalid: boolean,
-    dob: Date,
-    dob_is_invalid: boolean,
-    photo_blob: Blob,
-    is_private_contact: boolean,
-    is_private_alt_contact: boolean,
-    is_private_dob: boolean
 }
 
 export class DashboardCoach extends React.Component<DashboardCoachProps, DashboardCoachState>{
@@ -76,7 +61,7 @@ export class DashboardCoach extends React.Component<DashboardCoachProps, Dashboa
     render() {
         return (
             <Container fluid >
-                <Tab.Container id="left-tabs-example" defaultActiveKey="profile">
+                <Tab.Container defaultActiveKey="profile">
                     <Row>
                         <Col lg={2}>
                             <Card bg="light" style={{ marginTop: '1em' }}>

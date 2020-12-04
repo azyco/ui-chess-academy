@@ -1,30 +1,15 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Chessboard from "chessboardjsx";
-import config from '../config';
-
-import { io } from 'socket.io-client';
+import { Button } from 'react-bootstrap';
+//import config from '../../config';
 
 const Chess = require("chess.js");
 
 type HumanVsHumanProps = {
-  class_hash: string,
-  updateChatHistoryStateCallback: Function,
-  setChatHistoryStateCallback: Function,
-  chat_message: chatMessage | null,
-  messageObjectResetCallback: Function,
+  boardHistoryUpdate: Function,
+  startingFen: string,
 }
-
-type HumanVsHumanState = {
-  fen: string,
-  dropSquareStyle: any,
-  squareStyles: any,
-  pieceSquare: string,
-  square: string,
-  history: Array<move>,
-  chat_history: Array<string>,
-  chat_pending: boolean,
-};
 
 type move = {
   color: string,
@@ -35,23 +20,22 @@ type move = {
   to: string,
 }
 
-type chatMessage = {
-  id: number,
-  fullname: string,
-  user_id: number,
-  sent_at: Date,
-  message: string
-}
+type HumanVsHumanState = {
+  fen: string,
+  dropSquareStyle: any,
+  squareStyles: any,
+  pieceSquare: string,
+  square: string,
+  history: Array<move>,
+};
 
 class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState> {
-  static propTypes = { children: PropTypes.func };
   game: any;
-  ws: any | null;
-
+  static propTypes = { children: PropTypes.func };
   constructor(props: HumanVsHumanProps) {
     super(props);
     this.state = {
-      fen: "start",
+      fen: this.props.startingFen,
       // square styles for active drop square
       dropSquareStyle: {},
       // custom square styles
@@ -62,80 +46,13 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
       square: "",
       // array of past game moves
       history: [],
-      chat_history: [],
-      chat_pending: false,
     };
-
-    this.ws = io(config.webSocketApi);
-
-    this.ws.on('board_init', (data: { pgn: string, class_hash: string }) => {
-      if (this.props.class_hash === data.class_hash) {
-        console.log('board init received', data);
-        console.log('current state', this.state);
-        if (data.pgn) {
-          this.game.load_pgn(data.pgn);
-          this.setState({ fen: this.game.fen(), history: this.game.history({ verbose: true }) }, () => { console.log('state after board init', this.state); });
-        }
-      }
-    });
-
-    this.ws.on('board', (data: { pgn: string, class_hash: string }) => {
-      if (this.props.class_hash === data.class_hash) {
-        console.log('board update received', data);
-        console.log('current state', this.state);
-        this.game.load_pgn(data.pgn);
-        this.setState({ fen: this.game.fen(), history: this.game.history({ verbose: true }) }, () => { console.log('state after board update', this.state) });
-      }
-    });
-
-    this.ws.on('chat_init', (data: { chat_history: Array<chatMessage>, class_hash: string }) => {
-      if (this.props.class_hash === data.class_hash) {
-        console.log('chat init received', data);
-        console.log('current state', this.state);
-        if (data.chat_history.length > 0) {
-          this.props.setChatHistoryStateCallback(data.chat_history);
-        }
-      }
-    });
-
-    this.ws.on('chat', (data: { chat: chatMessage, class_hash: string }) => {
-      if (this.props.class_hash === data.class_hash) {
-        console.log('chat update received', data);
-        console.log('current state', this.state);
-        this.props.updateChatHistoryStateCallback(data.chat);
-      }
-    });
-
   }
 
   componentDidMount() {
-    this.game = new Chess();
-    this.ws.emit('enter', `${this.props.class_hash}`);
-  }
-
-  componentWillUnmount() {
-    try {
-      this.ws !== null && this.ws.disconnect();
-    } catch (e) {
-      console.log('no socket created - hence cannot disconnect')
-    }
-  }
-
-  componentDidUpdate() {
-    if (this.props.chat_message && !this.state.chat_pending) {
-      this.setState({
-        chat_pending: true
-      })
-      this.ws.emit('chat', `${JSON.stringify({ chat: this.props.chat_message, class_hash: this.props.class_hash })}`, () => { this.props.messageObjectResetCallback(); this.setState({ chat_pending: false }) });
-      //callbacks not working
-      this.props.messageObjectResetCallback();
-      this.setState({ chat_pending: false })
-    }
-  }
-
-  handleWSBoardCallback = () => {
-    console.log("chesspiece moved,state ", this.state)
-    this.ws.emit('board', `${JSON.stringify({ pgn: this.game.pgn(), class_hash: this.props.class_hash })}`);
+    console.log("chessboard ", this.props, this.state);
+    this.game = new Chess(this.props.startingFen);
+    this.props.boardHistoryUpdate(this.game.pgn())
   }
 
   // keep clicked square style and remove hint squares
@@ -186,7 +103,7 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
       fen: this.game.fen(),
       history: this.game.history({ verbose: true }),
       squareStyles: squareStyling({ pieceSquare, history })
-    }), this.handleWSBoardCallback);
+    }), this.props.boardHistoryUpdate(this.game.pgn()));
   };
 
   onMouseOverSquare = (square: string) => {
@@ -238,7 +155,7 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
       fen: this.game.fen(),
       history: this.game.history({ verbose: true }),
       pieceSquare: ""
-    }, this.handleWSBoardCallback);
+    }, this.props.boardHistoryUpdate(this.game.pgn()));
   };
 
   onSquareRightClick = (square: string) =>
@@ -262,27 +179,36 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
     })
   };
 
+  undoMove = () => {
+    this.game.undo();
+    this.setState({
+      history: this.game.history({ verbose: true }),
+      fen: this.game.fen(),
+    }, this.props.boardHistoryUpdate(this.game.pgn()));
+  }
+
   render() {
     return (
       <>
         {this.renderChildrenSeparate()}
+        <br />
+        <Button variant="dark" onClick={this.undoMove} block disabled={!this.game || this.game.history({ verbose: true }).length === 0}>
+          Undo
+        </Button>
       </>
     );
   }
 }
 
 type WithMoveValidationProps = {
-  class_hash: string,
   width: number,
-  updateChatHistoryStateCallback: Function,
-  setChatHistoryStateCallback: Function,
-  chat_message: chatMessage | null,
-  messageObjectResetCallback: Function,
+  boardHistoryUpdate: Function,
+  startingFen: string,
 }
 
 export default function WithMoveValidation(props: WithMoveValidationProps) {
   return (
-    <HumanVsHuman messageObjectResetCallback={props.messageObjectResetCallback} chat_message={props.chat_message} class_hash={props.class_hash} updateChatHistoryStateCallback={props.updateChatHistoryStateCallback} setChatHistoryStateCallback={props.setChatHistoryStateCallback}>
+    <HumanVsHuman startingFen={props.startingFen} boardHistoryUpdate={props.boardHistoryUpdate}>
       {({
         position,
         onDrop,
@@ -294,23 +220,27 @@ export default function WithMoveValidation(props: WithMoveValidationProps) {
         onSquareClick,
         onSquareRightClick
       }: any) => (
-          <Chessboard
-            id="humanVsHuman"
-            width={props.width}
-            position={position}
-            onDrop={onDrop}
-            onMouseOverSquare={onMouseOverSquare}
-            onMouseOutSquare={onMouseOutSquare}
-            boardStyle={{
-              borderRadius: "5px",
-              boxShadow: `0 5px 15px rgba(0, 0, 0, 0.5)`
-            }}
-            squareStyles={squareStyles}
-            dropSquareStyle={dropSquareStyle}
-            onDragOverSquare={onDragOverSquare}
-            onSquareClick={onSquareClick}
-            onSquareRightClick={onSquareRightClick}
-          />
+          <>
+            <Chessboard
+              key={position} //temporay fix ?
+              id="humanVsHuman"
+              width={props.width}
+              position={position}
+              onDrop={onDrop}
+              onMouseOverSquare={onMouseOverSquare}
+              onMouseOutSquare={onMouseOutSquare}
+              boardStyle={{
+                borderRadius: "5px",
+                boxShadow: `0 5px 15px rgba(0, 0, 0, 0.5)`
+              }}
+              squareStyles={squareStyles}
+              dropSquareStyle={dropSquareStyle}
+              onDragOverSquare={onDragOverSquare}
+              onSquareClick={onSquareClick}
+              onSquareRightClick={onSquareRightClick}
+            />
+            {/* <span>{position}</span> */}
+          </>
         )}
     </HumanVsHuman>
   );
