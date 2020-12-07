@@ -40,7 +40,7 @@ type ClassCoachProps = {
 
 type ClassCoachState = {
     classroom_array: classroom[],
-    selected_classroom_id: number,
+    selected_classroom_array_index: number,
     selected_classroom_class_array: classroom_class[] | null,
     show_class_form: boolean,
     start_time_input: string,
@@ -55,7 +55,7 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
         super(props);
         this.state = {
             classroom_array: [],
-            selected_classroom_id: -1,
+            selected_classroom_array_index: -1,
             selected_classroom_class_array: null,
             show_class_form: false,
             start_time_input: '',
@@ -87,12 +87,13 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
         });
     }
 
-    getClassArrayAndResetForm(classroom_id: number = this.state.selected_classroom_id) {
+    getClassArrayAndResetForm(classroom_array_index: number = this.state.selected_classroom_array_index) {
+        const classroom_id: number = this.state.classroom_array[classroom_array_index].id;
         Api.get('/class?classroom_id=' + classroom_id).then((response) => {
             console.log("got class array ", response);
             this.setState({
                 selected_classroom_class_array: response.data,
-                selected_classroom_id: classroom_id,
+                selected_classroom_array_index: classroom_array_index,
                 start_time_input: '',
                 start_time: new Date(),
                 start_time_is_invalid: true,
@@ -115,7 +116,7 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
         Api.delete('/class?class_id=' + class_id + '&classroom_id=' + classroom_id).then((response) => {
             console.log(response);
             this.props.onAlert({ alert_type: "success", alert_text: "Class deleted successfully" });
-            this.getClassArrayAndResetForm(this.state.selected_classroom_id);
+            this.getClassArrayAndResetForm(this.state.selected_classroom_array_index);
         }).catch((error) => {
             console.log(error);
             if (error.response.status === 403) {
@@ -128,12 +129,13 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
     }
 
     addClass() {
-        const start_time_db = this.state.start_time.valueOf();
+        const start_time = this.state.start_time.valueOf();
+        const classroom_id: number = this.state.classroom_array[this.state.selected_classroom_array_index].id
         Api.post('/class', {
             class_details: {
-                start_time: start_time_db,
+                start_time,
                 duration: this.state.duration,
-                classroom_id: this.state.selected_classroom_id
+                classroom_id,
             }
         }).then((response) => {
             console.log(response);
@@ -150,14 +152,14 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
         });
     }
 
-    classroomRowGenerator = (classrom_row: classroom) => (
-        <tr key={classrom_row.id} >
+    classroomRowGenerator = (classrom_row: classroom, index: number) => (
+        <tr key={index} >
             <td>{classrom_row.id}</td>
             <td>{classrom_row.name}</td>
             <td>{classrom_row.description}</td>
             <td>{classrom_row.student_count}</td>
             <td>
-                <Button variant="dark" onClick={() => { this.getClassArrayAndResetForm(classrom_row.id) }} disabled={this.state.selected_classroom_id === classrom_row.id}>
+                <Button variant="dark" onClick={() => { this.getClassArrayAndResetForm(index) }} disabled={this.state.selected_classroom_array_index === index}>
                     Select
                 </Button>
             </td>
@@ -221,7 +223,7 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
     );
 
     renderClassTable() {
-        const collapse_condition = this.state.selected_classroom_id === -1;
+        const collapse_condition = this.state.selected_classroom_array_index === -1;
         const no_class_condition = (this.state.selected_classroom_class_array && this.state.selected_classroom_class_array.length > 0);
         const table_element = (!no_class_condition) ?
             (
@@ -292,7 +294,7 @@ export class ClassCoach extends React.Component<ClassCoachProps, ClassCoachState
     }
 
     renderClassForm() {
-        if (this.state.selected_classroom_id !== -1) {
+        if (this.state.selected_classroom_array_index !== -1) {
             return (
                 <Card.Body>
                     <Collapse in={!this.state.show_class_form}>

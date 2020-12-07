@@ -54,8 +54,8 @@ type AssignmentsCreateCoachProps = {
 
 type AssignmentsCreateCoachState = {
     classroom_array: Array<classroom>,
-    selected_classroom_id: number,
-    selected_classroom_class_id: number,
+    selected_classroom_array_index: number,
+    selected_class_array_index: number,
     selected_classroom_class_array: Array<classroom_class> | null,
     selected_classroom_class_question_array: Array<question> | null,
     fen_modal: string,
@@ -75,8 +75,8 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
         super(props);
         this.state = {
             classroom_array: [],
-            selected_classroom_id: -1,
-            selected_classroom_class_id: -1,
+            selected_classroom_array_index: -1,
+            selected_class_array_index: -1,
             selected_classroom_class_array: null,
             selected_classroom_class_question_array: null,
             fen_modal: '',
@@ -100,9 +100,10 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
     getClassroomArray() {
         Api.get('/classroom?coach_id=' + this.props.user_authentication.id).then((response) => {
             console.log("classroom array updated ", response);
-            this.setState({ classroom_array: Array.from(response.data.classroom_array) }, () => {
-                console.log("state after classroom update ", this.state);
-            });
+            this.setState({
+                classroom_array: Array.from(response.data.classroom_array),
+                selected_classroom_array_index: 0,
+            }, this.getClassArrayAndResetForm)
         }).catch((error) => {
             console.log("failed to update classroom array ", error);
             if (error.response.status === 403) {
@@ -114,32 +115,15 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
         });
     }
 
-    getClassArrayAndResetForm(classroom_id: number = this.state.selected_classroom_id) {
+    getClassArrayAndResetForm = (classroom_array_index: number = this.state.selected_classroom_array_index) => {
+        const classroom_id: number = this.state.classroom_array[classroom_array_index].id;
         Api.get('/class?classroom_id=' + classroom_id).then((response) => {
             console.log("got class array ", response);
             this.setState({
                 selected_classroom_class_array: response.data,
-                selected_classroom_id: classroom_id,
-                selected_classroom_class_id: -1,
+                selected_classroom_array_index: classroom_array_index,
+                selected_class_array_index: 0,
                 selected_classroom_class_question_array: [],
-            });
-        }).catch((error) => {
-            console.log(error);
-            if (error.response.status === 403) {
-                this.props.unauthorizedLogout();
-            }
-            else {
-                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
-            }
-        });
-    }
-
-    getQuestionArrayAndResetForm(class_id: number = this.state.selected_classroom_class_id) {
-        Api.get('/question?class_id=' + class_id).then((response) => {
-            console.log("got question array ", response);
-            this.setState({
-                selected_classroom_class_question_array: response.data,
-                selected_classroom_class_id: class_id,
                 show_question_form: false,
                 deadline_input: '',
                 deadline: new Date(),
@@ -148,7 +132,7 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
                 description_is_invalid: true,
                 fen: '',
                 fen_is_invalid: true,
-            });
+            }, this.getQuestionArrayAndResetForm)
         }).catch((error) => {
             console.log(error);
             if (error.response.status === 403) {
@@ -160,123 +144,33 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
         });
     }
 
-    classroomRowGenerator = (classrom_row: classroom) => (
-        <tr key={classrom_row.id} >
-            <td>{classrom_row.id}</td>
-            <td>{classrom_row.name}</td>
-            <td>{classrom_row.description}</td>
-            <td>{classrom_row.student_count}</td>
-            <td>
-                <Button variant="dark" onClick={() => { this.getClassArrayAndResetForm(classrom_row.id) }} disabled={this.state.selected_classroom_id === classrom_row.id}>
-                    Select
-                </Button>
-            </td>
-        </tr>
-    );
-
-    renderClassroomTable() {
-        console.log("rendering classroom table");
-        if (this.state.classroom_array && this.state.classroom_array.length > 0) {
-            return (
-                <Card bg="light" style={{ marginTop: '1em' }}>
-                    <Card.Header as='h5'>{config.classroomsCardHeader}</Card.Header>
-                    <Card.Body>
-                        <Container fluid>
-                            <Table striped bordered hover responsive="lg" >
-                                <thead>
-                                    <tr>
-                                        <th>{config.tableHeaderID}</th>
-                                        <th>{config.tableHeaderName}</th>
-                                        <th>{config.tableHeaderDescription}</th>
-                                        <th>{config.tableHeaderStudents}</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {this.state.classroom_array.map(this.classroomRowGenerator)}
-                                </tbody>
-                            </Table>
-                        </Container>
-                    </Card.Body>
-                </Card>
-            );
+    getQuestionArrayAndResetForm = (class_array_index: number = this.state.selected_class_array_index) => {
+        if (this.state.selected_classroom_class_array && class_array_index !== -1) {
+            const class_id: number = this.state.selected_classroom_class_array[class_array_index].id;
+            Api.get('/question?class_id=' + class_id).then((response) => {
+                console.log("got question array ", response);
+                this.setState({
+                    selected_classroom_class_question_array: response.data,
+                    selected_class_array_index: class_array_index,
+                    show_question_form: false,
+                    deadline_input: '',
+                    deadline: new Date(),
+                    deadline_is_invalid: true,
+                    description_input: '',
+                    description_is_invalid: true,
+                    fen: '',
+                    fen_is_invalid: true,
+                });
+            }).catch((error) => {
+                console.log(error);
+                if (error.response.status === 403) {
+                    this.props.unauthorizedLogout();
+                }
+                else {
+                    this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+                }
+            });
         }
-        else {
-            return (
-                <Card bg="light" style={{ marginTop: '1em' }}>
-                    <Card.Header as='h5'>{config.classroomsCardHeader}</Card.Header>
-                    <Card.Body>
-                        <Container>
-                            {config.noClassroomCoach}
-                        </Container>
-                    </Card.Body>
-                </Card>
-            );
-        }
-
-    }
-
-    classRowGenerator = (class_row: classroom_class) => (
-        <tr key={class_row.id} >
-            <td><a href={'/class/' + class_row.class_hash}>{class_row.id}</a></td>
-            <td>{new Date(class_row.start_time).toLocaleString()}</td>
-            <td>{class_row.duration}</td>
-            <td>{new Date(class_row.created_at).toLocaleString()}</td>
-            <td>
-                <Button variant="dark" onClick={() => { this.getQuestionArrayAndResetForm(class_row.id) }} disabled={this.state.selected_classroom_class_id === class_row.id}>
-                    Select
-                </Button>
-            </td>
-        </tr>
-    );
-
-    renderClassTable() {
-        const collapse_condition = this.state.selected_classroom_id === -1;
-        const no_class_condition = (this.state.selected_classroom_class_array && this.state.selected_classroom_class_array.length > 0);
-        const table_element = (!no_class_condition) ?
-            (
-
-                <Card.Body>
-                    <Container>
-                        No Classes Scheduled
-                    </Container>
-                </Card.Body>
-            ) :
-            (
-
-                <Card.Body>
-                    <Table striped bordered hover responsive="lg" >
-                        <thead>
-                            <tr>
-                                <th>Class ID/Link</th>
-                                <th>Start Time</th>
-                                <th>Duration</th>
-                                <th>Created At</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {this.state.selected_classroom_class_array?.map(this.classRowGenerator)}
-                        </tbody>
-                    </Table>
-                </Card.Body>
-            );
-        console.log("rendering class table");
-        return (
-            <Card bg="light" style={{ marginTop: '1em' }}>
-                <Card.Header as='h5'>Class</Card.Header>
-                <Card.Body>
-                    <Collapse in={!collapse_condition} >
-                        {table_element}
-                    </Collapse>
-                    <Collapse in={collapse_condition}>
-                        <Container>
-                            Select a classroom
-                    </Container>
-                    </Collapse>
-                </Card.Body>
-            </Card>
-        );
     }
 
     onPositionChange = (position: any) => {
@@ -298,7 +192,7 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
         Api.delete('/question?question_id=' + question_id + '&class_id=' + class_id).then((response) => {
             console.log(response);
             this.props.onAlert({ alert_type: "success", alert_text: "question deleted successfully" });
-            this.getQuestionArrayAndResetForm(this.state.selected_classroom_class_id);
+            this.getQuestionArrayAndResetForm(this.state.selected_class_array_index);
         }).catch((error) => {
             console.log(error);
             if (error.response.status === 403) {
@@ -322,15 +216,26 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
             <td>{new Date(question_row.created_at).toLocaleString()}</td>
             <td>{new Date(question_row.deadline).toLocaleString()}</td>
             <td>
-                <Button variant="dark" onClick={() => { this.deleteQuestion(this.state.selected_classroom_class_id, question_row.id) }} >
+                <Button variant="dark" onClick={() => { this.deleteQuestion(this.state.selected_class_array_index, question_row.id) }} >
                     Delete
                 </Button>
             </td>
         </tr>
     );
 
+    classroomOptionGenerator = (classroom_row: classroom, index: number) => (
+        <option value={index} key={classroom_row.id}>
+            {classroom_row.name}
+        </option>
+    )
+
+    classOptionGenerator = (classroom_class_row: classroom_class, index: number) => (
+        <option value={index} key={classroom_class_row.id}>
+            {classroom_class_row.class_hash}
+        </option>
+    )
+
     renderQuestionsTable() {
-        const collapse_condition = this.state.selected_classroom_class_id === -1;
         const no_class_condition = (this.state.selected_classroom_class_question_array && this.state.selected_classroom_class_question_array?.length > 0);
         const table_element = (!no_class_condition) ?
             (
@@ -339,7 +244,6 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
                 </Container>
             ) :
             (
-
                 <Table striped bordered hover responsive="lg" >
                     <thead>
                         <tr>
@@ -359,14 +263,21 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
         console.log("rendering question table");
         return (
             <Card.Body>
-                <Collapse in={!collapse_condition} >
-                    {table_element}
-                </Collapse>
-                <Collapse in={collapse_condition}>
-                    <Container>
-                        Select a class
-                    </Container>
-                </Collapse>
+                <Form>
+                    <Form.Row>
+                        <Form.Group sm={6} as={Col}>
+                            <Form.Control custom as="select" onChange={(ev: any) => { this.getClassArrayAndResetForm(Number(ev.target.value)) }} >
+                                {this.state.classroom_array.map(this.classroomOptionGenerator)}
+                            </Form.Control>
+                        </Form.Group>
+                        <Form.Group sm={6} as={Col}>
+                            <Form.Control value={this.state.selected_class_array_index} custom as="select" onChange={(ev: any) => { this.getQuestionArrayAndResetForm(Number(ev.target.value)) }} disabled={this.state.selected_classroom_array_index === -1}>
+                                {this.state.selected_classroom_class_array?.map(this.classOptionGenerator)}
+                            </Form.Control>
+                        </Form.Group>
+                    </Form.Row>
+                </Form>
+                {table_element}
             </Card.Body>
         );
     }
@@ -407,7 +318,7 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
             question_details: {
                 fen_question: this.state.fen,
                 description: this.state.description_input,
-                class_id: this.state.selected_classroom_class_id,
+                class_id: this.state.selected_class_array_index,
                 deadline,
             }
         }).then((response) => {
@@ -426,7 +337,7 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
     }
 
     renderQuestionForm() {
-        if (this.state.selected_classroom_class_id !== -1) {
+        if (this.state.selected_class_array_index !== -1) {
             return (
                 <div>
                     <Card.Body>
@@ -512,10 +423,8 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
         return (
             <div>
                 {this.renderModal()}
-                {this.renderClassroomTable()}
-                {this.renderClassTable()}
                 <Card bg="light" style={{ marginTop: '1em' }}>
-                    <Card.Header as='h5'>Questions</Card.Header>
+                    <Card.Header as='h5'>Create Questions</Card.Header>
                     {this.renderQuestionsTable()}
                     {this.renderQuestionForm()}
                 </Card>

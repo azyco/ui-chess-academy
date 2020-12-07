@@ -239,7 +239,6 @@ export default function WithMoveValidation(props: WithMoveValidationProps) {
               onSquareClick={onSquareClick}
               onSquareRightClick={onSquareRightClick}
             />
-            {/* <span>{position}</span> */}
           </>
         )}
     </HumanVsHuman>
