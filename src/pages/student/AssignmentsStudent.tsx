@@ -174,6 +174,10 @@ export class AssignmentsStudent extends React.Component<AssignmentsStudentProps,
         }
     }
 
+    questionSolutionURLConstructor(filters: filterStudent) {
+        return `/solution?${(filters.classroom_id) ? `&classroom_id=${filters.classroom_id}` : ``}${(filters.class_id) ? `&class_id=${filters.class_id}` : ``}`;
+    }
+
     getQuestionSolutionArrayAndResetForm = (class_array_index: number = this.state.selected_class_array_index) => {
         const classroom_id = (this.state.selected_classroom_array_index !== -1) ? this.state.classroom_array[this.state.selected_classroom_array_index].id : null;
         const class_id = (this.state.selected_class_array && class_array_index !== -1) ? this.state.selected_class_array[class_array_index].id : null;
@@ -182,7 +186,7 @@ export class AssignmentsStudent extends React.Component<AssignmentsStudentProps,
             class_id,
             student_id: this.props.user_authentication.id,
         }
-        Api.get(`/solution?${(filters.classroom_id) ? `&classroom_id=${filters.classroom_id}` : ``}${(filters.class_id) ? `&class_id=${filters.class_id}` : ``}`).then((response) => {
+        Api.get(this.questionSolutionURLConstructor(filters)).then((response) => {
             console.log("got question array ", response);
             const question_response = response;
             this.setState({

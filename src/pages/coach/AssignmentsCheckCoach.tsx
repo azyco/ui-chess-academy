@@ -291,6 +291,10 @@ export class AssignmentsCheckCoach extends React.Component<AssignmentsCheckCoach
         });
     }
 
+    solutionURLConstructor(filters: filterCoach) {
+        return `/solution?${(filters.classroom_id) ? `&classroom_id=${filters.classroom_id}` : ``}${(filters.class_id) ? `&class_id=${filters.class_id}` : ``}${(filters.student_id) ? `&student_id=${filters.student_id}` : ``}${(filters.question_id) ? `&question_id=${filters.question_id}` : ``}`
+    }
+
     getSolutionArray = () => {
         const classroom_id = (this.state.selected_classroom_array_index !== -1) ? this.state.classroom_array[this.state.selected_classroom_array_index].id : null;
         const class_id = (this.state.selected_classroom_class_array && this.state.selected_class_array_index !== -1) ? this.state.selected_classroom_class_array[this.state.selected_class_array_index].id : null;
@@ -302,7 +306,7 @@ export class AssignmentsCheckCoach extends React.Component<AssignmentsCheckCoach
             student_id,
             question_id,
         }
-        Api.get(`/solution?${(filters.classroom_id) ? `&classroom_id=${filters.classroom_id}` : ``}${(filters.class_id) ? `&class_id=${filters.class_id}` : ``}${(filters.student_id) ? `&student_id=${filters.student_id}` : ``}${(filters.question_id) ? `&question_id=${filters.question_id}` : ``}`).then((response) => {
+        Api.get(this.solutionURLConstructor(filters)).then((response) => {
             console.log("got solution array ", response);
             this.setState({
                 solution_array: response.data,
