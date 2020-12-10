@@ -181,10 +181,11 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
 
   undoMove = () => {
     this.game.undo();
-    this.setState({
-      history: this.game.history({ verbose: true }),
+    this.setState(({ history, pieceSquare }) => ({
       fen: this.game.fen(),
-    }, this.props.boardHistoryUpdate(this.game.pgn()));
+      history: this.game.history({ verbose: true }),
+      squareStyles: squareStyling({ pieceSquare, history })
+    }), this.props.boardHistoryUpdate(this.game.pgn()));
   }
 
   render() {

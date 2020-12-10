@@ -93,15 +93,17 @@ export class Login extends React.Component<LoginProps, LoginState> {
     }
 
     renderRedirect = () => {
-        let redirectTo : (any | null) = queryString.parse(this.props.location.search).redirect;
-        if(this.props.is_logged_in) {
-            if(redirectTo && redirectTo.startsWith('/class/')) {
-                return <Redirect to={redirectTo} />
-            }
-            else if ((this.state.redirect_to === 'profile' && this.props.got_auth_and_profile)) {
-                console.log("redirecting to profile ")
-                return <Redirect to='/profile' />
-            }
+        let redirectTo: (any | null) = queryString.parse(this.props.location.search).redirect;
+        if (redirectTo && redirectTo.startsWith('/class/')) {
+            return <Redirect to={redirectTo} />
+        }
+        else if ((this.state.redirect_to === 'profile' && this.props.got_auth_and_profile)) {
+            console.log("redirecting to profile ")
+            return <Redirect to='/profile' />
+        }
+        else if ((this.props.is_logged_in && this.props.got_auth_and_profile)) {
+            console.log("redirecting to profile ")
+            return <Redirect to='/profile' />
         }
     }
 

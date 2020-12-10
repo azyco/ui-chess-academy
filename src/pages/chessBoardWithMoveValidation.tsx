@@ -2,7 +2,9 @@ import React from "react";
 import PropTypes from "prop-types";
 import Chessboard from "chessboardjsx";
 import config from '../config';
-
+import {
+  Button, Col, Row
+} from 'react-bootstrap';
 import { io } from 'socket.io-client';
 
 const Chess = require("chess.js");
@@ -13,6 +15,7 @@ type HumanVsHumanProps = {
   setChatHistoryStateCallback: Function,
   chat_message: chatMessage | null,
   messageObjectResetCallback: Function,
+  user_type: String
 }
 
 type HumanVsHumanState = {
@@ -24,6 +27,7 @@ type HumanVsHumanState = {
   history: Array<move>,
   chat_history: Array<string>,
   chat_pending: boolean,
+  redo_stack: Array<move>,
 };
 
 type move = {
@@ -64,6 +68,7 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
       history: [],
       chat_history: [],
       chat_pending: false,
+      redo_stack: [],
     };
 
     this.ws = io(config.webSocketApi);
@@ -134,8 +139,10 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
   }
 
   handleWSBoardCallback = () => {
-    console.log("chesspiece moved,state ", this.state)
-    this.ws.emit('board', `${JSON.stringify({ pgn: this.game.pgn(), class_hash: this.props.class_hash })}`);
+    if (this.props.user_type === 'coach') {
+      console.log("broadcasting move ", this.state)
+      this.ws.emit('board', `${JSON.stringify({ pgn: this.game.pgn(), class_hash: this.props.class_hash })}`);
+    }
   }
 
   // keep clicked square style and remove hint squares
@@ -185,6 +192,7 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
     this.setState(({ history, pieceSquare }) => ({
       fen: this.game.fen(),
       history: this.game.history({ verbose: true }),
+      redo_stack: [],
       squareStyles: squareStyling({ pieceSquare, history })
     }), this.handleWSBoardCallback);
   };
@@ -237,7 +245,8 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
     this.setState({
       fen: this.game.fen(),
       history: this.game.history({ verbose: true }),
-      pieceSquare: ""
+      pieceSquare: "",
+      redo_stack: [],
     }, this.handleWSBoardCallback);
   };
 
@@ -262,10 +271,60 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
     })
   };
 
+  undoMove = () => {
+    const last_move: move = this.game.undo();
+    // this.setState({
+    //   redo_stack: this.state.redo_stack.concat([last_move]),
+    //   history: this.game.history({ verbose: true }),
+    //   fen: this.game.fen(),
+    // }, this.handleWSBoardCallback);
+    this.setState(({ history, pieceSquare }) => ({
+      redo_stack: this.state.redo_stack.concat([last_move]),
+      fen: this.game.fen(),
+      history: this.game.history({ verbose: true }),
+      squareStyles: squareStyling({ pieceSquare, history })
+    }), this.handleWSBoardCallback)
+  }
+
+  redoMove = () => {
+    const redo_stack: Array<move> = this.state.redo_stack;
+    const redo_move: move | undefined = redo_stack.pop();
+    this.game.move(redo_move);
+    // this.setState({
+    //   history: this.game.history({ verbose: true }),
+    //   redo_stack,
+    //   fen: this.game.fen(),
+    // }, this.handleWSBoardCallback)
+    this.setState(({ history, pieceSquare }) => ({
+      fen: this.game.fen(),
+      history: this.game.history({ verbose: true }),
+      redo_stack,
+      squareStyles: squareStyling({ pieceSquare, history })
+    }), this.handleWSBoardCallback)
+  }
+
+  renderUndoRedo() {
+    return (
+      <Row>
+        <Col >
+          <Button variant="dark" block onClick={this.undoMove} disabled={this.state.fen === 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' || this.state.fen === 'start'}>
+            Undo
+          </Button>
+        </Col>
+        <Col >
+          <Button variant="dark" block onClick={this.redoMove} disabled={this.state.redo_stack.length === 0}>
+            Redo
+          </Button>
+        </Col>
+      </Row>
+    )
+  }
   render() {
     return (
       <>
         {this.renderChildrenSeparate()}
+        <br />
+        {this.renderUndoRedo()}
       </>
     );
   }
@@ -278,11 +337,19 @@ type WithMoveValidationProps = {
   setChatHistoryStateCallback: Function,
   chat_message: chatMessage | null,
   messageObjectResetCallback: Function,
+  user_type: string
 }
 
 export default function WithMoveValidation(props: WithMoveValidationProps) {
   return (
-    <HumanVsHuman messageObjectResetCallback={props.messageObjectResetCallback} chat_message={props.chat_message} class_hash={props.class_hash} updateChatHistoryStateCallback={props.updateChatHistoryStateCallback} setChatHistoryStateCallback={props.setChatHistoryStateCallback}>
+    <HumanVsHuman
+      messageObjectResetCallback={props.messageObjectResetCallback}
+      chat_message={props.chat_message}
+      class_hash={props.class_hash}
+      updateChatHistoryStateCallback={props.updateChatHistoryStateCallback}
+      setChatHistoryStateCallback={props.setChatHistoryStateCallback}
+      user_type={props.user_type}
+    >
       {({
         position,
         onDrop,
@@ -295,6 +362,7 @@ export default function WithMoveValidation(props: WithMoveValidationProps) {
         onSquareRightClick
       }: any) => (
           <Chessboard
+            key={position}
             id="humanVsHuman"
             width={props.width}
             position={position}

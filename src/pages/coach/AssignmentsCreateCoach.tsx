@@ -354,19 +354,19 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
                                     <Col lg={8} className="align-items-center">
                                         <Form>
                                             <Form.Row>
-                                                <Form.Group as={Col}>
+                                                <Form.Group as={Col} sm={6}>
                                                     <Form.Control isInvalid={this.state.deadline_is_invalid} value={this.state.deadline_input} onChange={this.onDeadlineChange} placeholder="Deadline" />
                                                     <Form.Control.Feedback type="invalid" >
                                                         Deadline (MM/DD/YYYY, HH:MM:SS) must be valid
-                                            </Form.Control.Feedback>
+                                                    </Form.Control.Feedback>
                                                 </Form.Group>
-                                                <Form.Group as={Col}>
+                                                <Form.Group as={Col} sm={6}>
                                                     <Form.Control readOnly value={this.state.deadline.toLocaleString()} />
                                                 </Form.Group>
                                             </Form.Row>
                                             <Form.Row>
                                                 <Form.Group as={Col}>
-                                                    <Form.Control isInvalid={this.state.description_is_invalid} value={this.state.description_input} onChange={this.onDescriptionhange} placeholder="Description" />
+                                                    <Form.Control as="textarea" isInvalid={this.state.description_is_invalid} value={this.state.description_input} onChange={this.onDescriptionhange} placeholder="Description" />
                                                     <Form.Control.Feedback type="invalid" >
                                                         Description must be present
                                                     </Form.Control.Feedback>

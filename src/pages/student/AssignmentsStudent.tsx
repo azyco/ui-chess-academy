@@ -5,7 +5,7 @@ import WithMoveValidation from './chessBoardWithMoveValidation';
 import {
     Container,
     Card,
-    Table, Button, Collapse,
+    Table, Button,
     Modal,
     Col, Row,
     Form,

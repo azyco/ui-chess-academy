@@ -3,7 +3,7 @@ import Measure from 'react-measure'
 import Chessboard from "chessboardjsx";
 
 import {
-    Container, Col, Row,
+    Col, Row,
     Card,
     Table, Button, Form,
     Modal
@@ -494,6 +494,7 @@ export class AssignmentsCheckCoach extends React.Component<AssignmentsCheckCoach
                 <Modal show={(this.state.selected_solution_array_index !== -1) ? true : false} >
                     <Modal.Body>
                         <ResizableChessBoard fen={this.state.evaluation_fen} id={"evaluation_view"} />
+                        <br />
                         <Form>
                             <Form.Row>
                                 <Form.Group as={Col} >
