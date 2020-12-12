@@ -252,7 +252,7 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
                     sent_at: new Date(),
                     message: this.state.chat_message_string,
                 }
-            },()=>{
+            }, () => {
                 console.log("message object created", this.state.chat_message)
             })
         }
@@ -289,7 +289,7 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
                                     {this.state.chat_history.map(this.chatRowGenerator)}
                                 </tbody>
                             </Table>
-                            <br/>
+                            <br />
                             <Form>
                                 <Form.Group controlId="formChatBox">
                                     <Form.Control value={this.state.chat_message_string} onChange={(ev: any) => { this.setState({ chat_message_string: ev.target.value }) }} as="textarea" placeholder="Say something" />
@@ -309,18 +309,16 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
     renderClassControls() {
         if (this.props.user_authentication?.user_type === 'coach') {
             return (
-                <Row>
-                    <Col>
-                        <Row className="justify-content-md-center">
-                            <Card bg="light" style={{ marginTop: '1em' }}>
-                                <Card.Header as="h5" >Class Controls</Card.Header>
-                                <Card.Body>
-                                    <Button variant="dark" block onClick={this.endClass}>
-                                        End
+                <Row >
+                    <Col >
+                        <Card bg="light" style={{ marginTop: '1em' }}>
+                            <Card.Header as="h5" >Class Controls</Card.Header>
+                            <Card.Body>
+                                <Button variant="dark" block onClick={this.endClass}>
+                                    End
                                     </Button>
-                                </Card.Body>
-                            </Card>
-                        </Row>
+                            </Card.Body>
+                        </Card>
                     </Col>
                 </Row>
             )
@@ -363,41 +361,38 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
     // }
 
     renderDuringClass() {
-        console.log("DuringClass")
-        return (
-            <Container fluid>
-                <Row>
-                    <Col md={6}>
-                        <Card bg="light" style={{ marginTop: '1em' }}>
-                            <Card.Header as="h5" >Chessboard Area</Card.Header>
-                            <ResizableChessBoard messageObjectResetCallback={this.messageObjectResetCallback} chat_message={this.state.chat_message} class_hash={this.state.class_hash} updateChatHistoryStateCallback={this.updateChatHistoryStateCallback} setChatHistoryStateCallback={this.setChatHistoryStateCallback} />
-                            {/* <Card.Footer className="d-flex justify-content-between">
-                                <Button onClick={}>
-                                    Prev. Move
-                                </Button>
-                                <span >
-                                    Move {this.state.total_moves} of {this.state.move_number}
-                                </span>
-                                <Button >
-                                    Next Move
-                                </Button>
-                            </Card.Footer> */}
-                        </Card>
-                    </Col>
-                    <Col md={6}>
-                        <Card bg="light" style={{ marginTop: '1em' }}>
-                            <Card.Header as="h5" >Video Area</Card.Header>
-                            <Card.Body>
-                                {this.jitsiApp()}
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
-                {this.renderChat()}
-                {this.renderClassControls()}
-            </Container>
-
-        );
+        if (this.props.user_authentication) {
+            console.log("DuringClass")
+            return (
+                <Container fluid>
+                    <Row>
+                        <Col md={6}>
+                            <Card bg="light" style={{ marginTop: '1em' }}>
+                                <Card.Header as="h5" >Chessboard Area</Card.Header>
+                                <ResizableChessBoard
+                                    user_type={this.props.user_authentication.user_type}
+                                    messageObjectResetCallback={this.messageObjectResetCallback}
+                                    chat_message={this.state.chat_message}
+                                    class_hash={this.state.class_hash}
+                                    updateChatHistoryStateCallback={this.updateChatHistoryStateCallback}
+                                    setChatHistoryStateCallback={this.setChatHistoryStateCallback}
+                                />
+                            </Card>
+                        </Col>
+                        <Col md={6}>
+                            <Card bg="light" style={{ marginTop: '1em' }}>
+                                <Card.Header as="h5" >Video Area</Card.Header>
+                                <Card.Body>
+                                    {this.jitsiApp()}
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    </Row>
+                    {this.renderChat()}
+                    {this.renderClassControls()}
+                </Container>
+            );
+        }
     }
 
     countdownComplete() {
@@ -626,6 +621,7 @@ type ResizableChessBoardProps = {
     setChatHistoryStateCallback: Function,
     chat_message: chatMessage | null,
     messageObjectResetCallback: Function,
+    user_type: string,
 }
 
 type ResizableChessBoardState = {
@@ -652,7 +648,14 @@ class ResizableChessBoard extends React.Component<ResizableChessBoardProps, Resi
                 {({ measureRef }) => (
                     <Card.Body >
                         <div ref={measureRef}>
-                            <WithMoveValidation messageObjectResetCallback={this.props.messageObjectResetCallback} chat_message={this.props.chat_message} updateChatHistoryStateCallback={this.props.updateChatHistoryStateCallback} setChatHistoryStateCallback={this.props.setChatHistoryStateCallback} class_hash={this.props.class_hash} width={width} />
+                            <WithMoveValidation
+                                messageObjectResetCallback={this.props.messageObjectResetCallback}
+                                chat_message={this.props.chat_message}
+                                updateChatHistoryStateCallback={this.props.updateChatHistoryStateCallback}
+                                setChatHistoryStateCallback={this.props.setChatHistoryStateCallback}
+                                class_hash={this.props.class_hash} width={width}
+                                user_type={this.props.user_type}
+                            />
                         </div>
                     </Card.Body>
                 )}

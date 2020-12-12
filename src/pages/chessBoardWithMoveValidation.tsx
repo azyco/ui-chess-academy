@@ -2,7 +2,9 @@ import React from "react";
 import PropTypes from "prop-types";
 import Chessboard from "chessboardjsx";
 import config from '../config';
-
+import {
+  Button, Col, Row
+} from 'react-bootstrap';
 import { io } from 'socket.io-client';
 
 const Chess = require("chess.js");
@@ -13,19 +15,29 @@ type HumanVsHumanProps = {
   setChatHistoryStateCallback: Function,
   chat_message: chatMessage | null,
   messageObjectResetCallback: Function,
+  user_type: String
 }
 
 type HumanVsHumanState = {
-  game?: any,
   fen: string,
   dropSquareStyle: any,
   squareStyles: any,
   pieceSquare: string,
   square: string,
-  board_history?: Array<string>,
+  history: Array<move>,
   chat_history: Array<string>,
   chat_pending: boolean,
+  redo_stack: Array<move>,
 };
+
+type move = {
+  color: string,
+  flags: string,
+  from: string,
+  piece: string,
+  san: string,
+  to: string,
+}
 
 type chatMessage = {
   id: number,
@@ -53,30 +65,31 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
       // currently clicked square
       square: "",
       // array of past game moves
-      board_history: [],
+      history: [],
       chat_history: [],
       chat_pending: false,
+      redo_stack: [],
     };
 
     this.ws = io(config.webSocketApi);
 
-    this.ws.on('board_init', (data: { board_history: Array<string>, class_hash: string }) => {
+    this.ws.on('board_init', (data: { pgn: string, class_hash: string }) => {
       if (this.props.class_hash === data.class_hash) {
         console.log('board init received', data);
         console.log('current state', this.state);
-        if (data.board_history.length > 0) {
-          this.setState({ board_history: data.board_history, fen: data.board_history[data.board_history.length - 1] }, () => { console.log('state after board init', this.state); this.game = new Chess(data.board_history[data.board_history.length - 1]) });
+        if (data.pgn) {
+          this.game.load_pgn(data.pgn);
+          this.setState({ fen: this.game.fen(), history: this.game.history({ verbose: true }) }, () => { console.log('state after board init', this.state); });
         }
       }
     });
 
-    this.ws.on('board', (data: { fen: string, class_hash: string }) => {
+    this.ws.on('board', (data: { pgn: string, class_hash: string }) => {
       if (this.props.class_hash === data.class_hash) {
         console.log('board update received', data);
         console.log('current state', this.state);
-        let board_history = this.state.board_history;
-        board_history?.push(data.fen);
-        this.setState({ board_history, fen: data.fen }, () => { console.log('state after board update', this.state); this.game = new Chess(data.fen); });
+        this.game.load_pgn(data.pgn);
+        this.setState({ fen: this.game.fen(), history: this.game.history({ verbose: true }) }, () => { console.log('state after board update', this.state) });
       }
     });
 
@@ -126,14 +139,16 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
   }
 
   handleWSBoardCallback = () => {
-    console.log("chesspiece moved,state ", this.state)
-    this.ws.emit('board', `${JSON.stringify({ fen: this.state.fen, class_hash: this.props.class_hash })}`);
+    if (this.props.user_type === 'coach') {
+      console.log("broadcasting move ", this.state)
+      this.ws.emit('board', `${JSON.stringify({ pgn: this.game.pgn(), class_hash: this.props.class_hash })}`);
+    }
   }
 
   // keep clicked square style and remove hint squares
   removeHighlightSquare = (square: string) => {
-    this.setState(({ pieceSquare, board_history }) => ({
-      squareStyles: squareStyling({ pieceSquare, board_history })
+    this.setState(({ pieceSquare, history }) => ({
+      squareStyles: squareStyling({ pieceSquare, history })
     }));
   };
 
@@ -151,7 +166,7 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
             }
           },
           ...squareStyling({
-            board_history: this.state.board_history,
+            history: this.state.history,
             pieceSquare: this.state.pieceSquare
           })
         };
@@ -174,13 +189,11 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
 
     // illegal move
     if (move === null) return;
-    let board_history = this.state.board_history;
-    board_history?.push(this.game.fen())
-
-    this.setState(({ board_history, pieceSquare }) => ({
-      board_history,
+    this.setState(({ history, pieceSquare }) => ({
       fen: this.game.fen(),
-      squareStyles: squareStyling({ pieceSquare, board_history })
+      history: this.game.history({ verbose: true }),
+      redo_stack: [],
+      squareStyles: squareStyling({ pieceSquare, history })
     }), this.handleWSBoardCallback);
   };
 
@@ -215,8 +228,8 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
   };
 
   onSquareClick = (square: string) => {
-    this.setState(({ board_history }) => ({
-      squareStyles: squareStyling({ pieceSquare: square, board_history }),
+    this.setState(({ history }) => ({
+      squareStyles: squareStyling({ pieceSquare: square, history }),
       pieceSquare: square
     }));
 
@@ -229,14 +242,12 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
     // illegal move
     if (move === null) return;
 
-    let board_history = this.state.board_history;
-    board_history?.push(this.game.fen())
-
-    this.setState(({ board_history, pieceSquare }) => ({
-      board_history,
+    this.setState({
       fen: this.game.fen(),
-      squareStyles: squareStyling({ pieceSquare, board_history })
-    }), this.handleWSBoardCallback);
+      history: this.game.history({ verbose: true }),
+      pieceSquare: "",
+      redo_stack: [],
+    }, this.handleWSBoardCallback);
   };
 
   onSquareRightClick = (square: string) =>
@@ -244,7 +255,7 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
       squareStyles: { [square]: { backgroundColor: "deepPink" } }
     });
 
-  render() {
+  renderChildrenSeparate = () => {
     const { fen, dropSquareStyle, squareStyles } = this.state;
     // @ts-ignore
     return this.props.children({
@@ -257,7 +268,65 @@ class HumanVsHuman extends React.Component<HumanVsHumanProps, HumanVsHumanState>
       onDragOverSquare: this.onDragOverSquare,
       onSquareClick: this.onSquareClick,
       onSquareRightClick: this.onSquareRightClick
-    });
+    })
+  };
+
+  undoMove = () => {
+    const last_move: move = this.game.undo();
+    // this.setState({
+    //   redo_stack: this.state.redo_stack.concat([last_move]),
+    //   history: this.game.history({ verbose: true }),
+    //   fen: this.game.fen(),
+    // }, this.handleWSBoardCallback);
+    this.setState(({ history, pieceSquare }) => ({
+      redo_stack: this.state.redo_stack.concat([last_move]),
+      fen: this.game.fen(),
+      history: this.game.history({ verbose: true }),
+      squareStyles: squareStyling({ pieceSquare, history })
+    }), this.handleWSBoardCallback)
+  }
+
+  redoMove = () => {
+    const redo_stack: Array<move> = this.state.redo_stack;
+    const redo_move: move | undefined = redo_stack.pop();
+    this.game.move(redo_move);
+    // this.setState({
+    //   history: this.game.history({ verbose: true }),
+    //   redo_stack,
+    //   fen: this.game.fen(),
+    // }, this.handleWSBoardCallback)
+    this.setState(({ history, pieceSquare }) => ({
+      fen: this.game.fen(),
+      history: this.game.history({ verbose: true }),
+      redo_stack,
+      squareStyles: squareStyling({ pieceSquare, history })
+    }), this.handleWSBoardCallback)
+  }
+
+  renderUndoRedo() {
+    return (
+      <Row>
+        <Col >
+          <Button variant="dark" block onClick={this.undoMove} disabled={this.state.fen === 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' || this.state.fen === 'start'}>
+            Undo
+          </Button>
+        </Col>
+        <Col >
+          <Button variant="dark" block onClick={this.redoMove} disabled={this.state.redo_stack.length === 0}>
+            Redo
+          </Button>
+        </Col>
+      </Row>
+    )
+  }
+  render() {
+    return (
+      <>
+        {this.renderChildrenSeparate()}
+        <br />
+        {this.renderUndoRedo()}
+      </>
+    );
   }
 }
 
@@ -268,11 +337,19 @@ type WithMoveValidationProps = {
   setChatHistoryStateCallback: Function,
   chat_message: chatMessage | null,
   messageObjectResetCallback: Function,
+  user_type: string
 }
 
 export default function WithMoveValidation(props: WithMoveValidationProps) {
   return (
-    <HumanVsHuman messageObjectResetCallback={props.messageObjectResetCallback} chat_message={props.chat_message} class_hash={props.class_hash} updateChatHistoryStateCallback={props.updateChatHistoryStateCallback} setChatHistoryStateCallback={props.setChatHistoryStateCallback}>
+    <HumanVsHuman
+      messageObjectResetCallback={props.messageObjectResetCallback}
+      chat_message={props.chat_message}
+      class_hash={props.class_hash}
+      updateChatHistoryStateCallback={props.updateChatHistoryStateCallback}
+      setChatHistoryStateCallback={props.setChatHistoryStateCallback}
+      user_type={props.user_type}
+    >
       {({
         position,
         onDrop,
@@ -285,6 +362,7 @@ export default function WithMoveValidation(props: WithMoveValidationProps) {
         onSquareRightClick
       }: any) => (
           <Chessboard
+            key={position}
             id="humanVsHuman"
             width={props.width}
             position={position}
@@ -306,18 +384,18 @@ export default function WithMoveValidation(props: WithMoveValidationProps) {
   );
 }
 
-const squareStyling = ({ pieceSquare, board_history }: any) => {
-  const sourceSquare = board_history.length && board_history[board_history.length - 1].from;
-  const targetSquare = board_history.length && board_history[board_history.length - 1].to;
+const squareStyling = ({ pieceSquare, history }: any) => {
+  const sourceSquare = history.length && history[history.length - 1].from;
+  const targetSquare = history.length && history[history.length - 1].to;
 
   return {
     [pieceSquare]: { backgroundColor: "rgba(255, 255, 0, 0.4)" },
-    ...(board_history.length && {
+    ...(history.length && {
       [sourceSquare]: {
         backgroundColor: "rgba(255, 255, 0, 0.4)"
       }
     }),
-    ...(board_history.length && {
+    ...(history.length && {
       [targetSquare]: {
         backgroundColor: "rgba(255, 255, 0, 0.4)"
       }

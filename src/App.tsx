@@ -187,13 +187,8 @@ class App extends React.Component<AppClassProps, AppClassState>{
 	}
 
 	unauthorizedLogout = () => {
-		this.setState({
-			user_authentication: null,
-			user_profile: null
-		}, () => {
-			console.log('forced logout')
-			this.alertCallback({ alert_type: "warning", alert_text: "Please log in." })
-		});
+		this.logoutCallback();
+		this.alertCallback({ alert_type: "warning", alert_text: "Please log in." });
 	}
 
 	updateProfileStateCallback = (response: any) => {
@@ -298,7 +293,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
 					<Route path="/student/register">
 						<RegisterStudent onAlert={this.alertCallback} />
 					</Route>
-					<Route path="/class/:class_hash" render={(props) => 
+					<Route path="/class/:class_hash" render={(props) =>
 						<ClassroomClass {...props}
 							onAlert={this.alertCallback}
 							user_profile={this.state.user_profile}

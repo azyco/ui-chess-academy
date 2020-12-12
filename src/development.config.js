@@ -1,7 +1,7 @@
 export default {
-    apiUrl: "http://192.168.56.1:12345/",
-    currentWebsite: 'https://192.168.56.1/',
-    webSocketApi: 'ws://192.168.56.1:12345',
+    apiUrl: "http://localhost:12345",
+    currentWebsite: 'https://192.168.1.100:3000',
+    webSocketApi: 'ws://localhost:12345',
     websiteName: "Generic Chess Academy",
     websiteDescription: "We are the biggest chess academy in Bengal. Register as a student to take a glimpse of the different courses we have.",
     aboutDescription: "Some text to show that data can be loaded from a config file",
@@ -91,5 +91,7 @@ export default {
     selectedCoachesAdmin: "Selected Coaches",
     classroomManagementTab: 'Classroom Management',
     coachManagementTab: 'Coach Management',
-    profileManagementTab: 'Profile Management'
+    profileManagementTab: 'Profile Management',
+    assignmentScoreMax: 100,
+    assignmentScoreMin: 0,
 };
