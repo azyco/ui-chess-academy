@@ -16,8 +16,17 @@ type RegisterCoachState = {
     fullname_is_invalid: boolean,
     country: string,
     state: string,
+    city: string,
+    pincode: string,
+    address: string,
+    city_is_invalid: boolean,
+    address_is_invalid: boolean,
+    pincode_is_invalid: boolean,
     description: string,
     fide_id: string,
+    fide_title: string,
+    peak_rating: string,
+    current_rating: string,
     lichess_id: string,
     contact: string,
     contact_is_invalid: boolean,
@@ -32,7 +41,15 @@ type RegisterCoachState = {
     dob_input: string,
     dob: Date,
     dob_is_invalid: boolean,
-    photo_blob: Blob,
+    user_image: File | null,
+    user_image_is_invalid: boolean,
+    successful_students: string,
+    exp_trainer: string,
+    perf_highlights: string,
+    fees: string,
+    fees_is_invalid: boolean,
+    bank_details: string,
+    bank_details_is_invalid: boolean,
     show_form: boolean
 }
 
@@ -44,8 +61,17 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
             fullname_is_invalid: true,
             country: config.countrySelectList[0],
             state: config.stateSelectList[0],
+            city: '',
+            pincode: '',
+            address: '',
+            city_is_invalid: true,
+            address_is_invalid: true,
+            pincode_is_invalid: true,
             description: "",
             fide_id: "",
+            fide_title: '',
+            peak_rating: '',
+            current_rating: '',
             lichess_id: "",
             contact: "",
             contact_is_invalid: true,
@@ -60,7 +86,15 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
             dob: new Date(),
             dob_input: '',
             dob_is_invalid: true,
-            photo_blob: new Blob(),
+            user_image: null,
+            user_image_is_invalid: true,
+            successful_students: '',
+            exp_trainer: '',
+            perf_highlights: '',
+            fees: '',
+            fees_is_invalid: true,
+            bank_details: '',
+            bank_details_is_invalid: true,
             show_form: false
         };
     }
@@ -87,7 +121,8 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
             dob: new Date(),
             dob_input: '',
             dob_is_invalid: true,
-            photo_blob: new Blob(),
+            user_image: null,
+            user_image_is_invalid: true,
             show_form: false
         });
     }
@@ -104,6 +139,9 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
                 fullname: this.state.fullname,
                 country: country_sql,
                 state: this.state.state,
+                city: this.state.city,
+                address: this.state.address,
+                pincode: this.state.pincode,
                 contact: this.state.contact,
                 contact_code: this.state.contact_code,
                 description: this.state.description,
@@ -111,8 +149,16 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
                 lichess_id: this.state.lichess_id,
                 alt_contact: this.state.alt_contact,
                 alt_contact_code: this.state.alt_contact_code,
-                photo_blob: this.state.photo_blob,
-                dob: dob_sql
+                user_image: null,
+                dob: dob_sql,
+                fide_title: this.state.fide_title,
+                peak_rating: this.state.peak_rating,
+                current_rating: this.state.current_rating,
+                perf_highlights: this.state.perf_highlights,
+                exp_trainer: this.state.exp_trainer,
+                successful_students: this.state.successful_students,
+                fees: this.state.fees,
+                bank_details: this.state.bank_details,
             }
         }
         ).then((response) => {
@@ -126,7 +172,7 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
                 if (error.response.status === 403) {
                     this.props.unauthorizedLogout();
                 }
-                else{
+                else {
                     if (error.response.data.error_code === 'ER_DUP_ENTRY') {
                         this.props.onAlert({ alert_type: "warning", alert_text: config.duplicateEntryText });
                     }
@@ -147,7 +193,13 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
             this.state.fullname_is_invalid ||
             this.state.contact_is_invalid ||
             this.state.alt_contact_is_invalid ||
-            this.state.dob_is_invalid;
+            this.state.dob_is_invalid ||
+            this.state.city_is_invalid ||
+            this.state.address_is_invalid ||
+            this.state.pincode_is_invalid ||
+            this.state.fees_is_invalid ||
+            // this.state.user_image_is_invalid ||
+            this.state.bank_details_is_invalid;
     }
 
     onEmailChange = (ev: any) => {
@@ -210,13 +262,59 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
         this.setState({ state: ev.target.value });
     }
 
+    onCityChange = (ev: any) => {
+        this.setState({ city: ev.target.value, city_is_invalid: (ev.target.value === '') ? true : false });
+    }
+
+    onPincodeChange = (ev: any) => {
+        this.setState({ pincode: ev.target.value, pincode_is_invalid: (ev.target.value === '') ? true : false });
+    }
+
+    onAddressChange = (ev: any) => {
+        this.setState({ address: ev.target.value, address_is_invalid: (ev.target.value === '') ? true : false });
+    }
+
     onDescriptionChange = (ev: any) => {
         this.setState({ description: ev.target.value });
     }
 
-    onPhotoChange = (ev: any) => {
-        this.setState({ photo_blob: ev });
+    onExpTrainerChange = (ev: any) => {
+        this.setState({ exp_trainer: ev.target.value });
+    }
 
+    onPerfHighlightsChange = (ev: any) => {
+        this.setState({ perf_highlights: ev.target.value });
+    }
+
+    onSuccessfulStudentsChange = (ev: any) => {
+        this.setState({ successful_students: ev.target.value });
+    }
+
+    onFideTitleChange = (ev: any) => {
+        this.setState({ fide_title: ev.target.value });
+    }
+
+    onPeakRatingChange = (ev: any) => {
+        this.setState({ peak_rating: ev.target.value });
+    }
+
+    onCurrentRatingChange = (ev: any) => {
+        this.setState({ current_rating: ev.target.value });
+    }
+
+    onFeesChange = (ev: any) => {
+        this.setState({ fees: ev.target.value, fees_is_invalid: (ev.target.value === '') ? true : false });
+    }
+
+    onBankDetailsChange = (ev: any) => {
+        this.setState({ bank_details: ev.target.value, bank_details_is_invalid: (ev.target.value === '') ? true : false });
+    }
+
+    onPhotoChange = (ev: any) => {
+        this.setState({
+            user_image: ev.target.files[0],
+            user_image_is_invalid: (!ev.target.files[0] || ev.target.files[0].type !== 'image/jpeg')
+        });
     }
 
     optionGenerator = (option_value: string) => (
@@ -253,18 +351,39 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
                             </Form.Control.Feedback>
                         </Form.Group>
                     </Form.Row>
-                    <Form.Label>{config.countryAndStateLabel}</Form.Label>
+                    <Form.Label>Address</Form.Label>
                     <Form.Row>
-                        <Form.Group md={6} as={Col} controlId="formGridCountry">
+                        <Form.Group lg={6} as={Col} controlId="formGridCountry">
                             <Form.Control value={this.state.country} custom as="select" onChange={this.onCountryChange}>
                                 {config.countrySelectList.map(this.optionGenerator)}
                             </Form.Control>
                         </Form.Group>
-
-                        <Form.Group md={6} as={Col} controlId="formGridState">
+                        <Form.Group lg={6} as={Col} controlId="formGridState">
                             <Form.Control value={this.state.state} custom as="select" onChange={this.onStateChange} defaultValue={config.countrySelectList[0]}>
                                 {config.stateSelectList.map((this.optionGenerator))}
                             </Form.Control>
+                        </Form.Group>
+                    </Form.Row>
+                    <Form.Row>
+                        <Form.Group lg={6} as={Col} controlId="formGridCity">
+                            <Form.Control value={this.state.city} onChange={this.onCityChange} placeholder="City" isInvalid={this.state.city_is_invalid} />
+                            <Form.Control.Feedback type="invalid">
+                                City name must be valid
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                        <Form.Group lg={6} as={Col} controlId="formGridPincode">
+                            <Form.Control value={this.state.pincode} onChange={this.onPincodeChange} placeholder="Pincode" isInvalid={this.state.pincode_is_invalid} />
+                            <Form.Control.Feedback type="invalid">
+                                Pincode must be valid
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                    </Form.Row>
+                    <Form.Row>
+                        <Form.Group as={Col} controlId="formGridAddress">
+                            <Form.Control value={this.state.address} as="textarea" onChange={this.onAddressChange} placeholder="Your full address" isInvalid={this.state.address_is_invalid} />
+                            <Form.Control.Feedback type="invalid" >
+                                Address must be valid
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Form.Row>
                     <Form.Label>{config.dobLabel}</Form.Label>
@@ -301,7 +420,7 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
                             </Form.Control>
                         </Form.Group>
                         <Form.Group xs={8} as={Col} controlId="formGridAltContact">
-                            <Form.Control value={this.state.alt_contact} type="number" onChange={this.onAltContactChange} placeholder={config.altContactLabel} isInvalid={this.state.alt_contact_is_invalid} />
+                            <Form.Control value={this.state.alt_contact} type="number" onChange={this.onAltContactChange} placeholder={"Whatsapp Number"} isInvalid={this.state.alt_contact_is_invalid} />
                             <Form.Control.Feedback type="invalid">
                                 {config.altContactInvalidFeedback}
                             </Form.Control.Feedback>
@@ -322,10 +441,57 @@ export class RegisterCoach extends React.Component<RegisterCoachProps, RegisterC
                             <Form.Control value={this.state.lichess_id} onChange={this.onLichessIDChange} placeholder={config.lichessLabel} />
                         </Form.Group>
                     </Form.Row>
+                    <Form.Row>
+                        <Form.Group lg={4} as={Col} controlId="formGridFideTitle">
+                            <Form.Control value={this.state.fide_title} onChange={this.onFideTitleChange} placeholder="Fide Title" />
+                        </Form.Group>
+                        <Form.Group lg={4} as={Col} controlId="formGridPeakRating">
+                            <Form.Control value={this.state.peak_rating} onChange={this.onPeakRatingChange} placeholder="Peak Rating" />
+                        </Form.Group>
+                        <Form.Group lg={4} as={Col} controlId="formGridCurrentRating">
+                            <Form.Control value={this.state.current_rating} onChange={this.onCurrentRatingChange} placeholder="Current Rating" />
+                        </Form.Group>
+                    </Form.Row>
+                    <Form.Label>Performance Highlights</Form.Label>
+                    <Form.Row>
+                        <Form.Group as={Col} controlId="formGridPerformanceHighlights">
+                            <Form.Control value={this.state.perf_highlights} as="textarea" onChange={this.onPerfHighlightsChange} placeholder={"Performance Highlights"} />
+                        </Form.Group>
+                    </Form.Row>
+                    <Form.Label>Experience as a trainer</Form.Label>
+                    <Form.Row>
+                        <Form.Group as={Col} controlId="formGridExperienceasatrainer">
+                            <Form.Control value={this.state.exp_trainer} as="textarea" onChange={this.onExpTrainerChange} placeholder={"Experience as a trainer"} />
+                        </Form.Group>
+                    </Form.Row>
+                    <Form.Label>Successful Students</Form.Label>
+                    <Form.Row>
+                        <Form.Group as={Col} controlId="formGridSuccessfulstudents">
+                            <Form.Control value={this.state.successful_students} as="textarea" onChange={this.onSuccessfulStudentsChange} placeholder={"Successful Students"} />
+                        </Form.Group>
+                    </Form.Row>
+                    <Form.Label>Fees</Form.Label>
+                    <Form.Row>
+                        <Form.Group as={Col} controlId="formGridFFees">
+                            <Form.Control value={this.state.fees} onChange={this.onFeesChange} placeholder="Fees" isInvalid={this.state.fees_is_invalid} />
+                            <Form.Control.Feedback type="invalid">
+                                Fees must be valid
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                    </Form.Row>
+                    <Form.Label>Bank Details</Form.Label>
+                    <Form.Row>
+                        <Form.Group as={Col} controlId="formGridSuccessfulstudents">
+                            <Form.Control value={this.state.bank_details} as="textarea" onChange={this.onBankDetailsChange} placeholder={"Bank Details"} isInvalid={this.state.bank_details_is_invalid} />
+                            <Form.Control.Feedback type="invalid">
+                                Bank Details must be valid
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                    </Form.Row>
                     {/* <Form.Label>{config.imageLabel}</Form.Label>
                     <Form.Row>
                         <Form.Group as={Col} >
-                                <Form.File type="file" id="formGridphoto" onChange={this.onPhotoChange} label={config.imagePlaceholder} custom />
+                            <Form.File type="file" id="formGridphoto" onChange={this.onPhotoChange} label={(this.state.user_image) ? (this.state.user_image_is_invalid) ? config.imageInvalidFeedback : this.state.user_image.name : config.imagePlaceholder} custom isInvalid={this.state.user_image_is_invalid} />
                         </Form.Group>
                     </Form.Row> */}
                 </Form>

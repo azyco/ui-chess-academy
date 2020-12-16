@@ -67,10 +67,10 @@ export class ClassStudent extends React.Component<ClassStudentProps, ClassStuden
             });
         }).catch((error) => {
             console.log("failed to update classroom array ", error);
-            if(error.response.status === 403){
+            if (error.response.status === 403) {
                 this.props.unauthorizedLogout()
             }
-            else{
+            else {
                 this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
             }
         });
@@ -86,10 +86,10 @@ export class ClassStudent extends React.Component<ClassStudentProps, ClassStuden
             });
         }).catch((error) => {
             console.log(error);
-            if(error.response.status === 403){
+            if (error.response.status === 403) {
                 this.props.unauthorizedLogout()
             }
-            else{
+            else {
                 this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
             }
         });
@@ -139,7 +139,12 @@ export class ClassStudent extends React.Component<ClassStudentProps, ClassStuden
         else {
             return (
                 <Card bg="light" style={{ marginTop: '1em' }}>
-                    <Card.Header as='h5'>{config.noClassroomStudent}</Card.Header>
+                    <Card.Header as='h5'>{config.classroomsCardHeader}</Card.Header>
+                    <Card.Body >
+                        <Container >
+                            {config.noClassroomStudent}
+                        </Container>
+                    </Card.Body>
                 </Card>
             )
         }

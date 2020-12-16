@@ -14,6 +14,12 @@ type RegisterStudentState = {
     fullname_is_invalid: boolean,
     country: string,
     state: string,
+    city: string,
+    pincode: string,
+    address: string,
+    city_is_invalid: boolean,
+    address_is_invalid: boolean,
+    pincode_is_invalid: boolean,
     description: string,
     fide_id: string,
     lichess_id: string,
@@ -44,6 +50,12 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
             fullname_is_invalid: true,
             country: config.countrySelectList[0],
             state: config.stateSelectList[0],
+            city: '',
+            pincode: '',
+            address: '',
+            city_is_invalid: true,
+            address_is_invalid: true,
+            pincode_is_invalid: true,
             description: "",
             fide_id: "",
             lichess_id: "",
@@ -84,6 +96,9 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
                 fullname: this.state.fullname,
                 country: country_sql,
                 state: this.state.state,
+                city: this.state.city,
+                address: this.state.address,
+                pincode: this.state.pincode,
                 contact: this.state.contact,
                 contact_code: this.state.contact_code,
                 description: this.state.description,
@@ -92,7 +107,7 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
                 alt_contact: this.state.alt_contact,
                 alt_contact_code: this.state.alt_contact_code,
                 parent: parent,
-                photo_blob: this.state.photo_blob,
+                user_image: null,
                 dob: dob_sql
             }
         }).then((response) => {
@@ -123,6 +138,9 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
             this.state.contact_is_invalid ||
             this.state.alt_contact_is_invalid ||
             this.state.dob_is_invalid ||
+            this.state.city_is_invalid ||
+            this.state.address_is_invalid ||
+            this.state.pincode_is_invalid ||
             ((this.state.parent_is_disabled) ? false : this.state.parent_is_invalid);
     }
 
@@ -187,6 +205,19 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
         this.setState({ state: ev.target.value });
     }
 
+    onCityChange = (ev: any) => {
+        this.setState({ city: ev.target.value, city_is_invalid: (ev.target.value === '') ? true : false });
+    }
+
+    onPincodeChange = (ev: any) => {
+        const invalid: boolean = ev.target.value.length !== 6 || isNaN(Number(ev.target.value));
+        this.setState({ pincode: ev.target.value, pincode_is_invalid: invalid });
+    }
+
+    onAddressChange = (ev: any) => {
+        this.setState({ address: ev.target.value, address_is_invalid: (ev.target.value === '') ? true : false });
+    }
+
     onDescriptionChange = (ev: any) => {
         this.setState({ description: ev.target.value });
     }
@@ -234,13 +265,13 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
                             <Form.Label>{config.emailAndPasswordLabel}</Form.Label>
                             <Form.Row>
                                 <Form.Group md={6} as={Col} controlId="formGridEmail">
-                                    <Form.Control onChange={this.onEmailChange} type="email" placeholder={config.emailPlaceholderText} isInvalid={this.state.email_is_invalid} />
+                                    <Form.Control value={this.state.email} onChange={this.onEmailChange} type="email" placeholder={config.emailPlaceholderText} isInvalid={this.state.email_is_invalid} />
                                     <Form.Control.Feedback type="invalid" >
                                         {config.emailInvalidFeedback}
                                     </Form.Control.Feedback>
                                 </Form.Group>
                                 <Form.Group md={6} as={Col} controlId="formGridPassword">
-                                    <Form.Control onChange={this.onPasswordChange} type="password" placeholder={config.passwordPlaceholderText} isInvalid={this.state.password_is_invalid} />
+                                    <Form.Control value={this.state.password} onChange={this.onPasswordChange} type="password" placeholder={config.passwordPlaceholderText} isInvalid={this.state.password_is_invalid} />
                                     <Form.Control.Feedback type="invalid" >
                                         {config.passwordInvalidFeedback}
                                     </Form.Control.Feedback>
@@ -249,24 +280,42 @@ export class RegisterStudent extends React.Component<RegisterStudentProps, Regis
                             <Form.Label>{config.fullNameLabel}</Form.Label>
                             <Form.Row>
                                 <Form.Group as={Col} controlId="formGridFullName">
-                                    <Form.Control onChange={this.onFullNameChange} placeholder={config.fullNameLabel} isInvalid={this.state.fullname_is_invalid} />
+                                    <Form.Control value={this.state.fullname} onChange={this.onFullNameChange} placeholder={config.fullNameLabel} isInvalid={this.state.fullname_is_invalid} />
                                     <Form.Control.Feedback type="invalid" >
                                         {config.fullNameInvalidFeedback}
                                     </Form.Control.Feedback>
                                 </Form.Group>
                             </Form.Row>
-                            <Form.Label>{config.countryAndStateLabel}</Form.Label>
+                            <Form.Label>Address</Form.Label>
                             <Form.Row>
-                                <Form.Group md={6} as={Col} controlId="formGridCountry">
-                                    <Form.Control custom as="select" onChange={this.onCountryChange}>
+                                <Form.Group lg={6} as={Col} controlId="formGridCountry">
+                                    <Form.Control value={this.state.country} custom as="select" onChange={this.onCountryChange}>
                                         {config.countrySelectList.map(this.optionGenerator)}
                                     </Form.Control>
                                 </Form.Group>
-
-                                <Form.Group md={6} as={Col} controlId="formGridState">
-                                    <Form.Control custom as="select" onChange={this.onStateChange} defaultValue={config.countrySelectList[0]}>
+                                <Form.Group lg={6} as={Col} controlId="formGridState">
+                                    <Form.Control value={this.state.state} custom as="select" onChange={this.onStateChange} defaultValue={config.countrySelectList[0]}>
                                         {config.stateSelectList.map((this.optionGenerator))}
                                     </Form.Control>
+                                </Form.Group>
+                            </Form.Row>
+                            <Form.Row>
+                                <Form.Group lg={6} as={Col} controlId="formGridCity">
+                                    <Form.Control value={this.state.city} onChange={this.onCityChange} placeholder="City" isInvalid={this.state.city_is_invalid} />
+                                    <Form.Control.Feedback type="invalid">
+                                        City name must be valid
+                            </Form.Control.Feedback>
+                                </Form.Group>
+                                <Form.Group lg={6} as={Col} controlId="formGridPincode">
+                                    <Form.Control value={this.state.pincode} onChange={this.onPincodeChange} placeholder="Pincode" isInvalid={this.state.pincode_is_invalid} />
+                                    <Form.Control.Feedback type="invalid">
+                                        Pincode must be valid
+                            </Form.Control.Feedback>
+                                </Form.Group>
+                            </Form.Row>
+                            <Form.Row>
+                                <Form.Group as={Col} controlId="formGridAddress">
+                                    <Form.Control value={this.state.address} as="textarea" onChange={this.onAddressChange} placeholder="Your full address" />
                                 </Form.Group>
                             </Form.Row>
                             <Form.Label>{config.dobLabel}</Form.Label>

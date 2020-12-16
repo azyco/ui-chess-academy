@@ -21,29 +21,46 @@ type userAuthenticationType = {
     email: string,
     created_at: number
 }
+
 type userProfileType = {
-    fullname: string,
-    country: string,
-    state: string,
-    description: string,
-    user_image: Blob,
-    fide_id: string,
-    lichess_id: string,
-    contact: string,
-    contact_code: string,
-    alt_contact: string,
-    alt_contact_code: string,
-    dob: Date,
+	fullname: string,
+	country: string,
+	state: string,
+	city: string,
+	pincode: string,
+	address: string,
+	description: string,
+	user_image: File | null,
+	fide_id: string,
+	lichess_id: string,
+	contact: string,
+	contact_code: string,
+	alt_contact: string,
+	alt_contact_code: string,
+	dob: Date,
+	parent: string,
+	is_private_contact: boolean,
+	is_private_alt_contact: boolean,
+	is_private_dob: boolean,
+	is_private_parent: boolean
+}
+
+type coachExtras = {
+    fide_title: string,
+    peak_rating: string,
+    current_rating: string,
+    successful_students: string,
+    exp_trainer: string,
+    perf_highlights: string,
+    fees: string,
+    bank_details: string,
     parent: string,
-    is_private_contact: boolean,
-    is_private_alt_contact: boolean,
-    is_private_dob: boolean,
-    is_private_parent: boolean
 }
 
 type DashboardCoachProps = {
     onAlert: Function,
     onLogout: any,
+    coach_extras: coachExtras,
     user_authentication: userAuthenticationType,
     user_profile: userProfileType,
     updateState: Function,
@@ -76,9 +93,9 @@ export class DashboardCoach extends React.Component<DashboardCoachProps, Dashboa
                                         <Nav.Item>
                                             <Nav.Link eventKey="assignments">{config.assignmentsTabText}</Nav.Link>
                                         </Nav.Item>
-                                        <Nav.Item>
+                                        {/* <Nav.Item>
                                             <Nav.Link eventKey="puzzles">{config.puzzlesTabText}</Nav.Link>
-                                        </Nav.Item>
+                                        </Nav.Item> */}
                                         <Button variant={"warning"} onClick={this.props.onLogout} >
                                             {config.logoutButtonText}
                                         </Button>
@@ -89,16 +106,35 @@ export class DashboardCoach extends React.Component<DashboardCoachProps, Dashboa
                         <Col lg={10}>
                             <Tab.Content>
                                 <Tab.Pane eventKey="profile">
-                                    <ProfileCoach unauthorizedLogout={this.props.unauthorizedLogout} updateState={this.props.updateState} onAlert={this.props.onAlert} user_profile={this.props.user_profile} user_authentication={this.props.user_authentication} />
+                                    <ProfileCoach
+                                        unauthorizedLogout={this.props.unauthorizedLogout}
+                                        updateState={this.props.updateState}
+                                        onAlert={this.props.onAlert}
+                                        user_profile={this.props.user_profile}
+                                        coach_extras={this.props.coach_extras}
+                                        user_authentication={this.props.user_authentication}
+                                    />
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="classes">
-                                    <ClassCoach unauthorizedLogout={this.props.unauthorizedLogout} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} />
+                                    <ClassCoach
+                                        unauthorizedLogout={this.props.unauthorizedLogout}
+                                        user_authentication={this.props.user_authentication}
+                                        onAlert={this.props.onAlert}
+                                    />
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="assignments">
-                                    <AssignmentsCoach unauthorizedLogout={this.props.unauthorizedLogout} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} />
+                                    <AssignmentsCoach
+                                        unauthorizedLogout={this.props.unauthorizedLogout}
+                                        user_authentication={this.props.user_authentication}
+                                        onAlert={this.props.onAlert}
+                                    />
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="puzzles">
-                                    <PuzzlesCoach unauthorizedLogout={this.props.unauthorizedLogout} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} />
+                                    <PuzzlesCoach
+                                        unauthorizedLogout={this.props.unauthorizedLogout}
+                                        user_authentication={this.props.user_authentication}
+                                        onAlert={this.props.onAlert}
+                                    />
                                 </Tab.Pane>
                             </Tab.Content>
                         </Col>

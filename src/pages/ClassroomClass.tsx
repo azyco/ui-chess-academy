@@ -22,8 +22,11 @@ type userProfileType = {
     fullname: string,
     country: string,
     state: string,
+    city: string,
+    pincode: string,
+    address: string,
     description: string,
-    user_image: Blob,
+    user_image: File | null,
     fide_id: string,
     lichess_id: string,
     contact: string,
@@ -31,11 +34,9 @@ type userProfileType = {
     alt_contact: string,
     alt_contact_code: string,
     dob: Date,
-    parent: string,
     is_private_contact: boolean,
     is_private_alt_contact: boolean,
     is_private_dob: boolean,
-    is_private_parent: boolean
 }
 
 type classroom = {

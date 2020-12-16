@@ -21,8 +21,11 @@ type userProfileType = {
     fullname: string,
     country: string,
     state: string,
+    city: string,
+    pincode: string,
+    address: string,
     description: string,
-    user_image: Blob,
+    user_image: File | null,
     fide_id: string,
     lichess_id: string,
     contact: string,
@@ -50,17 +53,22 @@ type ProfileStudentState = {
     fullname: string,
     fullname_is_invalid: boolean,
     state: string,
+    city: string,
+    pincode: string,
+    address: string,
+    city_is_invalid: boolean,
+    address_is_invalid: boolean,
+    pincode_is_invalid: boolean,
     description: string,
     fide_id: string,
     lichess_id: string,
-    password: string,
-    password_is_invalid: boolean,
     dob: Date,
     dob_is_invalid: boolean,
     parent: string,
     parent_is_invalid: boolean,
     parent_is_disabled: boolean,
-    photo_blob: Blob,
+    user_image: File | null,
+    user_image_is_invalid: boolean,
     is_private_parent: boolean,
     is_private_contact: boolean,
     is_private_alt_contact: boolean,
@@ -77,17 +85,22 @@ export class ProfileStudent extends React.Component<ProfileStudentProps, Profile
             fullname: this.props.user_profile.fullname,
             fullname_is_invalid: false,
             state: this.props.user_profile.state,
+            city: this.props.user_profile.city,
+            pincode: this.props.user_profile.pincode,
+            address: this.props.user_profile.address,
+            city_is_invalid: false,
+            address_is_invalid: false,
+            pincode_is_invalid: false,
             description: this.props.user_profile.description,
             fide_id: this.props.user_profile.fide_id,
             lichess_id: this.props.user_profile.lichess_id,
-            password: '00000',
-            password_is_invalid: false,
             dob: this.props.user_profile.dob,
             dob_is_invalid: false,
             parent: this.props.user_profile.parent,
             parent_is_invalid: (this.props.user_profile.parent) ? false : true,
             parent_is_disabled: parent_disabled_test,
-            photo_blob: new Blob(),
+            user_image: null,
+            user_image_is_invalid: true,
             is_private_parent: this.props.user_profile.is_private_parent,
             is_private_contact: this.props.user_profile.is_private_contact,
             is_private_alt_contact: this.props.user_profile.is_private_alt_contact,
@@ -106,14 +119,12 @@ export class ProfileStudent extends React.Component<ProfileStudentProps, Profile
             description: this.props.user_profile.description,
             fide_id: this.props.user_profile.fide_id,
             lichess_id: this.props.user_profile.lichess_id,
-            password: '00000',
-            password_is_invalid: false,
             dob: this.props.user_profile.dob,
             dob_is_invalid: false,
             parent: this.props.user_profile.parent,
             parent_is_invalid: (this.props.user_profile.parent) ? false : true,
             parent_is_disabled: parent_disabled_test,
-            photo_blob: new Blob(),
+            user_image: null,
             is_private_parent: this.props.user_profile.is_private_parent,
             is_private_contact: this.props.user_profile.is_private_contact,
             is_private_alt_contact: this.props.user_profile.is_private_alt_contact,
@@ -150,6 +161,18 @@ export class ProfileStudent extends React.Component<ProfileStudentProps, Profile
         this.setState({ state: ev.target.value });
     }
 
+    onCityChange = (ev: any) => {
+        this.setState({ city: ev.target.value, city_is_invalid: (ev.target.value === '') ? true : false });
+    }
+
+    onPincodeChange = (ev: any) => {
+        this.setState({ pincode: ev.target.value, pincode_is_invalid: (ev.target.value === '') ? true : false });
+    }
+
+    onAddressChange = (ev: any) => {
+        this.setState({ address: ev.target.value, address_is_invalid: (ev.target.value === '') ? true : false });
+    }
+
     onDescriptionChange = (ev: any) => {
         this.setState({ description: ev.target.value });
     }
@@ -159,8 +182,10 @@ export class ProfileStudent extends React.Component<ProfileStudentProps, Profile
     }
 
     onPhotoChange = (ev: any) => {
-        this.setState({ photo_blob: ev });
-
+        this.setState({
+            user_image: ev.target.files[0],
+            user_image_is_invalid: (!ev.target.files[0] || ev.target.files[0].type !== 'image/jpeg')
+        });
     }
 
     optionGenerator = (option_value: string) => (
@@ -203,11 +228,14 @@ export class ProfileStudent extends React.Component<ProfileStudentProps, Profile
             updated_user_profile: {
                 fullname: this.state.fullname,
                 state: this.state.state,
+                city: this.state.city,
+                address: this.state.address,
+                pincode: this.state.pincode,
                 description: this.state.description,
                 fide_id: this.state.fide_id,
                 lichess_id: this.state.lichess_id,
                 parent: parent,
-                photo_blob: this.state.photo_blob,
+                user_image: null,
                 dob: dob_sql,
                 is_private_parent: this.state.is_private_parent,
                 is_private_contact: this.state.is_private_contact,
@@ -220,10 +248,10 @@ export class ProfileStudent extends React.Component<ProfileStudentProps, Profile
             this.setState({ profile_edit_mode: false }, () => { this.props.updateState(response) });
         }).catch((error) => {
             console.log(error);
-            if(error.response.status === 403){
+            if (error.response.status === 403) {
                 this.props.unauthorizedLogout()
             }
-            else{
+            else {
                 this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
             }
         });
@@ -308,6 +336,19 @@ export class ProfileStudent extends React.Component<ProfileStudentProps, Profile
                         </Form.Group>
                         <Form.Group md={6} as={Col} controlId="formGridState">
                             <Form.Control readOnly value={this.props.user_profile?.state} />
+                        </Form.Group>
+                    </Form.Row>
+                    <Form.Row>
+                        <Form.Group lg={6} as={Col} controlId="formGridCity">
+                            <Form.Control value={this.props.user_profile.city} readOnly />
+                        </Form.Group>
+                        <Form.Group lg={6} as={Col} controlId="formGridPincode">
+                            <Form.Control value={this.props.user_profile.pincode} readOnly />
+                        </Form.Group>
+                    </Form.Row>
+                    <Form.Row>
+                        <Form.Group as={Col} controlId="formGridAddress">
+                            <Form.Control value={this.props.user_profile.address} as="textarea" readOnly />
                         </Form.Group>
                     </Form.Row>
                     <Form.Label>{config.dobLabel}</Form.Label>
@@ -401,6 +442,28 @@ export class ProfileStudent extends React.Component<ProfileStudentProps, Profile
                             <Form.Control custom as="select" onChange={this.onStateChange} defaultValue={this.props.user_profile.state}>
                                 {config.stateSelectList.map((this.optionGenerator))}
                             </Form.Control>
+                        </Form.Group>
+                    </Form.Row>
+                    <Form.Row>
+                        <Form.Group lg={6} as={Col} controlId="formGridCity">
+                            <Form.Control value={this.state.city} onChange={this.onCityChange} placeholder="City" isInvalid={this.state.city_is_invalid} />
+                            <Form.Control.Feedback type="invalid">
+                                City name must be valid
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                        <Form.Group lg={6} as={Col} controlId="formGridPincode">
+                            <Form.Control value={this.state.pincode} onChange={this.onPincodeChange} placeholder="Pincode" isInvalid={this.state.pincode_is_invalid} />
+                            <Form.Control.Feedback type="invalid">
+                                Pincode must be valid
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                    </Form.Row>
+                    <Form.Row>
+                        <Form.Group as={Col} controlId="formGridAddress">
+                            <Form.Control value={this.state.address} as="textarea" onChange={this.onAddressChange} placeholder="Your full address" isInvalid={this.state.address_is_invalid} />
+                            <Form.Control.Feedback type="invalid" >
+                                Address must be valid
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Form.Row>
                     <Form.Label>{config.dobLabel}</Form.Label>

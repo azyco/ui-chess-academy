@@ -88,10 +88,8 @@ export class StudentManagement extends React.Component<StudentManagementProps, S
                 <Card bg="light" style={{ marginTop: '1em' }}>
                     <Card.Header as='h5'>Students</Card.Header>
                     <Card.Body>
-                        <Container fluid>
-                            <Card.Title>
-                                No Students present
-                            </Card.Title>
+                        <Container >
+                            No Students present
                         </Container>
                     </Card.Body>
                 </Card>

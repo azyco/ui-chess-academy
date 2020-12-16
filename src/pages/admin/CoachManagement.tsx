@@ -50,7 +50,7 @@ export class CoachManagement extends React.Component<CoachManagementProps, Coach
             if (error.response.status === 403) {
                 this.props.unauthorizedLogout();
             }
-            else{
+            else {
                 this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
             }
         });
@@ -93,10 +93,8 @@ export class CoachManagement extends React.Component<CoachManagementProps, Coach
                 <Card bg="light" style={{ marginTop: '1em' }}>
                     <Card.Header as='h5'>Coaches</Card.Header>
                     <Card.Body>
-                        <Container fluid>
-                            <Card.Title>
-                                No Coaches present
-                            </Card.Title>
+                        <Container >
+                            No Coaches present
                         </Container>
                     </Card.Body>
                 </Card>

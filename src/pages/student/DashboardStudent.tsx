@@ -22,23 +22,26 @@ type userAuthenticationType = {
 }
 
 type userProfileType = {
-    fullname: string,
-    country: string,
-    state: string,
-    description: string,
-    user_image: Blob,
-    fide_id: string,
-    lichess_id: string,
-    contact: string,
-    contact_code: string,
-    alt_contact: string,
-    alt_contact_code: string,
-    dob: Date,
-    parent: string,
-    is_private_contact: boolean,
-    is_private_alt_contact: boolean,
-    is_private_dob: boolean,
-    is_private_parent: boolean
+	fullname: string,
+	country: string,
+	state: string,
+	city: string,
+	pincode: string,
+	address: string,
+	description: string,
+	user_image: File | null,
+	fide_id: string,
+	lichess_id: string,
+	contact: string,
+	contact_code: string,
+	alt_contact: string,
+	alt_contact_code: string,
+	dob: Date,
+	parent: string,
+	is_private_contact: boolean,
+	is_private_alt_contact: boolean,
+	is_private_dob: boolean,
+	is_private_parent: boolean
 }
 
 type DashboardStudentProps = {
@@ -77,9 +80,9 @@ export class DashboardStudent extends React.Component<DashboardStudentProps, Das
                                         <Nav.Item>
                                             <Nav.Link eventKey="assignments">{config.assignmentsTabText}</Nav.Link>
                                         </Nav.Item>
-                                        <Nav.Item>
+                                        {/* <Nav.Item>
                                             <Nav.Link eventKey="puzzles">{config.puzzlesTabText}</Nav.Link>
-                                        </Nav.Item>
+                                        </Nav.Item> */}
                                         <Button variant={"warning"} onClick={this.props.onLogout} >
                                             {config.logoutButtonText}
                                         </Button>
