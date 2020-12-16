@@ -19,24 +19,26 @@ type userAuthenticationType = {
 }
 
 type userProfileType = {
-    fullname: string,
-    country: string,
-    state: string,
-    city: string,
-    pincode: string,
-    address: string,
-    description: string,
-    user_image: File | null,
-    fide_id: string,
-    lichess_id: string,
-    contact: string,
-    contact_code: string,
-    alt_contact: string,
-    alt_contact_code: string,
-    dob: Date,
-    is_private_contact: boolean,
-    is_private_alt_contact: boolean,
-    is_private_dob: boolean,
+	fullname: string,
+	country: string,
+	state: string,
+	city: string,
+	pincode: string,
+	address: string,
+	description: string,
+	user_image: File | null,
+	fide_id: string,
+	lichess_id: string,
+	contact: string,
+	contact_code: string,
+	alt_contact: string,
+	alt_contact_code: string,
+	dob: Date,
+	parent: string,
+	is_private_contact: boolean,
+	is_private_alt_contact: boolean,
+	is_private_dob: boolean,
+	is_private_parent: boolean
 }
 
 type classroom = {
@@ -99,8 +101,6 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
             chat_history: [],
             chat_message_string: '',
             chat_message: null,
-            // move_number: -1,
-            // total_moves: -1,
             configOverwrite: {
                 enableWelcomePage: false,
                 disableProfile: true,
@@ -348,18 +348,6 @@ export class ClassroomClass extends React.Component<ClassroomClassProps, Classro
             />
         );
     }
-
-    // nextMoveCallback = () => {
-
-    // }
-
-    // prevMoveCallback = () => {
-
-    // }
-
-    // getMoveNumberCallback = () => {
-
-    // }
 
     renderDuringClass() {
         if (this.props.user_authentication) {
