@@ -6,7 +6,8 @@ import {
     Col, Row,
     Card,
     Table, Button, Form,
-    Modal
+    Modal,
+    Container
 } from 'react-bootstrap';
 
 import config from '../../config';
@@ -392,6 +393,34 @@ export class AssignmentsCheckCoach extends React.Component<AssignmentsCheckCoach
     )
 
     renderQuestionsTable() {
+        const table_element: any = (this.state.solution_array && this.state.solution_array.length > 0) ?
+            (
+                <Table striped bordered hover responsive >
+                    <thead>
+                        <tr>
+                            <th>Question ID</th>
+                            <th>Question</th>
+                            <th>Board</th>
+                            <th>Student ID</th>
+                            <th>PGN</th>
+                            <th>Score</th>
+                            <th>Comments</th>
+                            <th>Updated At</th>
+                            <th>Evaluated</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {this.state.solution_array?.map(this.solutionsRowGenerator)}
+                    </tbody>
+                </Table>
+            )
+            :
+            (
+                <Container>
+                    No solutions submitted
+                </Container>
+            );
         return (
             <Card bg="light" style={{ marginTop: '1em' }}>
                 <Card.Header as='h5'>Questions</Card.Header>
@@ -422,25 +451,7 @@ export class AssignmentsCheckCoach extends React.Component<AssignmentsCheckCoach
                     </Form>
                     <Row>
                         <Col>
-                            <Table striped bordered hover responsive >
-                                <thead>
-                                    <tr>
-                                        <th>Question ID</th>
-                                        <th>Question</th>
-                                        <th>Board</th>
-                                        <th>Student ID</th>
-                                        <th>PGN</th>
-                                        <th>Score</th>
-                                        <th>Comments</th>
-                                        <th>Updated At</th>
-                                        <th>Evaluated</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {this.state.solution_array?.map(this.solutionsRowGenerator)}
-                                </tbody>
-                            </Table>
+                            {table_element}
                         </Col>
                     </Row>
                 </Card.Body>

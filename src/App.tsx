@@ -30,8 +30,11 @@ type userProfileType = {
 	fullname: string,
 	country: string,
 	state: string,
+	city: string,
+	pincode: string,
+	address: string,
 	description: string,
-	user_image: Blob,
+	user_image: File | null,
 	fide_id: string,
 	lichess_id: string,
 	contact: string,
@@ -46,12 +49,27 @@ type userProfileType = {
 	is_private_parent: boolean
 }
 
+type coachExtras = {
+	fide_title: string,
+	peak_rating: string,
+	current_rating: string,
+	successful_students: string,
+	exp_trainer: string,
+	perf_highlights: string,
+	fees: string,
+	bank_details: string,
+	parent: string,
+}
+
 type userProfileResponseType = {
 	fullname: string,
 	country: string,
 	state: string,
+	city: string,
+	pincode: string,
+	address: string,
 	description: string,
-	user_image: Blob,
+	user_image: File,
 	fide_id: string,
 	lichess_id: string,
 	contact: string,
@@ -77,6 +95,7 @@ type AppClassProps = {
 type AppClassState = {
 	user_authentication: userAuthenticationType | null,
 	user_profile: userProfileType | null,
+	coach_extras: coachExtras | null,
 	show_alert: boolean,
 	alert_text: string,
 	alert_type: string,
@@ -94,6 +113,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
 		this.state = {
 			user_authentication: null,
 			user_profile: null,
+			coach_extras: null,
 			show_alert: false,
 			alert_text: '',
 			alert_type: '',
@@ -111,13 +131,14 @@ class App extends React.Component<AppClassProps, AppClassState>{
 	 * @param loginResponseInfo HTTP response struct with login data
 	 */
 
-	createAuthenticationAndProfileState = (user_profile_response: userProfileResponseType, loginResponseData: loginResponseType) => {
+	createAuthenticationAndProfileState = (user_profile_response: userProfileResponseType, loginResponseData: loginResponseType, coach_extras: coachExtras | null = null) => {
 		const data: userProfileType = { ...user_profile_response, dob: new Date(user_profile_response.dob) }
 		console.log("set authentication and profile data")
 		this.setState({
 			user_profile: data,
 			user_authorization_check_complete: true,
-			user_authentication: loginResponseData.user_authentication
+			user_authentication: loginResponseData.user_authentication,
+			coach_extras
 		});
 	}
 
@@ -131,14 +152,19 @@ class App extends React.Component<AppClassProps, AppClassState>{
 
 	getUserProfile(loginResponseData: loginResponseType) {
 		if (loginResponseData.user_authentication.user_type !== 'admin') {
-			Api.get('/profile').then((response) => {
-				console.log("got user profile ", response);
-				this.createAuthenticationAndProfileState(response.data.user_profile, loginResponseData);
+			Api.get('/profile').then((profile_response) => {
+				console.log("got user profile ", profile_response);
+				if (loginResponseData.user_authentication.user_type === 'coach') {
+					this.createAuthenticationAndProfileState(profile_response.data.user_profile, loginResponseData, profile_response.data.coach_extras);
+				} else {
+					this.createAuthenticationAndProfileState(profile_response.data.user_profile, loginResponseData);
+				}
 			}).catch((error) => {
 				console.log("Profile failed to load, resetting login: ", error);
 				this.setState({
 					user_authentication: null,
 					user_profile: null,
+					coach_extras: null,
 					user_authorization_check_complete: true
 				});
 			});
@@ -187,16 +213,53 @@ class App extends React.Component<AppClassProps, AppClassState>{
 	}
 
 	unauthorizedLogout = () => {
-		this.logoutCallback();
-		this.alertCallback({ alert_type: "warning", alert_text: "Please log in." });
+		Api.delete('/login').then(
+			(response) => {
+				console.log("session and login data deleted ", response);
+				this.setState({
+					user_authentication: null,
+					coach_extras: null,
+					user_profile: null
+				}, () => {
+					this.alertCallback({ alert_type: "warning", alert_text: "Please log in." });
+				});
+			}).catch((error) => {
+				console.log("session and login data deleted ", error);
+				this.setState({
+					user_authentication: null,
+					coach_extras: null,
+					user_profile: null,
+				}, () => {
+					this.alertCallback({ alert_type: "warning", alert_text: "Please log in." });
+				});
+			});
+
 	}
 
-	updateProfileStateCallback = (response: any) => {
-		console.log("Profile State updated ", response);
-		const data: userProfileType = { ...response.data.user_profile, dob: new Date(response.data.user_profile.dob) }
-		this.setState({
-			user_profile: data
-		})
+	updateProfileStateCallback = () => {
+		Api.get('/profile').then((profile_response) => {
+			console.log("got updated user profile ", profile_response);
+			const data: userProfileType = { ...profile_response.data.user_profile, dob: new Date(profile_response.data.user_profile.dob) }
+			if (this.state.user_authentication?.user_type === 'coach') {
+				this.setState({
+					user_profile: data,
+					coach_extras: profile_response.data.coach_extras,
+				});
+			} else {
+				this.setState({
+					user_profile: data,
+					coach_extras: null,
+				});
+			}
+		}).catch((error) => {
+			console.log("Profile failed to load, resetting login: ", error);
+			this.setState({
+				user_authentication: null,
+				user_profile: null,
+				coach_extras: null,
+				user_authorization_check_complete: true
+			});
+		});
 	}
 
 	studentRegister() {
@@ -281,6 +344,7 @@ class App extends React.Component<AppClassProps, AppClassState>{
 							onAlert={this.alertCallback}
 							onLogout={this.logoutCallback}
 							user_profile={this.state.user_profile}
+							coach_extras={this.state.coach_extras}
 							user_authentication={this.state.user_authentication} />
 					</Route>
 					<Route path="/login" render={(props) =>

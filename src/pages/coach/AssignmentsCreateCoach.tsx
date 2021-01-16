@@ -56,8 +56,8 @@ type AssignmentsCreateCoachState = {
     classroom_array: Array<classroom>,
     selected_classroom_array_index: number,
     selected_class_array_index: number,
-    selected_classroom_class_array: Array<classroom_class> | null,
-    selected_classroom_class_question_array: Array<question> | null,
+    selected_class_array: Array<classroom_class> | null,
+    selected_question_array: Array<question> | null,
     fen_modal: string,
     show_question_form: boolean,
     deadline_input: string,
@@ -77,8 +77,8 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
             classroom_array: [],
             selected_classroom_array_index: -1,
             selected_class_array_index: -1,
-            selected_classroom_class_array: null,
-            selected_classroom_class_question_array: null,
+            selected_class_array: null,
+            selected_question_array: null,
             fen_modal: '',
             show_question_form: false,
             deadline_input: '',
@@ -102,7 +102,7 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
             console.log("classroom array updated ", response);
             this.setState({
                 classroom_array: Array.from(response.data.classroom_array),
-                selected_classroom_array_index: 0,
+                selected_classroom_array_index: (Array.from(response.data.classroom_array).length > 0) ? 0 : -1,
             }, this.getClassArrayAndResetForm)
         }).catch((error) => {
             console.log("failed to update classroom array ", error);
@@ -116,41 +116,43 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
     }
 
     getClassArrayAndResetForm = (classroom_array_index: number = this.state.selected_classroom_array_index) => {
-        const classroom_id: number = this.state.classroom_array[classroom_array_index].id;
-        Api.get('/class?classroom_id=' + classroom_id).then((response) => {
-            console.log("got class array ", response);
-            this.setState({
-                selected_classroom_class_array: response.data,
-                selected_classroom_array_index: classroom_array_index,
-                selected_class_array_index: 0,
-                selected_classroom_class_question_array: [],
-                show_question_form: false,
-                deadline_input: '',
-                deadline: new Date(),
-                deadline_is_invalid: true,
-                description_input: '',
-                description_is_invalid: true,
-                fen: '',
-                fen_is_invalid: true,
-            }, this.getQuestionArrayAndResetForm)
-        }).catch((error) => {
-            console.log(error);
-            if (error.response.status === 403) {
-                this.props.unauthorizedLogout();
-            }
-            else {
-                this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
-            }
-        });
+        if (this.state.classroom_array.length > 0) {
+            const classroom_id: number = this.state.classroom_array[classroom_array_index].id;
+            Api.get('/class?classroom_id=' + classroom_id).then((response) => {
+                console.log("got class array ", response);
+                this.setState({
+                    selected_class_array: response.data,
+                    selected_classroom_array_index: classroom_array_index,
+                    selected_class_array_index: (response.data.length > 0) ? 0 : -1,
+                    selected_question_array: [],
+                    show_question_form: false,
+                    deadline_input: '',
+                    deadline: new Date(),
+                    deadline_is_invalid: true,
+                    description_input: '',
+                    description_is_invalid: true,
+                    fen: '',
+                    fen_is_invalid: true,
+                }, this.getQuestionArrayAndResetForm)
+            }).catch((error) => {
+                console.log(error);
+                if (error.response.status === 403) {
+                    this.props.unauthorizedLogout();
+                }
+                else {
+                    this.props.onAlert({ alert_type: "warning", alert_text: config.serverDownAlertText });
+                }
+            });
+        }
     }
 
     getQuestionArrayAndResetForm = (class_array_index: number = this.state.selected_class_array_index) => {
-        if (this.state.selected_classroom_class_array && class_array_index !== -1) {
-            const class_id: number = this.state.selected_classroom_class_array[class_array_index].id;
+        if (this.state.selected_class_array && this.state.selected_class_array.length > 0 && class_array_index !== -1) {
+            const class_id: number = this.state.selected_class_array[class_array_index].id;
             Api.get('/question?class_id=' + class_id).then((response) => {
                 console.log("got question array ", response);
                 this.setState({
-                    selected_classroom_class_question_array: response.data,
+                    selected_question_array: response.data,
                     selected_class_array_index: class_array_index,
                     show_question_form: false,
                     deadline_input: '',
@@ -236,7 +238,7 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
     )
 
     renderQuestionsTable() {
-        const no_class_condition = (this.state.selected_classroom_class_question_array && this.state.selected_classroom_class_question_array?.length > 0);
+        const no_class_condition = (this.state.selected_question_array && this.state.selected_question_array?.length > 0);
         const table_element = (!no_class_condition) ?
             (
                 <Container>
@@ -256,7 +258,7 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
                         </tr>
                     </thead>
                     <tbody>
-                        {this.state.selected_classroom_class_question_array?.map(this.questionsRowGenerator)}
+                        {this.state.selected_question_array?.map(this.questionsRowGenerator)}
                     </tbody>
                 </Table>
             );
@@ -272,7 +274,7 @@ export class AssignmentsCreateCoach extends React.Component<AssignmentsCreateCoa
                         </Form.Group>
                         <Form.Group sm={6} as={Col}>
                             <Form.Control value={this.state.selected_class_array_index} custom as="select" onChange={(ev: any) => { this.getQuestionArrayAndResetForm(Number(ev.target.value)) }} disabled={this.state.selected_classroom_array_index === -1}>
-                                {this.state.selected_classroom_class_array?.map(this.classOptionGenerator)}
+                                {this.state.selected_class_array?.map(this.classOptionGenerator)}
                             </Form.Control>
                         </Form.Group>
                     </Form.Row>

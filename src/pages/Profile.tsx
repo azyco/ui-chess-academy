@@ -16,28 +16,44 @@ type userAuthenticationType = {
 };
 
 type userProfileType = {
-    fullname: string,
-    country: string,
-    state: string,
-    description: string,
-    user_image: Blob,
-    fide_id: string,
-    lichess_id: string,
-    contact: string,
-    contact_code: string,
-    alt_contact: string,
-    alt_contact_code: string,
-    dob: Date,
+	fullname: string,
+	country: string,
+	state: string,
+	city: string,
+	pincode: string,
+	address: string,
+	description: string,
+	user_image: File | null,
+	fide_id: string,
+	lichess_id: string,
+	contact: string,
+	contact_code: string,
+	alt_contact: string,
+	alt_contact_code: string,
+	dob: Date,
+	parent: string,
+	is_private_contact: boolean,
+	is_private_alt_contact: boolean,
+	is_private_dob: boolean,
+	is_private_parent: boolean
+}
+
+type coachExtras = {
+    fide_title: string,
+    peak_rating: string,
+    current_rating: string,
+    successful_students: string,
+    exp_trainer: string,
+    perf_highlights: string,
+    fees: string,
+    bank_details: string,
     parent: string,
-    is_private_contact: boolean,
-    is_private_alt_contact: boolean,
-    is_private_dob: boolean,
-    is_private_parent: boolean
 };
 
 type ProfileProps = {
     user_authentication: userAuthenticationType | null,
     user_profile: userProfileType | null,
+    coach_extras: coachExtras | null,
     onLogout: Function,
     onAlert: Function,
     updateState: Function,
@@ -55,25 +71,36 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
         };
     }
 
-    // componentWillReceiveProps(nextProps: ProfileProps) {
-    //     if (nextProps.user_authentication !== this.props.user_authentication) {
-    //         this.setState({
-    //             signed_in: (!!nextProps.user_authentication),
-    //         });
-    //     }
-    // }
-
     render() {
         if (this.props.user_authorization_check_complete) {
             if (this.props.user_authentication) {
                 if (this.props.user_authentication.user_type === 'student' && !!this.props.user_profile) {
-                    return (<DashboardStudent unauthorizedLogout={this.props.unauthorizedLogout} updateState={this.props.updateState} user_profile={this.props.user_profile} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
+                    return (<DashboardStudent
+                        unauthorizedLogout={this.props.unauthorizedLogout}
+                        updateState={this.props.updateState}
+                        user_profile={this.props.user_profile}
+                        user_authentication={this.props.user_authentication}
+                        onAlert={this.props.onAlert}
+                        onLogout={this.props.onLogout}
+                    />);
                 }
-                else if (this.props.user_authentication.user_type === 'coach' && !!this.props.user_profile) {
-                    return (<DashboardCoach unauthorizedLogout={this.props.unauthorizedLogout} updateState={this.props.updateState} user_profile={this.props.user_profile} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
+                else if (this.props.user_authentication.user_type === 'coach' && !!this.props.user_profile && !!this.props.coach_extras) {
+                    return (<DashboardCoach
+                        unauthorizedLogout={this.props.unauthorizedLogout}
+                        updateState={this.props.updateState}
+                        coach_extras={this.props.coach_extras}
+                        user_profile={this.props.user_profile}
+                        user_authentication={this.props.user_authentication}
+                        onAlert={this.props.onAlert} onLogout={this.props.onLogout}
+                    />);
                 }
                 else if (this.props.user_authentication.user_type === 'admin') {
-                    return (<Admin unauthorizedLogout={this.props.unauthorizedLogout} user_authentication={this.props.user_authentication} onAlert={this.props.onAlert} onLogout={this.props.onLogout} />);
+                    return (<Admin
+                        unauthorizedLogout={this.props.unauthorizedLogout}
+                        user_authentication={this.props.user_authentication}
+                        onAlert={this.props.onAlert}
+                        onLogout={this.props.onLogout}
+                    />);
                 }
                 else {
                     console.log("Bad user type", this.props.user_authentication, this.props.user_profile);

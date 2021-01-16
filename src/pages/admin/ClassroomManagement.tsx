@@ -689,10 +689,8 @@ export class ClassroomManagement extends React.Component<ClassroomManagementProp
         else {
             return (
                 <Card.Body>
-                    <Container fluid>
-                        <Card.Title>
-                            {config.noClassroomsAdmin}
-                        </Card.Title>
+                    <Container>
+                        {config.noClassroomsAdmin}
                     </Container>
                 </Card.Body>
             )
